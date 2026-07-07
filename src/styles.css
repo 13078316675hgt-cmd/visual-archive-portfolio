@@ -1,5 +1,6 @@
 :root{
   --ink:#17191c;
+  --page-ground:#f4f6f4;
   --paper:#f4f3ef;
   --white:#fff;
   --red:#b53b32;
@@ -7473,4 +7474,57 @@ html.motion-enabled [data-motion-scene="final"].is-complete [data-motion="anatom
   .resume-contact.final-anatomy .resume-compact-experience p{
     color:rgba(23,25,28,.58)!important;
   }
+}
+
+/* V3.45: unified cool paper ground + Contents text-frame repair */
+body,
+main{
+  background:var(--page-ground);
+}
+
+.paper-page,
+.white-page,
+.contents-index,
+.key-visual-page,
+.key-visual-one,
+.key-visual-two,
+.key-visual-three,
+.sheets,
+.detail,
+.portraits,
+.selected,
+.additional{
+  background:var(--page-ground)!important;
+}
+
+.title-page{
+  --title-bg:var(--page-ground);
+  background:var(--page-ground)!important;
+}
+
+.resume-contact.final-anatomy{
+  --anatomy-paper:var(--page-ground);
+  --final-canvas:var(--page-ground);
+  background:
+    linear-gradient(90deg, rgba(244,246,244,.94) 0 20%, rgba(244,246,244,.35) 37%, rgba(244,246,244,.22) 63%, rgba(244,246,244,.86) 100%),
+    var(--page-ground)!important;
+}
+
+.resume-contact.final-anatomy .final-resume-panel{
+  background:linear-gradient(90deg, rgba(244,246,244,.8), rgba(244,246,244,.48) 70%, transparent)!important;
+}
+
+.resume-contact.final-anatomy .final-contact-panel.contact-anchor.hand-contact{
+  background:linear-gradient(270deg, rgba(244,246,244,.8), rgba(244,246,244,.36) 76%, transparent)!important;
+}
+
+.contents-index-text-tile{
+  min-height:100%;
+  padding:0;
+  background:transparent!important;
+  color:var(--ink);
+}
+
+.contents-index-text-tile span{
+  color:var(--graphite);
 }

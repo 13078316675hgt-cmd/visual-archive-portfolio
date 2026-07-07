@@ -23,7 +23,7 @@ function PageMeta({ number, label }) {
 
 function Nav() {
   return <nav className="top-nav" aria-label="作品集章节导航">
-    <a href="#title" className="nav-name">HUANG GUO TAI</a>
+    <a href="#title" className="nav-name">SELECTED WORKS</a>
     <div className="nav-links">
       <a href="#contents">CONTENTS</a>
       <a href="#character-sheets">CHARACTER DESIGN</a>
@@ -261,9 +261,9 @@ function TitleSection() {
     <i className="title-signal" aria-hidden="true" />
     <i className="title-strokes" aria-hidden="true"><b /><b /><b /><b /></i>
     <div className="title-lockup">
-      <h1><span>HUANG</span><span>GUO</span><span>TAI</span></h1>
+      <h1><span>SELECTED</span><span>WORKS</span><span>2026</span></h1>
       <h2>CHARACTER CONCEPT ARTIST</h2>
-      <p>SELECTED WORKS 2026</p>
+      <p>CHARACTER ART PORTFOLIO</p>
     </div>
     <div className="title-meta" aria-label="Title metadata">
       <span>01 / TITLE</span>
@@ -466,7 +466,7 @@ function ResumeContactSection() {
     </figure>
 
     <div className="final-identity">
-      <h2>HUANG GUO TAI</h2>
+      <h2>{'\u9EC4\u56FD\u6CF0'}</h2>
       <p>CHARACTER CONCEPT ARTIST</p>
     </div>
 
