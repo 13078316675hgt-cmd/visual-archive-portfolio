@@ -1,0 +1,26 @@
+{
+  "name": "huang-guotai-portfolio",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:pages": "vite build --base=/huangguotai-portfolio/",
+    "preview": "vite preview",
+    "review:assets": "node scripts/audit-portfolio-assets.mjs",
+    "review:package": "node scripts/review-package.mjs"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "lucide-react": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "vite": "latest"
+  },
+  "devDependencies": {
+    "archiver": "^7.0.1",
+    "playwright": "^1.61.1",
+    "sharp": "^0.35.3"
+  }
+}

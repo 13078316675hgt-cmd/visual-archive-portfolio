@@ -1,0 +1,3 @@
+/* Runtime artwork URLs are supplied by the centralized manifest in main.jsx. */
+.breakdown .crop-image { background-image: var(--artwork-url); }
+.detail .detail-crop > div { background-image: var(--detail-artwork-url); }
