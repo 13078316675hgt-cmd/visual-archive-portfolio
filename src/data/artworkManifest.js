@@ -1,4 +1,5 @@
-const approved = '/assets/approved/'
+const appBase = import.meta.env?.BASE_URL ?? '/'
+const approved = `${appBase}assets/approved/`
 const web = `${approved}web/`
 
 const buildSrcSet = (entries) => entries.map(([filename, width]) => `${web}${filename} ${width}w`).join(', ')
