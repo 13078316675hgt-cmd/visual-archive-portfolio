@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 720" fill="none">
+
+<defs>
+  <linearGradient id="mist" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#c9d7e2" stop-opacity="0"/>
+    <stop offset="0.20" stop-color="#c9d7e2" stop-opacity=".22"/>
+    <stop offset="0.52" stop-color="#b7c9d8" stop-opacity=".30"/>
+    <stop offset="0.84" stop-color="#c9d7e2" stop-opacity=".16"/>
+    <stop offset="1" stop-color="#c9d7e2" stop-opacity="0"/>
+  </linearGradient>
+  <linearGradient id="fadeUp" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#eff4f7" stop-opacity=".55"/>
+    <stop offset=".55" stop-color="#d6e1e9" stop-opacity=".18"/>
+    <stop offset="1" stop-color="#d6e1e9" stop-opacity="0"/>
+  </linearGradient>
+  <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+    <feGaussianBlur stdDeviation="10"/>
+  </filter>
+  <filter id="soft2" x="-20%" y="-20%" width="140%" height="140%">
+    <feGaussianBlur stdDeviation="3"/>
+  </filter>
+  <pattern id="microgrid" width="32" height="32" patternUnits="userSpaceOnUse">
+    <path d="M32 0H0V32" fill="none" stroke="#7b9ab3" stroke-opacity=".08" stroke-width="1"/>
+  </pattern>
+  <pattern id="dots" width="16" height="16" patternUnits="userSpaceOnUse">
+    <circle cx="2" cy="2" r=".65" fill="#4f80a6" fill-opacity=".18"/>
+  </pattern>
+  <mask id="softMask">
+    <rect width="100%" height="100%" fill="url(#fadeUp)"/>
+  </mask>
+</defs>
+
+<!-- CENTRAL CORE: restrained archive residue. No scene, subject, text, or UI -->
+<!-- left and right paper-collage fields keep a central lane open -->
+<g opacity=".62">
+  <rect x="74" y="96" width="410" height="420" fill="url(#microgrid)"/>
+  <rect x="1116" y="76" width="370" height="438" fill="url(#microgrid)"/>
+</g>
+<!-- soft paper planes, asymmetrical and broken -->
+<path d="M90 130 H518 V276 H432 V418 H210 L164 356 H92 Z" fill="#c5d5e1" fill-opacity=".12"/>
+<path d="M138 168 H470 V252 H378 V382 H224 L184 334" stroke="#7997b0" stroke-opacity=".17" stroke-width="1"/>
+<path d="M1124 116 H1494 V306 H1396 V472 H1174 L1128 402 Z" fill="#c5d5e1" fill-opacity=".12"/>
+<path d="M1162 154 H1454 V278 H1354 V432 H1208 L1164 386" stroke="#7997b0" stroke-opacity=".17" stroke-width="1"/>
+<!-- collage residue clusters, deliberately non-representational -->
+<g filter="url(#soft2)">
+ <path d="M146 346 C254 300 358 332 466 300 L510 350 C398 398 288 382 170 424 Z" fill="#a4bbc9" fill-opacity=".16"/>
+ <path d="M1084 332 C1198 294 1312 314 1458 282 L1502 346 C1366 388 1238 380 1098 426 Z" fill="#a4bbc9" fill-opacity=".16"/>
+ <path d="M272 454 C362 430 442 448 536 422 L566 472 C458 506 362 496 286 524 Z" fill="#aebfcb" fill-opacity=".11"/>
+ <path d="M1068 452 C1172 420 1280 442 1396 410 L1426 468 C1302 502 1186 492 1084 522 Z" fill="#aebfcb" fill-opacity=".11"/>
+</g>
+<!-- neutral, fractured construction traces -->
+<g stroke="#758fa5" stroke-opacity=".16" stroke-width="1">
+ <path d="M180 228 H426 M182 247 H386 M265 116 V312"/>
+ <path d="M1164 206 H1430 M1222 228 H1394 M1374 108 V304"/>
+ <path d="M466 584 H694 M926 582 H1144"/>
+ <path d="M570 606 H714 M902 606 H1040" stroke-dasharray="2 8"/>
+</g>
+<!-- very light mid-band that references archive imagery but leaves center route clean -->
+<g opacity=".25">
+ <rect x="520" y="242" width="118" height="60" fill="#b3c7d4"/>
+ <rect x="954" y="218" width="132" height="66" fill="#b3c7d4"/>
+ <rect x="548" y="405" width="88" height="48" fill="#c6d5de"/>
+ <rect x="972" y="404" width="94" height="44" fill="#c6d5de"/>
+</g>
+<!-- broken datum ring / no target -->
+<path d="M628 180 A182 182 0 0 1 866 154" stroke="#6d90ad" stroke-opacity=".16" stroke-width="1.3"/>
+<path d="M912 212 A170 170 0 0 1 1000 390" stroke="#6d90ad" stroke-opacity=".14" stroke-width="1.3"/>
+<path d="M602 442 A166 166 0 0 1 626 366" stroke="#6d90ad" stroke-opacity=".12" stroke-width="1"/>
+<path d="M802 240 h72 M838 204 v72" stroke="#4f7fa3" stroke-opacity=".24" stroke-width="1"/>
+
+<!-- abstract central archive contour; intentionally non-figurative and non-architectural -->
+<g stroke="#7796af" stroke-opacity=".13" stroke-width="1.15">
+  <path d="M742 164 C712 238 728 298 702 356 C682 402 698 446 672 504"/>
+  <path d="M774 148 C756 228 778 282 754 346 C735 396 755 454 728 512"/>
+  <path d="M806 144 C830 224 808 288 834 350 C852 396 834 452 862 510"/>
+  <path d="M838 158 C864 234 846 298 872 358 C890 404 870 444 900 496"/>
+</g>
+<g stroke="#a4bac9" stroke-opacity=".13" stroke-width="1">
+  <path d="M676 288 C724 266 772 274 814 256 C850 242 890 248 934 226"/>
+  <path d="M674 426 C720 404 760 414 802 396 C842 380 882 388 930 366"/>
+</g>
+
+<!-- route-supporting band, no blue primary line -->
+<path d="M0 560 C178 520 322 565 482 536 C655 504 744 536 890 516 C1080 493 1270 526 1600 474" stroke="#cad7e0" stroke-opacity=".70" stroke-width="18" filter="url(#soft)"/>
+<path d="M0 570 C178 530 322 575 482 546 C655 514 744 546 890 526 C1080 503 1270 536 1600 484" stroke="#8daabc" stroke-opacity=".22" stroke-width="1.15"/>
+<!-- sparse registration bits -->
+<g fill="#4f7fa3" fill-opacity=".30">
+ <rect x="498" y="210" width="4" height="4"/><rect x="536" y="260" width="3" height="3"/>
+ <rect x="1090" y="210" width="4" height="4"/><rect x="1068" y="254" width="3" height="3"/>
+ <rect x="794" y="132" width="3" height="3"/><rect x="850" y="500" width="4" height="4"/>
+</g>
+<rect x="0" y="544" width="1600" height="112" fill="url(#mist)" filter="url(#soft)" opacity=".72"/>
+<rect x="366" y="585" width="870" height="42" fill="url(#dots)" opacity=".42"/>
+</svg>

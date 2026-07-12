@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="220" viewBox="0 0 320 220" fill="none">
+  <defs>
+    <symbol id="node-ring" viewBox="-24 -24 48 48">
+      <circle cx="0" cy="0" r="17" fill="#F8FBFF" stroke="#15191E" stroke-width="3"/>
+      <circle cx="0" cy="0" r="9" fill="#1268F4"/>
+      <path d="M0 -24V-14M0 14V24M-24 0H-14M14 0H24" stroke="#1268F4" stroke-width="2"/>
+    </symbol>
+
+    <symbol id="node-small" viewBox="-12 -12 24 24">
+      <circle cx="0" cy="0" r="8" fill="#1268F4"/>
+      <circle cx="0" cy="0" r="11" stroke="#F8FBFF" stroke-width="2"/>
+      <circle cx="0" cy="0" r="12" stroke="#1268F4" stroke-width="1"/>
+    </symbol>
+
+    <symbol id="connector-tail" viewBox="0 0 120 34">
+      <path d="M2 17H78L118 2" stroke="#1268F4" stroke-width="2"/>
+      <path d="M78 17L118 32" stroke="#1268F4" stroke-width="2" opacity="0.35"/>
+      <circle cx="2" cy="17" r="3" fill="#1268F4"/>
+    </symbol>
+
+    <symbol id="dotted-branch" viewBox="0 0 160 50">
+      <path d="M0 25C38 0 82 0 160 25" stroke="#1268F4" stroke-width="2.5" stroke-dasharray="5 7"/>
+    </symbol>
+
+    <symbol id="blue-endpoint" viewBox="-18 -18 36 36">
+      <rect x="-9" y="-9" width="18" height="18" fill="#F8FBFF" stroke="#1268F4" stroke-width="3"/>
+      <path d="M-18 0H-11M11 0H18M0 -18V-11M0 11V18" stroke="#1268F4" stroke-width="2"/>
+    </symbol>
+  </defs>
+
+  <g transform="translate(45 45)"><use href="#node-ring"/></g>
+  <g transform="translate(110 45)"><use href="#node-small"/></g>
+  <g transform="translate(25 88)"><use href="#connector-tail"/></g>
+  <g transform="translate(25 145)"><use href="#dotted-branch"/></g>
+  <g transform="translate(250 44)"><use href="#blue-endpoint"/></g>
+</svg>

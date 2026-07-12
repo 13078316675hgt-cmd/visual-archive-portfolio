@@ -1,71 +1,48 @@
-# GitHub Pages 部署说明
+# GitHub Pages 自定义域名部署说明
 
-## 仓库名称
+生产仓库目标：`visual-archive-portfolio`  
+生产域名：`https://www.marlsa.cc.cd/`
 
-仓库必须命名为：
+当前仓库只完成本地部署准备；尚未 push，也未公开部署。
 
-```bash
-huangguotai-portfolio
-```
+## 生产构建
 
-## GitHub Pages 设置
-
-进入 GitHub 仓库后设置：
-
-```text
-Settings -> Pages -> Source -> GitHub Actions
-```
-
-不要选择 `gh-pages` 分支部署。
-
-## 首次上传
-
-在项目根目录执行：
-
-```bash
-git init
-git branch -M main
-git add .
-git commit -m "Initial portfolio website"
-git remote add origin https://github.com/YOUR_GITHUB_USERNAME/huangguotai-portfolio.git
-git push -u origin main
-```
-
-推送到 `main` 后，GitHub Actions 会自动运行：
+自定义域名从根路径提供网站，因此生产命令必须是：
 
 ```bash
 pnpm install --frozen-lockfile
-pnpm run build:pages
+pnpm run review:assets
+pnpm run build
 ```
 
-并将 `dist/` 部署到 GitHub Pages。
-
-## 后续更新
-
-每次修改网站后：
-
-```bash
-git add .
-git commit -m "Update portfolio website"
-git push
-```
-
-GitHub Actions 会自动重新构建和部署。
-
-## 预期访问地址
+生产 Vite base：`/`。GitHub Actions 通过公开环境值设置：
 
 ```text
-https://YOUR_GITHUB_USERNAME.github.io/huangguotai-portfolio/
+VITE_PUBLIC_SITE_URL=https://www.marlsa.cc.cd/
 ```
 
-## 公开仓库安全提醒
+`pnpm run build:pages` 只保留为 `/visual-archive-portfolio/` 仓库路径 fallback，不用于自定义域名生产部署。
 
-GitHub Pages 是公开网站。不要提交以下内容：
+## GitHub Pages
 
-- PSD / CLIP 源文件
-- review ZIP 压缩包
-- 临时导出文件
-- 未公开的个人资料
-- 密码、Token、账号凭据
+1. 获得授权后，把远程仓库重命名为 `visual-archive-portfolio` 并更新本地 origin。
+2. 在 `Settings -> Pages` 中选择 `GitHub Actions`。
+3. 在 Custom domain 中填写 `www.marlsa.cc.cd`。
+4. GitHub Actions 使用 `.github/workflows/deploy-pages.yml` 上传 `./dist`。
 
-当前 `.gitignore` 已忽略常见 review 包、PSD、CLIP、`node_modules/` 和 `dist/`。
+项目没有 `CNAME` 文件。Actions 部署不依赖分支生成的 CNAME；域名通过仓库 Pages 设置维护。
+
+## DNS 模板
+
+```text
+Type: CNAME
+Host: www
+Value: YOUR-GITHUB-USERNAME.github.io
+TTL: Auto 或 300–600 秒
+```
+
+不要在 Value 中加入 `https://` 或 `/visual-archive-portfolio/`。GitHub 域名验证 TXT 值必须从 GitHub Profile Settings -> Pages 原样复制。
+
+## 安全
+
+不要提交 `.env`、Token、密码或账号凭据。生产域名是公开配置，不属于秘密。

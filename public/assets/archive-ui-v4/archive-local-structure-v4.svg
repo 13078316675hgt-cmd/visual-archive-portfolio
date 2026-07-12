@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="720" viewBox="0 0 1800 720" fill="none">
+  <!-- This layer is intentionally light: no characters, no scenery, no painted background. -->
+  <g opacity="0.58">
+    <rect x="350" y="98" width="580" height="340" stroke="#6C8CA6" stroke-opacity="0.16" stroke-width="1"/>
+    <rect x="410" y="138" width="420" height="260" stroke="#1268F4" stroke-opacity="0.10" stroke-width="1"/>
+    <path d="M270 510H980" stroke="#6C8CA6" stroke-opacity="0.13"/>
+    <path d="M480 70V602" stroke="#6C8CA6" stroke-opacity="0.13"/>
+    <path d="M745 40V660" stroke="#1268F4" stroke-opacity="0.10"/>
+    <path d="M280 180L720 420L1160 210" stroke="#1268F4" stroke-opacity="0.10"/>
+    <path d="M1040 120H1570M1080 168H1500M1160 410H1700" stroke="#6C8CA6" stroke-opacity="0.12"/>
+    <path d="M1130 270L1540 478" stroke="#1268F4" stroke-opacity="0.13"/>
+    <path d="M1220 92V560" stroke="#6C8CA6" stroke-opacity="0.10"/>
+  </g>
+
+  <!-- pale document plates, no card shadows -->
+  <g fill="#BFD0DD" opacity="0.105">
+    <path d="M610 88H970L890 440H520Z"/>
+    <path d="M1160 132H1500L1430 386H1090Z"/>
+    <rect x="80" y="382" width="340" height="110"/>
+    <rect x="1310" y="488" width="300" height="86"/>
+  </g>
+
+  <!-- local datum marks -->
+  <g stroke="#1268F4" stroke-width="1.2" opacity="0.20">
+    <path d="M934 230a130 130 0 0 1 -86 122"/>
+    <path d="M846 96a130 130 0 0 1 118 74"/>
+    <path d="M890 116V352M772 234H1010"/>
+    <circle cx="890" cy="234" r="4" fill="#1268F4" stroke="none"/>
+  </g>
+
+  <!-- sparse chip-like marks -->
+  <g opacity="0.35" stroke="#1268F4" stroke-width="1">
+    <path d="M160 190h32v32h-32z"/>
+    <path d="M164 410h22M175 399v22"/>
+    <path d="M1330 240h34v34h-34z"/>
+    <path d="M1515 315h28M1529 301v28"/>
+    <path d="M1010 520h36v12h-36"/>
+  </g>
+
+  <!-- light texture dots, localized -->
+  <g fill="#2F5E86" opacity="0.06">
+    <circle cx="700" cy="192" r="1.2"/><circle cx="720" cy="210" r="0.8"/><circle cx="690" cy="240" r="0.7"/>
+    <circle cx="760" cy="292" r="1.1"/><circle cx="805" cy="180" r="0.8"/><circle cx="1160" cy="350" r="1"/>
+    <circle cx="1188" cy="368" r="0.8"/><circle cx="1230" cy="315" r="0.9"/>
+  </g>
+</svg>

@@ -1,0 +1,41 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" fill="none">
+  <defs>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" stroke="#647C8E" stroke-opacity="0.10" stroke-width="1"/>
+    </pattern>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.58" numOctaves="3" seed="77"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer><feFuncA type="table" tableValues="0 0.10"/></feComponentTransfer>
+    </filter>
+  </defs>
+  <rect width="1920" height="1080" fill="#F4F6F6"/>
+  <rect width="1920" height="1080" fill="url(#grid)" opacity="0.70"/>
+  <rect width="1920" height="1080" filter="url(#grain)" opacity="0.25"/>
+
+
+  <g fill="#C9D5DD" opacity="0.42">
+    <rect x="185" y="290" width="260" height="150"/>
+    <rect x="1300" y="268" width="270" height="160"/>
+    <path d="M500 150H745L695 330H462Z"/>
+    <path d="M1185 500H1538L1470 690H1128Z"/>
+    <rect x="1035" y="820" width="380" height="86"/>
+  </g>
+
+  <g stroke="#1268F4" stroke-width="2" opacity="0.45">
+    <path d="M386 476H448"/>
+    <path d="M1500 428V500"/>
+    <path d="M1118 154H1185"/>
+    <circle cx="1464" cy="704" r="4" fill="#1268F4"/>
+    <circle cx="456" cy="510" r="4" fill="#1268F4"/>
+  </g>
+
+  <g stroke="#2C526D" stroke-width="1" opacity="0.28">
+    <path d="M70 540H830"/>
+    <path d="M1050 440H1840"/>
+    <path d="M420 120V950"/>
+    <path d="M1520 58V1000"/>
+    <path d="M250 720L850 342"/>
+    <path d="M1120 280L1710 720"/>
+  </g>
+</svg>

@@ -1,0 +1,47 @@
+{
+  "version": "v4.1",
+  "concept": "Central Archive Selection Screen",
+  "motion_layers": [
+    {
+      "name": "central_core",
+      "behavior": "slow breathing opacity/scale, subtle glow"
+    },
+    {
+      "name": "noise_field",
+      "behavior": "very slow drift or static; no heavy animation"
+    },
+    {
+      "name": "route_lines",
+      "behavior": "draw from central core outward to nodes"
+    },
+    {
+      "name": "nodes",
+      "behavior": "small pulse when active"
+    },
+    {
+      "name": "retrieval_windows",
+      "behavior": "clip reveal after node activation"
+    },
+    {
+      "name": "labels",
+      "behavior": "appear last with tiny horizontal settle"
+    },
+    {
+      "name": "energy_accents",
+      "behavior": "small pulse; max 2-4 points"
+    }
+  ],
+  "sequence": [
+    "top_system_bar appears immediately",
+    "central archive core fades/breathes in",
+    "main route lines draw from core",
+    "node anchors activate",
+    "leader lines extend",
+    "tiny retrieval windows clip in",
+    "black strips and labels settle",
+    "resume/contact endpoints activate last"
+  ],
+  "desktop_only": true,
+  "mobile": "keep existing vertical route; do not use heavy central core",
+  "reduced_motion": "all nodes visible, no looping animations"
+}

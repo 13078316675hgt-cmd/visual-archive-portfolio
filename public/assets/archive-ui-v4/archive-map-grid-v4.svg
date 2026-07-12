@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="4000" height="720" viewBox="0 0 4000 720" fill="none">
+  <defs>
+    <pattern id="minorGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" stroke="#7FA0BD" stroke-opacity="0.075" stroke-width="1"/>
+    </pattern>
+    <pattern id="majorGrid" width="200" height="200" patternUnits="userSpaceOnUse">
+      <path d="M200 0H0V200" stroke="#547A9A" stroke-opacity="0.12" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="4000" height="720" fill="url(#minorGrid)" opacity="0.55"/>
+  <rect width="4000" height="720" fill="url(#majorGrid)" opacity="0.55"/>
+
+  <!-- sparse datum lines -->
+  <path d="M0 352H4000" stroke="#1268F4" stroke-opacity="0.16" stroke-width="1"/>
+  <path d="M120 160H820" stroke="#1268F4" stroke-opacity="0.13" stroke-width="1"/>
+  <path d="M1220 118H1740" stroke="#1268F4" stroke-opacity="0.13" stroke-width="1"/>
+  <path d="M2460 176H3100" stroke="#1268F4" stroke-opacity="0.12" stroke-width="1"/>
+  <path d="M3420 450H3880" stroke="#1268F4" stroke-opacity="0.11" stroke-width="1"/>
+
+  <!-- vertical reference axes -->
+  <path d="M940 40V650" stroke="#2D5F8B" stroke-opacity="0.08" stroke-width="1"/>
+  <path d="M1880 20V690" stroke="#2D5F8B" stroke-opacity="0.12" stroke-width="1"/>
+  <path d="M3020 50V650" stroke="#2D5F8B" stroke-opacity="0.08" stroke-width="1"/>
+
+  <!-- sparse micro ticks -->
+  <g stroke="#1268F4" stroke-opacity="0.22" stroke-width="1">
+    <path d="M240 348v-12M240 356v12M234 352h-12M246 352h12"/>
+    <path d="M780 196v-10M780 204v10M774 200h-10M786 200h10"/>
+    <path d="M1510 404v-10M1510 412v10M1504 408h-10M1516 408h10"/>
+    <path d="M2080 210v-12M2080 218v12M2074 214h-12M2086 214h12"/>
+    <path d="M2710 370v-10M2710 378v10M2704 374h-10M2716 374h10"/>
+    <path d="M3560 308v-10M3560 316v10M3554 312h-10M3566 312h10"/>
+  </g>
+
+  <!-- very light paper grain dots -->
+  <g fill="#2F5E86" opacity="0.08">
+    <circle cx="180" cy="98" r="1.2"/><circle cx="430" cy="280" r="0.9"/><circle cx="690" cy="110" r="1"/>
+    <circle cx="1090" cy="470" r="1.1"/><circle cx="1320" cy="250" r="0.8"/><circle cx="1740" cy="590" r="1.1"/>
+    <circle cx="2140" cy="350" r="1.2"/><circle cx="2520" cy="120" r="0.9"/><circle cx="2900" cy="540" r="1"/>
+    <circle cx="3260" cy="230" r="0.9"/><circle cx="3710" cy="430" r="1.2"/>
+  </g>
+</svg>

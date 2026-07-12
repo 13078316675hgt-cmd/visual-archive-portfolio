@@ -1,0 +1,20 @@
+{
+  "version": "v4.3-patch",
+  "changes": [
+    "Replace central-archive-core-v4-1.svg with stronger central-archive-core-v4-3.svg.",
+    "Replace heavy black node circles with archive-node-kit-v4-3 blue-white rings.",
+    "Optional: use archive-selection-field-v4-3.svg as stronger stage field if v4.2 still looks too pale."
+  ],
+  "core": {
+    "desktop_width": "54vw-66vw",
+    "max_height": "88vh-96vh",
+    "opacity": "0.9-1.0",
+    "z_index": "behind nodes and labels, above field",
+    "motion": "slow breathing scale 1 to 1.012, opacity/brightness subtle"
+  },
+  "nodes": {
+    "standard": "16-20px blue-white ring",
+    "node04": "24-30px blue-white ring",
+    "black_usage": "labels and strips only, not node bodies"
+  }
+}

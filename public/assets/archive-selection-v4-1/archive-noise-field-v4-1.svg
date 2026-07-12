@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" fill="none">
+  <defs>
+    <pattern id="dotField" width="18" height="18" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="0.8" fill="#1C2B35" opacity="0.22"/>
+    </pattern>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" seed="41"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer>
+        <feFuncA type="table" tableValues="0 0.12"/>
+      </feComponentTransfer>
+    </filter>
+  </defs>
+
+  <rect width="1920" height="1080" fill="#F7F8F7"/>
+  <rect width="1920" height="1080" fill="url(#dotField)" opacity="0.18"/>
+  <rect width="1920" height="1080" filter="url(#grain)" opacity="0.28"/>
+
+  <!-- asymmetric black/gray map structures -->
+  <g id="black-structures" fill="#101419">
+    <path d="M0 166H310L260 274H0Z" opacity="0.88"/>
+    <path d="M1608 0H1920V112H1652Z" opacity="0.80"/>
+    <path d="M1488 688H1920V1080H1390Z" opacity="0.20"/>
+    <path d="M0 820H350L280 1080H0Z" opacity="0.16"/>
+  </g>
+
+  <!-- pale gray blocks -->
+  <g id="gray-map-blocks" fill="#D9E1E6" opacity="0.55">
+    <rect x="180" y="310" width="270" height="146"/>
+    <rect x="1295" y="252" width="220" height="154"/>
+    <rect x="1120" y="800" width="390" height="96"/>
+    <path d="M522 160H740L690 328H485Z"/>
+    <path d="M1250 510H1510L1460 640H1210Z"/>
+  </g>
+
+  <!-- blue structural accents -->
+  <g id="blue-accents" fill="#1268F4" opacity="0.55">
+    <rect x="404" y="478" width="42" height="8"/>
+    <rect x="1498" y="440" width="8" height="62"/>
+    <rect x="1160" y="150" width="56" height="8"/>
+    <circle cx="1462" cy="706" r="4"/>
+    <circle cx="460" cy="510" r="4"/>
+  </g>
+
+  <!-- long structure lines -->
+  <g stroke="#2E4B61" stroke-width="1" opacity="0.25">
+    <path d="M80 548H870"/>
+    <path d="M1020 440H1840"/>
+    <path d="M420 120V940"/>
+    <path d="M1520 60V1000"/>
+    <path d="M250 720L860 340"/>
+    <path d="M1120 280L1700 720"/>
+  </g>
+</svg>

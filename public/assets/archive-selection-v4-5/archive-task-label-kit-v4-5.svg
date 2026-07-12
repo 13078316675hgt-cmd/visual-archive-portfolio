@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="460" height="220" viewBox="0 0 460 220" fill="none">
+  <defs>
+    <symbol id="task-tag-micro" viewBox="0 0 150 42">
+      <path d="M0 0H150V42H0Z" fill="#F7F9FA" stroke="#15191E" stroke-width="1"/>
+      <path d="M0 0H150V11H0Z" fill="#11161B"/>
+      <path d="M7 5.5H46" stroke="#F8FBFF" stroke-width="1"/>
+      <path d="M10 24H78" stroke="#11161B" stroke-width="2.4"/>
+      <path d="M10 34H116" stroke="#4A5660" stroke-width="1" opacity="0.65"/>
+    </symbol>
+    <symbol id="task-tag-side" viewBox="0 0 172 52">
+      <path d="M0 0H172V52H0Z" fill="#F7F9FA" stroke="#15191E" stroke-width="1"/>
+      <path d="M0 0H172V12H0Z" fill="#11161B"/>
+      <path d="M8 6H54" stroke="#F8FBFF" stroke-width="1"/>
+      <path d="M12 28H88" stroke="#11161B" stroke-width="2.8"/>
+      <path d="M12 40H135" stroke="#4A5660" stroke-width="1.1" opacity="0.65"/>
+      <path d="M172 0L158 12H172Z" fill="#1268F4" opacity="0.75"/>
+    </symbol>
+    <symbol id="endpoint-tag" viewBox="0 0 178 58">
+      <path d="M0 0H178V58H0Z" fill="#F7F9FA" stroke="#15191E" stroke-width="1"/>
+      <path d="M0 0H178V12H0Z" fill="#11161B"/>
+      <path d="M12 29H98" stroke="#15191E" stroke-width="3"/>
+      <path d="M12 43H136" stroke="#4A5660" stroke-width="1.2"/>
+      <rect x="151" y="18" width="14" height="14" stroke="#1268F4" stroke-width="1.4"/>
+    </symbol>
+    <symbol id="black-number-chip" viewBox="0 0 70 58">
+      <rect x="0" y="0" width="70" height="58" fill="#11161B"/>
+      <path d="M10 16H36" stroke="#F8FBFF" stroke-width="2"/>
+      <path d="M10 31H58" stroke="#F8FBFF" stroke-opacity="0.45" stroke-width="1"/>
+      <path d="M10 43H44" stroke="#F8FBFF" stroke-opacity="0.28" stroke-width="1"/>
+    </symbol>
+  </defs>
+  <g transform="translate(20 20)"><use href="#task-tag-micro"/></g>
+  <g transform="translate(20 84)"><use href="#task-tag-side"/></g>
+  <g transform="translate(20 158)"><use href="#endpoint-tag"/></g>
+  <g transform="translate(270 50)"><use href="#black-number-chip"/></g>
+</svg>

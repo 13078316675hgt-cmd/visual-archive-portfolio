@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080" fill="none">
+  <defs>
+    <radialGradient id="whiteCore" cx="50%" cy="45%" r="50%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="1"/>
+      <stop offset="38%" stop-color="#F8FBFF" stop-opacity="0.92"/>
+      <stop offset="74%" stop-color="#D9E4EB" stop-opacity="0.34"/>
+      <stop offset="100%" stop-color="#D9E4EB" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="blueAura" cx="50%" cy="52%" r="52%">
+      <stop offset="0%" stop-color="#1268F4" stop-opacity="0.26"/>
+      <stop offset="45%" stop-color="#1268F4" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#1268F4" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="softGlow"><feGaussianBlur stdDeviation="8"/></filter>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="2" seed="43"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer><feFuncA type="table" tableValues="0 0.10"/></feComponentTransfer>
+    </filter>
+  </defs>
+
+  <g id="core-aura">
+    <ellipse cx="960" cy="520" rx="475" ry="505" fill="url(#blueAura)"/>
+    <ellipse cx="960" cy="500" rx="350" ry="455" fill="url(#whiteCore)"/>
+    <ellipse cx="960" cy="508" rx="210" ry="380" fill="#FFFFFF" opacity="0.52" filter="url(#softGlow)"/>
+  </g>
+
+  <g id="core-body" opacity="0.96">
+    <path d="M960 104
+      C1015 205 1046 322 1034 438
+      C1020 566 1097 692 1212 850
+      C1084 802 1012 714 960 612
+      C908 714 836 802 708 850
+      C823 692 900 566 886 438
+      C874 322 905 205 960 104Z"
+      fill="#FFFFFF" opacity="0.88"/>
+    <path d="M960 170
+      C992 256 1002 342 996 445
+      C990 562 1026 674 1088 786"
+      stroke="#7896AD" stroke-width="2.2" opacity="0.46"/>
+    <path d="M960 170
+      C928 256 918 342 924 445
+      C930 562 894 674 832 786"
+      stroke="#7896AD" stroke-width="2.2" opacity="0.46"/>
+    <path d="M960 190V866" stroke="#5F7F98" stroke-width="1.8" opacity="0.46"/>
+    <path d="M890 360C842 405 812 475 790 565" stroke="#90A8BA" stroke-width="1.5" opacity="0.35"/>
+    <path d="M1030 360C1078 405 1108 475 1130 565" stroke="#90A8BA" stroke-width="1.5" opacity="0.35"/>
+  </g>
+
+  <g id="radial-structure" stroke="#7E9AB1" stroke-width="1.4" opacity="0.58">
+    <path d="M930 268 C780 280 635 355 498 490"/>
+    <path d="M990 268 C1140 280 1285 355 1422 490"/>
+    <path d="M902 374 C725 392 578 475 410 636"/>
+    <path d="M1018 374 C1195 392 1342 475 1510 636"/>
+    <path d="M887 498 C735 530 610 622 502 762"/>
+    <path d="M1033 498 C1185 530 1310 622 1418 762"/>
+  </g>
+
+  <g id="core-datum" stroke="#1268F4" opacity="0.34">
+    <circle cx="960" cy="520" r="270" stroke-width="1"/>
+    <circle cx="960" cy="520" r="112" stroke-width="1" opacity="0.32"/>
+    <path d="M960 218V854M642 520H1278" stroke-width="1"/>
+    <path d="M1154 334A270 270 0 0 1 1230 568" stroke-width="2.2"/>
+    <path d="M766 706A270 270 0 0 1 690 472" stroke-width="2.2"/>
+  </g>
+
+  <g id="dark-blocks">
+    <rect x="777" y="635" width="84" height="178" fill="#101419" opacity="0.58"/>
+    <rect x="1054" y="620" width="105" height="196" fill="#101419" opacity="0.52"/>
+    <rect x="872" y="770" width="214" height="84" fill="#101419" opacity="0.44"/>
+    <rect x="683" y="548" width="56" height="118" fill="#101419" opacity="0.26"/>
+    <rect x="1205" y="548" width="62" height="126" fill="#101419" opacity="0.26"/>
+  </g>
+
+  <g id="energy-points">
+    <circle cx="960" cy="522" r="5.5" fill="#FF3F6D" opacity="0.90"/>
+    <circle cx="940" cy="548" r="3" fill="#8D6CFF" opacity="0.80"/>
+    <circle cx="982" cy="548" r="3" fill="#8D6CFF" opacity="0.80"/>
+    <circle cx="960" cy="646" r="4" fill="#1268F4" opacity="0.75"/>
+  </g>
+
+  <rect x="610" y="126" width="700" height="820" filter="url(#grain)" opacity="0.28"/>
+</svg>

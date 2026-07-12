@@ -1,8 +1,9 @@
 ﻿import React from 'react'
 import { createRoot } from 'react-dom/client'
-import { useEffect } from 'react'
+import { useEffect, useLayoutEffect } from 'react'
 import './styles.css'
 import './gallery.css'
+import { initArchiveMotion } from './motion/archiveMotion.js'
 import {
   additionalCharacterDesigns,
   artworkManifest,
@@ -11,6 +12,7 @@ import {
   artworkTwo,
   characterSheets,
   contactHandsTech,
+  contentsV6CleanAtmosphere,
   contentsChapters,
   costumeDetailAsset,
   portraitStudies,
@@ -34,40 +36,118 @@ function Nav() {
 }
 
 function usePortfolioMotion() {
-  useEffect(() => {
+  useLayoutEffect(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const root = document.documentElement
+    const mobileMotion = window.matchMedia('(max-width: 900px)').matches
 
     root.classList.toggle('motion-reduced', reduceMotion)
+    const cleanupArchiveMotion = initArchiveMotion(document.querySelector('.archive-selection-scene'), { reducedMotion: reduceMotion })
 
-    const scrollToCurrentHash = () => {
-      if (!window.location.hash) return
-      const target = ['#resume-contact-resume', '#resume-contact-contact'].includes(window.location.hash)
-        ? document.querySelector('#resume-contact')
-        : document.querySelector(window.location.hash)
-      target?.scrollIntoView({ block: 'start' })
+    let navigationToken = 0
+    let navigationSettleTimer = 0
+    let navigationScrollEndHandler = null
+
+    const releaseAnchorNavigation = (token) => {
+      if (token !== navigationToken) return
+      if (navigationScrollEndHandler) {
+        window.removeEventListener('scrollend', navigationScrollEndHandler)
+        navigationScrollEndHandler = null
+      }
+      window.clearTimeout(navigationSettleTimer)
+      navigationSettleTimer = 0
     }
 
-    const hashTimers = []
-    const clearHashTimers = () => {
-      while (hashTimers.length) window.clearTimeout(hashTimers.pop())
+    const cancelPendingAnchorNavigation = () => {
+      navigationToken += 1
+      if (navigationScrollEndHandler) {
+        window.removeEventListener('scrollend', navigationScrollEndHandler)
+        navigationScrollEndHandler = null
+      }
+      window.clearTimeout(navigationSettleTimer)
+      navigationSettleTimer = 0
     }
-    const queueHashCorrection = () => {
-      clearHashTimers()
-      if (!window.location.hash) return
-      ;[80, 360, 900, 1800, 3200, 5200].forEach((delay) => {
-        hashTimers.push(window.setTimeout(scrollToCurrentHash, delay))
+
+    const resolveAnchorTarget = (hash) => {
+      if (!hash || hash === '#') return false
+
+      let targetId
+      try {
+        targetId = decodeURIComponent(hash.slice(1))
+      } catch {
+        return null
+      }
+
+      return document.getElementById(targetId)
+    }
+
+    const waitForAnchorLayout = async (target) => {
+      await document.fonts?.ready
+      const precedingImages = Array.from(document.images).filter((image) => {
+        const section = image.closest('section.page')
+        if (!section || section.matches('#title, #contents')) return false
+        return Boolean(image.compareDocumentPosition(target) & Node.DOCUMENT_POSITION_FOLLOWING)
       })
+      const loadingModes = precedingImages.map((image) => image.getAttribute('loading'))
+      precedingImages.forEach((image) => { image.loading = 'eager' })
+      await Promise.allSettled(precedingImages.map((image) => image.decode()))
+      precedingImages.forEach((image, index) => {
+        const loading = loadingModes[index]
+        if (loading == null) image.removeAttribute('loading')
+        else image.setAttribute('loading', loading)
+      })
+      await new Promise((resolve) => window.requestAnimationFrame(() => window.requestAnimationFrame(resolve)))
     }
 
-    window.addEventListener('hashchange', queueHashCorrection)
+    const navigateToAnchorOnce = async (hash, target = resolveAnchorTarget(hash)) => {
+      if (!target) return false
+
+      cancelPendingAnchorNavigation()
+      const token = navigationToken
+      await waitForAnchorLayout(target)
+      if (token !== navigationToken) return false
+
+      target.scrollIntoView({
+        block: 'start',
+        behavior: reduceMotion ? 'auto' : 'smooth',
+      })
+
+      navigationScrollEndHandler = () => releaseAnchorNavigation(token)
+      if ('onscrollend' in window) {
+        window.addEventListener('scrollend', navigationScrollEndHandler, { once: true })
+      }
+      navigationSettleTimer = window.setTimeout(() => releaseAnchorNavigation(token), reduceMotion ? 100 : 1400)
+      return true
+    }
+
+    const handleAnchorClick = (event) => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+      const anchor = event.target instanceof Element ? event.target.closest('a[href^="#"]') : null
+      if (!anchor || anchor.hasAttribute('download') || (anchor.target && anchor.target !== '_self')) return
+
+      const hash = anchor.getAttribute('href')
+      const target = resolveAnchorTarget(hash)
+      if (!hash || !target) return
+
+      event.preventDefault()
+      if (window.location.hash !== hash) {
+        window.history.pushState(null, '', `${window.location.pathname}${window.location.search}${hash}`)
+      }
+      void navigateToAnchorOnce(hash, target)
+    }
+
+    document.addEventListener('click', handleAnchorClick)
+    const initialHashFrame = window.requestAnimationFrame(() => {
+      if (window.location.hash) void navigateToAnchorOnce(window.location.hash)
+    })
 
     if (reduceMotion) {
-      queueHashCorrection()
       return () => {
-        clearHashTimers()
-        window.removeEventListener('hashchange', queueHashCorrection)
+        window.cancelAnimationFrame(initialHashFrame)
+        cancelPendingAnchorNavigation()
+        document.removeEventListener('click', handleAnchorClick)
         root.classList.remove('motion-reduced')
+        cleanupArchiveMotion()
       }
     }
 
@@ -75,16 +155,19 @@ function usePortfolioMotion() {
 
     const touchedNodes = new Set()
     const scenes = []
+    const completionTimers = new Set()
 
     const touch = (node) => {
       if (node) touchedNodes.add(node)
       return node
     }
 
-    const scene = (selector, name) => {
+    const scene = (selector, name, pattern, duration) => {
       const node = document.querySelector(selector)
       if (!node) return null
       node.setAttribute('data-motion-scene', name)
+      node.setAttribute('data-motion-pattern', pattern)
+      node.style.setProperty('--scene-duration', `var(${duration})`)
       scenes.push(node)
       return touch(node)
     }
@@ -94,80 +177,81 @@ function usePortfolioMotion() {
       nodes.forEach((node, index) => {
         node.setAttribute('data-motion', type)
         if (options.variant) node.setAttribute('data-motion-variant', options.variant)
-        if (options.delay != null || options.stagger) {
-          const delay = (options.delay || 0) + (options.stagger || 0) * index
-          node.style.setProperty('--motion-delay', `${Math.min(delay, options.maxDelay || 520)}ms`)
+        if (options.delay != null || options.stagger || options.mobileDelay != null || options.mobileStagger) {
+          const baseDelay = mobileMotion && options.mobileDelay != null ? options.mobileDelay : (options.delay || 0)
+          const stagger = mobileMotion && options.mobileStagger != null ? options.mobileStagger : (options.stagger || 0)
+          const delay = baseDelay + stagger * index
+          const maxDelay = mobileMotion
+            ? (options.mobileMaxDelay ?? Math.min(options.maxDelay || 240, 180))
+            : (options.maxDelay || 240)
+          node.style.setProperty('--motion-delay', `${Math.min(delay, maxDelay)}ms`)
         }
         touch(node)
       })
       return nodes
     }
 
-    scene('#title', 'title')
-    scene('#contents', 'contents')
-    scene('#key-visual-01', 'kv01')
-    scene('#key-visual-02', 'kv02')
-    scene('#key-visual-03', 'kv03')
-    scene('#character-sheets', 'sheets')
-    scene('#costume-detail', 'detail')
-    scene('#portrait-studies', 'portraits')
-    scene('#selected-works', 'selected')
-    scene('#additional-designs', 'additional')
-    scene('#resume-contact', 'final')
+    scene('#title', 'title', 'section-intro', '--motion-section')
+    scene('#key-visual-01', 'kv01', 'artwork-sequence', '--motion-section')
+    scene('#key-visual-02', 'kv02', 'artwork-sequence', '--motion-section')
+    scene('#key-visual-03', 'kv03', 'artwork-static-first', '--motion-standard')
+    scene('#character-sheets', 'sheets', 'artwork-sequence', '--motion-section')
+    scene('#costume-detail', 'detail', 'artwork-sequence', '--motion-section')
+    scene('#portrait-studies', 'portraits', 'artwork-sequence', '--motion-section')
+    scene('#selected-works', 'selected', 'artwork-sequence', '--motion-section')
+    scene('#additional-designs', 'additional', 'section-intro', '--motion-section')
+    scene('#resume-contact', 'final', 'contact-ending', '--motion-section')
 
-    setMotion('.title-cobalt-field', 'title-field')
-    setMotion('.title-scan', 'title-panel', { delay: 110, stagger: 90, maxDelay: 420 })
-    setMotion('.title-lockup h1 span', 'title-word', { delay: 160, stagger: 70, maxDelay: 340 })
-    setMotion('.title-lockup h2, .title-lockup p, .title-contact a, .title-contact p, .title-meta span', 'micro', { delay: 360, stagger: 40, maxDelay: 520 })
-    setMotion('.title-rule, .title-signal', 'title-rule', { delay: 260, stagger: 70, maxDelay: 420 })
-    setMotion('.title-print-orb, .title-strokes', 'title-grain', { delay: 320, stagger: 90, maxDelay: 520 })
+    setMotion('.title-rule-a, .title-rule-b', 'registration-rule', { stagger: 40, maxDelay: 80 })
+    setMotion('.title-lockup h1 span', 'intro-title', { delay: 80, stagger: 60, maxDelay: 200 })
+    setMotion('.title-lockup h2, .title-lockup p, .title-contact a, .title-contact p, .title-meta span', 'intro-meta', { delay: 220, stagger: 40, maxDelay: 240 })
+    setMotion('.title-cobalt-field', 'intro-field')
+    setMotion('.title-scan', 'intro-panel', { stagger: 40, maxDelay: 120 })
 
-    setMotion('.contents-index-head h2, .contents-index-head p', 'type', { stagger: 55, maxDelay: 140 })
-    setMotion('.contents-index-grid', 'line')
-    Array.from(document.querySelectorAll('.contents-index-entry')).forEach((node, index) => {
-      node.setAttribute('data-motion', 'contents-tile')
-      const delay = index < 5 ? index * 35 : 120 + (9 - index) * 35
-      node.style.setProperty('--motion-delay', `${delay}ms`)
-      touch(node)
-      const copy = node.querySelector('.contents-index-copy')
-      copy?.setAttribute('data-motion', 'micro')
-      copy?.style.setProperty('--motion-delay', `${delay + 50}ms`)
-      touch(copy)
-    })
+    setMotion('.key-visual-page .kv-number-row', 'section-title')
+    setMotion('.key-visual-page .kv-title-rule', 'registration-rule', { delay: 40 })
+    setMotion('.key-visual-page .kv-title-copy', 'section-copy', { delay: 80 })
+    setMotion('.key-visual-one .kv-main', 'artwork-primary', { variant: 'diagonal', delay: 40 })
+    setMotion('.key-visual-two .kv-main', 'artwork-primary', { variant: 'horizontal', delay: 40 })
+    setMotion('.key-visual-one .kv-red-shape, .key-visual-one .kv-local-plane, .key-visual-one .kv-rule, .key-visual-one .kv-mark', 'registration-detail', { delay: 160, stagger: 40, maxDelay: 240 })
+    setMotion('.key-visual-two .kv-red-shape, .key-visual-two .kv-local-plane, .key-visual-two .kv-rule, .key-visual-two .kv-mark', 'registration-detail', { delay: 120, stagger: 40, maxDelay: 240 })
+    setMotion('.key-visual-three .kv-red-shape, .key-visual-three .kv-local-plane, .key-visual-three .kv-rule, .key-visual-three .kv-mark', 'registration-detail', { delay: 80, stagger: 40, maxDelay: 140 })
 
-    setMotion('.key-visual-one .kv-number-row, .key-visual-two .kv-number-row, .key-visual-three .kv-number-row', 'type')
-    setMotion('.key-visual-one .kv-title-rule, .key-visual-two .kv-title-rule, .key-visual-three .kv-title-rule', 'line', { delay: 60 })
-    setMotion('.key-visual-one .kv-title-copy, .key-visual-two .kv-title-copy, .key-visual-three .kv-title-copy', 'type', { delay: 110 })
-    setMotion('.key-visual-one .kv-main', 'image-window', { variant: 'diagonal', delay: 100 })
-    setMotion('.key-visual-two .kv-main', 'image-window', { variant: 'rect', delay: 100 })
-    setMotion('.key-visual-one .kv-red-shape, .key-visual-one .kv-local-plane, .key-visual-one .kv-rule, .key-visual-one .kv-mark', 'support', { delay: 240 })
-    setMotion('.key-visual-two .kv-red-shape, .key-visual-two .kv-local-plane, .key-visual-two .kv-rule, .key-visual-two .kv-mark', 'support', { delay: 80 })
-    setMotion('.key-visual-three .kv-red-shape, .key-visual-three .kv-local-plane, .key-visual-three .kv-rule, .key-visual-three .kv-mark', 'support', { delay: 160, stagger: 70, maxDelay: 360 })
+    setMotion('.editorial-head span, .editorial-head h2', 'section-title', { stagger: 40, maxDelay: 80 })
+    setMotion('.editorial-head p', 'section-copy', { delay: 80 })
+    setMotion('.sheet-main', 'artwork-primary', { delay: 40 })
+    setMotion('.sheet-support', 'artwork-support', { delay: 100, stagger: 40, maxDelay: 220 })
+    setMotion('.detail-main', 'artwork-primary', { delay: 40 })
+    setMotion('.detail-crop', 'artwork-support', { delay: 120, stagger: 50, maxDelay: 220 })
+    setMotion('.portrait-item', 'artwork-support', { delay: 40, stagger: 70, maxDelay: 120 })
+    setMotion('.selected-primary img', 'artwork-primary', { delay: 80, mobileDelay: 40 })
+    setMotion('.selected-primary figcaption', 'section-copy', { delay: 160, mobileDelay: 100 })
+    setMotion('.selected-support img', 'artwork-support', { delay: 240, stagger: 80, maxDelay: 320, mobileDelay: 160, mobileStagger: 60, mobileMaxDelay: 220 })
+    setMotion('.selected-support figcaption', 'section-copy', { delay: 340, stagger: 60, maxDelay: 400, mobileDelay: 200, mobileStagger: 40, mobileMaxDelay: 240 })
+    setMotion('.additional-item', 'artwork-support', { delay: 60, stagger: 40, maxDelay: 220 })
 
-    setMotion('.editorial-head span, .editorial-head h2, .editorial-head p', 'type', { stagger: 45, maxDelay: 180 })
-    setMotion('.sheet', 'image-window', { stagger: 65, maxDelay: 260 })
-    setMotion('.detail-main, .detail-crop', 'image-window', { variant: 'vertical', stagger: 70, maxDelay: 260 })
-    setMotion('.portrait-item', 'image-window', { variant: 'vertical', stagger: 80, maxDelay: 180 })
-    setMotion('.selected-item', 'image-window', { stagger: 65, maxDelay: 280 })
-    Array.from(document.querySelectorAll('.additional-item')).forEach((node, index, nodes) => {
-      node.setAttribute('data-motion', 'image-window')
-      const half = Math.ceil(nodes.length / 2)
-      const delay = index < half ? index * 65 : 120 + (nodes.length - 1 - index) * 65
-      node.style.setProperty('--motion-delay', `${Math.min(delay, 360)}ms`)
-      touch(node)
-    })
+    setMotion('.final-hands', 'contact-field')
+    setMotion('.final-chapter-label, .final-identity, .final-resume-panel', 'contact-copy', { delay: 80, stagger: 50, maxDelay: 180 })
+    setMotion('.final-contact-panel', 'contact-copy', { delay: 220 })
+    setMotion('.hand-study-overlay .study-axis, .hand-study-overlay .study-measure, .hand-study-overlay .study-cross', 'contact-guide', { delay: 40, stagger: 50, maxDelay: 140 })
+    setMotion('.page-meta', 'micro-copy', { delay: 160 })
+    setMotion('.selected .page-meta', 'micro-copy', { delay: 400, mobileDelay: 240, mobileMaxDelay: 240 })
 
-    setMotion('.final-chapter-label, .final-identity, .final-resume-panel', 'anatomy-copy', { delay: 260, stagger: 70, maxDelay: 420 })
-    setMotion('.final-contact-panel', 'anatomy-copy', { delay: 520 })
-    setMotion('.hand-study-overlay .study-arc, .hand-study-overlay .study-guide, .hand-study-overlay .study-dotline', 'anatomy-guide', { delay: 120, stagger: 35, maxDelay: 260 })
-    setMotion('.hand-study-overlay .study-joint, .hand-study-overlay .study-marker, .hand-study-overlay .study-cross', 'anatomy-marker', { delay: 240, stagger: 28, maxDelay: 480 })
-    setMotion('.page-meta', 'micro', { delay: 120 })
+    const activateScene = (node) => {
+      if (node.classList.contains('is-inview')) return
+      node.classList.add('is-inview')
+      const completionDelay = window.matchMedia('(max-width: 900px)').matches ? 620 : 900
+      const timer = window.setTimeout(() => {
+        node.classList.add('is-complete')
+        completionTimers.delete(timer)
+      }, completionDelay)
+      completionTimers.add(timer)
+    }
 
     const sceneObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return
-        entry.target.classList.add('is-inview')
-        window.setTimeout(() => entry.target.classList.add('is-complete'), 760)
+        activateScene(entry.target)
         sceneObserver.unobserve(entry.target)
       })
     }, { threshold: 0.16, rootMargin: '0px 0px -8% 0px' })
@@ -178,8 +262,7 @@ function usePortfolioMotion() {
       scenes.forEach((node) => {
         const rect = node.getBoundingClientRect()
         if (rect.top < window.innerHeight * 0.92 && rect.bottom > 0) {
-          node.classList.add('is-inview')
-          window.setTimeout(() => node.classList.add('is-complete'), 760)
+          activateScene(node)
           sceneObserver.unobserve(node)
         }
       })
@@ -219,19 +302,23 @@ function usePortfolioMotion() {
     activeTargets.forEach(({ node }) => navObserver.observe(node))
     setActiveNav('#title')
 
-    queueHashCorrection()
-
     return () => {
-      clearHashTimers()
-      window.removeEventListener('hashchange', queueHashCorrection)
+      window.cancelAnimationFrame(initialHashFrame)
+      cancelPendingAnchorNavigation()
+      document.removeEventListener('click', handleAnchorClick)
       sceneObserver.disconnect()
       navObserver.disconnect()
+      completionTimers.forEach((timer) => window.clearTimeout(timer))
+      completionTimers.clear()
       root.classList.remove('motion-enabled')
       root.classList.remove('motion-reduced')
       navLinks.forEach((link) => link.classList.remove('is-active'))
+      cleanupArchiveMotion()
       scenes.forEach((node) => {
         node.classList.remove('is-inview', 'is-complete')
         node.removeAttribute('data-motion-scene')
+        node.removeAttribute('data-motion-pattern')
+        node.style.removeProperty('--scene-duration')
       })
       touchedNodes.forEach((node) => {
         node.removeAttribute('data-motion')
@@ -275,35 +362,173 @@ function TitleSection() {
 }
 
 
-function ContentsSection() {
-  return <section id="contents" className="contents contents-index page paper-page">
-    <header className="contents-index-head">
-      <h2>CONTENTS</h2>
-      <p>PORTFOLIO INDEX / 01-10</p>
-    </header>
-    <div className="contents-index-grid" aria-label="作品集目录">
-      {contentsChapters.map((chapter) => <a
-        className={`contents-index-entry ${chapter.type === 'text' ? 'contents-index-entry-text' : ''}`}
-        href={chapter.href}
-        key={chapter.number}
-        data-chapter={chapter.number}
-      >
-        {chapter.type === 'image'
-          ? <figure className="contents-index-preview">
-              <img {...imageAttrs(chapter.asset)} alt={`${chapter.asset.alt}目录预览`} style={{ objectPosition: chapter.objectPosition }} loading="lazy" decoding="async" fetchPriority="low" />
-            </figure>
-          : <div className="contents-index-text-tile" aria-label={`${chapter.title} / ${chapter.subtitle}`}>
-              <strong>{chapter.lines[0]}</strong>
-              <span>{chapter.lines[1]}</span>
-            </div>}
-        <div className="contents-index-copy">
-          <b>{chapter.number}</b>
-          <span>{chapter.title}</span>
-          <small>{chapter.subtitle}</small>
+const ARCHIVE_SCENE_WIDTH = 1920
+const ARCHIVE_SCENE_HEIGHT = 1080
+
+const CONTENTS_V6_MASTER_SAFE_AREA = Object.freeze({ left: 48, right: 48, top: 34, bottom: 34 })
+
+const CONTENTS_V6_MASTER_LAYOUT = Object.freeze([
+  { number: '01', title: 'HERO WORKS', descriptor: 'KEY VISUAL 01', marker: { x: 88, y: 530 }, window: { x: 112, y: 503, width: 94, height: 57 }, label: { x: 80, y: 468 }, route: 'M -20 520 C 18 509, 51 511, 88 530' },
+  { number: '02', title: 'CHARACTER DESIGN', descriptor: 'KEY VISUAL 02', marker: { x: 352, y: 610 }, window: { x: 365, y: 575, width: 92, height: 58 }, label: { x: 349, y: 537 }, route: 'M 88 530 C 164 515, 221 482, 274 521 C 314 550, 286 586, 352 610' },
+  { number: '03', title: 'STYLE EXPLORATION', descriptor: 'KEY VISUAL 03', marker: { x: 520, y: 711 }, window: { x: 537, y: 688, width: 96, height: 59 }, label: { x: 464, y: 751 }, route: 'M 352 610 C 395 649, 470 720, 520 711' },
+  { number: '04', title: 'CHARACTER SHEETS', descriptor: 'TURNAROUND DESIGN', marker: { x: 700, y: 555 }, window: { x: 659, y: 467, width: 110, height: 68 }, label: { x: 663, y: 430 }, route: 'M 520 711 C 570 702, 620 565, 700 555' },
+  { number: '05', title: 'PROP DESIGN', descriptor: 'LAYER / ORNAMENT', marker: { x: 946, y: 710 }, window: { x: 884, y: 724, width: 97, height: 56 }, label: { x: 850, y: 789 }, route: 'M 700 555 C 790 540, 830 690, 946 710' },
+  { number: '06', title: 'UI TRANSITION', descriptor: 'IDENTITY / EXPRESSION', marker: { x: 1070, y: 628 }, window: { x: 1058, y: 540, width: 96, height: 59 }, label: { x: 1134, y: 500 }, route: 'M 946 710 C 985 720, 1024 635, 1070 628' },
+  { number: '07', title: 'PROCESS ARCHIVE', descriptor: 'TECHNICAL SHEETS', marker: { x: 1360, y: 562 }, window: { x: 1368, y: 508, width: 96, height: 59 }, label: { x: 1354, y: 468 }, route: 'M 1070 628 C 1120 620, 1205 630, 1262 614 C 1296 604, 1322 558, 1360 562' },
+  { number: '08', title: 'RESUME', descriptor: 'CHARACTER CONCEPT ARTIST', marker: { x: 1488, y: 710 }, window: { x: 1440, y: 696, width: 84, height: 51 }, label: { x: 1496, y: 674 }, route: 'M 1360 562 C 1412 580, 1433 700, 1488 710' },
+  { number: '09', title: 'CONTACT', descriptor: 'EMAIL / WECHAT', marker: { x: 1678, y: 678 }, window: { x: 1645, y: 640, width: 84, height: 53 }, label: { x: 1660, y: 632 }, route: 'M 1488 710 C 1543 720, 1616 660, 1678 678' },
+])
+
+function toStagePercent(value, axis) {
+  return `${(value / (axis === 'x' ? ARCHIVE_SCENE_WIDTH : ARCHIVE_SCENE_HEIGHT)) * 100}%`
+}
+
+function MasterContentsSection() {
+  const chapterMap = new Map(contentsChapters.map((chapter) => [chapter.number, chapter]))
+  const { width, height } = getAssetDimensions(contentsV6CleanAtmosphere)
+
+  return <section id="contents" className="contents archive-route archive-selection-scene v6-master-contents page paper-page" data-contents-visual="v6master">
+    <div className="archive-selection-frame">
+      <div className="archive-selection-viewport">
+        <div className="archive-selection-map v6-master-map" style={{ '--selection-width': `${ARCHIVE_SCENE_WIDTH}px`, '--selection-height': `${ARCHIVE_SCENE_HEIGHT}px`, '--v6-safe-left': `${CONTENTS_V6_MASTER_SAFE_AREA.left}px`, '--v6-safe-right': `${CONTENTS_V6_MASTER_SAFE_AREA.right}px` }}>
+          <img className="archive-selection-core v6-master-plate" src={contentsV6CleanAtmosphere.src} alt="" aria-hidden="true" loading="eager" decoding="async" fetchPriority="high" width={width} height={height} />
+          <div className="v6-master-atmosphere-veil" aria-hidden="true" />
+          <header className="v6-master-title">
+            <span>ARCHIVE SYSTEM // KEY VISUAL INDEX</span>
+            <h2>CONTENTS</h2>
+            <b>EXPLORE THE ARCHIVE</b>
+            <p>Browse concept art, key visuals,<br />and design notes from selected works.<br />Thank you for visiting.</p>
+          </header>
+          <div className="v6-master-side-meta" aria-hidden="true"><span>PRJ</span><span>NO.</span><span>2.1.4</span><i /></div>
+
+          <svg className="archive-selection-lines v6-master-route" viewBox={`0 0 ${ARCHIVE_SCENE_WIDTH} ${ARCHIVE_SCENE_HEIGHT}`} preserveAspectRatio="none" aria-hidden="true">
+            {CONTENTS_V6_MASTER_LAYOUT.map((item) => <path className={`archive-selection-link archive-selection-link-${item.number}`} d={item.route} data-route-chapter={item.number} key={item.number} pathLength="1" />)}
+          </svg>
+
+          <nav className="archive-route-nodes v6-master-nodes" aria-label="作品集路线目录">
+            {CONTENTS_V6_MASTER_LAYOUT.map((item) => {
+              const chapter = chapterMap.get(item.number)
+              const isImage = chapter?.type === 'image'
+              return <a
+                className={`archive-route-node archive-selection-node v6-master-node ${isImage ? 'v6-master-node-image' : 'archive-route-node-utility v6-master-node-terminal'}`}
+                href={chapter?.href}
+                key={item.number}
+                data-chapter={item.number}
+                aria-label={`${item.number} ${item.title} ${item.descriptor}`}
+                style={{
+                  '--v6-marker-x': toStagePercent(item.marker.x, 'x'),
+                  '--v6-marker-y': toStagePercent(item.marker.y, 'y'),
+                  '--v6-window-x': toStagePercent(item.window.x, 'x'),
+                  '--v6-window-y': toStagePercent(item.window.y, 'y'),
+                  '--v6-window-w': toStagePercent(item.window.width, 'x'),
+                  '--v6-window-h': toStagePercent(item.window.height, 'y'),
+                  '--v6-label-x': toStagePercent(item.label.x, 'x'),
+                  '--v6-label-y': toStagePercent(item.label.y, 'y'),
+                }}
+              >
+                <span className="archive-route-anchor v6-master-marker" aria-hidden="true"><span className="archive-route-index">{item.number}</span></span>
+                {isImage
+                  ? <figure className="archive-route-window v6-master-window">
+                      <img {...imageAttrs(chapter.asset)} alt={`${chapter.asset.alt}目录检索裁切`} loading="eager" decoding="async" fetchPriority="low" />
+                      <span className="v6-master-window-corners" aria-hidden="true" />
+                    </figure>
+                  : null}
+                {isImage
+                  ? <span className="archive-route-label v6-master-label"><b>{item.number}</b><strong>{item.title}</strong><small>{item.descriptor}</small></span>
+                  : <span className="archive-route-utility v6-master-terminal"><b>{item.number}</b><strong>{item.title}</strong><small>{item.descriptor}</small></span>}
+              </a>
+            })}
+          </nav>
+          <div className="v6-master-footer-meta"><span>PROTOCOL SYSTEM</span><span>DISPLAY MODE: INDEX-LINE // FULL / ENGAGE</span></div>
         </div>
-      </a>)}
+      </div>
     </div>
   </section>
+}
+
+function MobileContentsSection() {
+  const routeChapters = contentsChapters.filter((chapter) => chapter.number !== '10')
+  return <section id="contents" className="contents archive-route archive-selection-scene mobile-contents page paper-page" data-contents-visual="v6master-mobile">
+    <div className="archive-selection-frame">
+      <header className="archive-route-head">
+        <div className="archive-route-kicker">INDEX / 04</div>
+        <h2>ARCHIVE ROUTE · SELECTION MATRIX</h2>
+        <p>MAP 09 · ROUTE STATUS / LIVE</p>
+        <a className="archive-route-return" href="#title">RETURN / TITLE</a>
+      </header>
+
+      <div className="archive-selection-viewport">
+        <div className="archive-selection-map" style={{ '--selection-width': `${ARCHIVE_SCENE_WIDTH}px`, '--selection-height': `${ARCHIVE_SCENE_HEIGHT}px` }}>
+          <div className="archive-route-nodes" aria-label="作品集路线目录">
+            {routeChapters.map((chapter) => {
+              const windowX = chapter.desktopMapX - chapter.routeX
+              const windowY = chapter.desktopMapY - chapter.routeY
+              return <a
+                className={[
+                  'archive-route-node',
+                  'archive-selection-node',
+                  `archive-route-node-${chapter.mapType}`,
+                  `archive-route-size-${chapter.mapSize}`,
+                  `archive-route-place-${chapter.mapPlacement}`,
+                  `archive-route-side-${chapter.mapSide}`,
+                  `archive-selection-zone-${chapter.mapZone}`,
+                ].join(' ')}
+                href={chapter.href}
+                key={chapter.number}
+                data-chapter={chapter.number}
+                data-reveal-start={chapter.revealStart}
+                data-reveal-end={chapter.revealEnd}
+                style={{
+                  '--map-x': `${(chapter.routeX / ARCHIVE_SCENE_WIDTH) * 100}%`,
+                  '--map-y': `${(chapter.routeY / ARCHIVE_SCENE_HEIGHT) * 100}%`,
+                  '--node-w': `${chapter.hitWidth || chapter.windowWidth || 176}px`,
+                  '--window-w': chapter.windowWidth ? `${chapter.windowWidth}px` : undefined,
+                  '--window-h': chapter.windowHeight ? `${chapter.windowHeight}px` : undefined,
+                  '--window-x': `${windowX}px`,
+                  '--window-y': `${windowY}px`,
+                  '--anchor-x': '0px',
+                  '--anchor-y': '0px',
+                  '--label-x': `${windowX + (chapter.labelOffsetX || 0)}px`,
+                  '--label-y': `${windowY + (chapter.labelOffsetY || 0)}px`,
+                  '--label-w': chapter.labelWidth ? `${chapter.labelWidth}px` : undefined,
+                  '--label-h': chapter.labelHeight ? `${chapter.labelHeight}px` : undefined,
+                  '--crop-position': chapter.cropPosition || chapter.objectPosition || '50% 50%',
+                  '--crop-scale': chapter.cropScale || 1,
+                }}
+                aria-label={`${chapter.number} ${chapter.title} ${chapter.archiveSubtitle || chapter.subtitle}`}
+              >
+                <span className="archive-route-anchor" aria-hidden="true">
+                  <span className="archive-route-index">{chapter.number}</span>
+                </span>
+                <span className="archive-selection-leader" aria-hidden="true" />
+                {chapter.mapType === 'image'
+                  ? <figure className="archive-route-window">
+                      <span className="archive-route-strip">ARCHIVE / FILE {chapter.number}</span>
+                      {chapter.number === '04' ? <span className="archive-route-corners" aria-hidden="true" /> : null}
+                      <img {...imageAttrs(chapter.asset)} alt={`${chapter.asset.alt}目录路线裁切预览`} loading="lazy" decoding="async" fetchPriority="low" />
+                    </figure>
+                  : <div className="archive-route-utility">
+                      <span>ARCHIVE / ENDPOINT {chapter.number}</span>
+                  <strong>{chapter.number} / {chapter.archiveTitle || chapter.lines[0]}</strong>
+                      <small>{chapter.lines[1]}</small>
+                    </div>}
+                <span className="archive-route-label">
+                  <b>ARCHIVE / {chapter.number}</b>
+                  <strong>{chapter.number} / {chapter.archiveTitle || chapter.title}</strong>
+                  <small>{chapter.archiveSubtitle || chapter.subtitle}</small>
+                </span>
+              </a>
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+}
+
+function ContentsSection() {
+  const mobile = window.matchMedia('(max-width: 1100px)').matches
+  return mobile ? <MobileContentsSection /> : <MasterContentsSection />
 }
 
 function KeyVisualPage({ id, number, title, asset, variant }) {
@@ -395,13 +620,20 @@ function PortraitStudies() {
 }
 
 function SelectedWorks() {
+  const [principal, ...supporting] = selectedWorks
   return <section id="selected-works" className="selected page paper-page">
     <header className="editorial-head compact"><div><span>CHARACTER PRESENTATION / IMAGE STUDIES</span><h2>SELECTED WORKS</h2></div><p>保留非 Key Visual 的展示页与横向图像研究，不重复 01–03 的独立作品页。</p></header>
     <div className="selected-layout">
-      {selectedWorks.map((asset, index) => <figure className={`selected-item selected-${index + 1}`} key={asset.id}>
-        <img {...imageAttrs(asset)} alt={asset.alt} loading="lazy" decoding="async" />
-        <figcaption>{asset.label}</figcaption>
-      </figure>)}
+      <figure className="selected-item selected-primary selected-1">
+        <img {...imageAttrs(principal)} alt={principal.alt} loading="lazy" decoding="async" />
+        <figcaption>{principal.label}</figcaption>
+      </figure>
+      <div className="selected-supporting">
+        {supporting.map((asset, index) => <figure className={`selected-item selected-support selected-${index + 2}`} key={asset.id}>
+          <img {...imageAttrs(asset)} alt={asset.alt} loading="lazy" decoding="async" />
+          <figcaption>{asset.label}</figcaption>
+        </figure>)}
+      </div>
     </div>
     <PageMeta number="07" label="SELECTED WORKS" />
   </section>
@@ -494,8 +726,10 @@ function ResumeContactSection() {
 
 function App() {
   usePortfolioMotion()
+  const query = new URLSearchParams(window.location.search)
+  const directContentsCapture = query.get('contentsCapture') === '1'
 
-  return <main>
+  return <main className={directContentsCapture ? 'contents-capture-direct' : undefined}>
     <TitleSection />
     <ContentsSection />
     <KeyVisualPage id="key-visual-01" number="01" title="KEY VISUAL 01" asset={artworkOne} variant="one" />

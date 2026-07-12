@@ -1,0 +1,60 @@
+/* V4.1 motion reference snippets for Codex integration.
+   These snippets are not meant to be blindly pasted; adapt to existing class names.
+*/
+
+.archive-core-glow {
+  animation: archiveCoreBreathe 5.8s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.archive-node-pulse {
+  animation: archiveNodePulse 2.4s ease-in-out infinite;
+}
+
+.archive-energy-dot {
+  animation: archiveEnergyPulse 1.9s ease-in-out infinite;
+}
+
+.archive-route-draw {
+  stroke-dasharray: var(--route-length, 1200);
+  stroke-dashoffset: calc(var(--route-length, 1200) * (1 - var(--route-progress, 0)));
+}
+
+.archive-window-retrieve {
+  clip-path: inset(0 calc((1 - var(--window-progress, 0)) * 100%) 0 0);
+  opacity: clamp(0, var(--window-progress, 0) * 1.35, 1);
+}
+
+.archive-label-settle {
+  opacity: var(--label-progress, 0);
+  transform: translate3d(calc((1 - var(--label-progress, 0)) * 8px), 0, 0);
+}
+
+@keyframes archiveCoreBreathe {
+  0%, 100% { opacity: 0.72; transform: scale(1); filter: brightness(1); }
+  50% { opacity: 0.92; transform: scale(1.012); filter: brightness(1.08); }
+}
+
+@keyframes archiveNodePulse {
+  0%, 100% { opacity: 0.78; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.12); }
+}
+
+@keyframes archiveEnergyPulse {
+  0%, 100% { opacity: 0.45; transform: scale(0.86); }
+  50% { opacity: 0.95; transform: scale(1.18); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .archive-core-glow,
+  .archive-node-pulse,
+  .archive-energy-dot {
+    animation: none !important;
+  }
+  .archive-window-retrieve,
+  .archive-label-settle {
+    opacity: 1;
+    transform: none;
+    clip-path: none;
+  }
+}

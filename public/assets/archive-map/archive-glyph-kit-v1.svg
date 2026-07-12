@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 200" fill="none">
+<defs>
+<style>
+  .b{stroke:#1268f4;stroke-width:2;stroke-linecap:square;stroke-linejoin:miter}
+  .s{stroke:#577d9b;stroke-width:1.3;stroke-opacity:.66}
+  .f{fill:#1268f4;fill-opacity:.9}
+</style>
+</defs>
+<!-- crop corner set -->
+<g id="crop-corners" class="b">
+ <path d="M24 48V24H48 M112 24H136V48 M24 112V136H48 M112 136H136V112"/>
+</g>
+<!-- partial datum -->
+<g id="partial-datum">
+ <path class="s" d="M220 40A44 44 0 0 1 284 94 M290 110A44 44 0 0 1 232 144"/>
+ <path class="b" d="M250 66V118 M224 92H276"/>
+ <circle class="f" cx="250" cy="92" r="3"/>
+</g>
+<!-- route anchoring glyph -->
+<g id="route-anchor">
+ <rect class="b" x="358" y="74" width="14" height="14" transform="rotate(45 365 81)"/>
+ <path class="b" d="M330 81H351 M379 81H420"/>
+ <circle class="f" cx="365" cy="81" r="2.8"/>
+</g>
+<!-- scale tick -->
+<g id="micro-scale">
+ <path class="s" d="M470 108H642"/>
+ <path class="s" d="M480 100V116 M516 104V112 M552 100V116 M588 104V112 M624 100V116"/>
+ <path class="b" d="M470 108H506"/>
+</g>
+</svg>

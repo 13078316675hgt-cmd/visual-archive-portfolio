@@ -14,7 +14,12 @@ Thumbs.db
 .cache/
 coverage/
 
-×÷Æ·¼¯*.zip
+# Local environment values; keep only the documented placeholder.
+.env
+.env.*
+!.env.example
+
+ä½œå“é›†*.zip
 
 # Private source files and local-only exports
 *.zip

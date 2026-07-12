@@ -13,37 +13,42 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      VITE_PUBLIC_SITE_URL: https://www.marlsa.cc.cd/
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
+      - name: Set up pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10.23.0
 
-      - name: Setup Node
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 22
           cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build GitHub Pages site
+      - name: Validate production assets
+        run: pnpm run review:assets
+
+      - name: Build custom-domain production site
         run: pnpm run build
 
-      - name: Setup Pages
+      - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload artifact
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist

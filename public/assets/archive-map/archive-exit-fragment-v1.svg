@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" fill="none">
+
+<defs>
+  <linearGradient id="mist" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#c9d7e2" stop-opacity="0"/>
+    <stop offset="0.20" stop-color="#c9d7e2" stop-opacity=".22"/>
+    <stop offset="0.52" stop-color="#b7c9d8" stop-opacity=".30"/>
+    <stop offset="0.84" stop-color="#c9d7e2" stop-opacity=".16"/>
+    <stop offset="1" stop-color="#c9d7e2" stop-opacity="0"/>
+  </linearGradient>
+  <linearGradient id="fadeUp" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#eff4f7" stop-opacity=".55"/>
+    <stop offset=".55" stop-color="#d6e1e9" stop-opacity=".18"/>
+    <stop offset="1" stop-color="#d6e1e9" stop-opacity="0"/>
+  </linearGradient>
+  <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+    <feGaussianBlur stdDeviation="10"/>
+  </filter>
+  <filter id="soft2" x="-20%" y="-20%" width="140%" height="140%">
+    <feGaussianBlur stdDeviation="3"/>
+  </filter>
+  <pattern id="microgrid" width="32" height="32" patternUnits="userSpaceOnUse">
+    <path d="M32 0H0V32" fill="none" stroke="#7b9ab3" stroke-opacity=".08" stroke-width="1"/>
+  </pattern>
+  <pattern id="dots" width="16" height="16" patternUnits="userSpaceOnUse">
+    <circle cx="2" cy="2" r=".65" fill="#4f80a6" fill-opacity=".18"/>
+  </pattern>
+  <mask id="softMask">
+    <rect width="100%" height="100%" fill="url(#fadeUp)"/>
+  </mask>
+</defs>
+
+<!-- light exit residue, breaks apart to the right -->
+<rect x="72" y="114" width="350" height="286" fill="url(#microgrid)" opacity=".44"/>
+<path d="M96 156 H410 V322 H306 V410 H154" stroke="#7896af" stroke-opacity=".15" stroke-width="1"/>
+<path d="M124 174 H374 V296 H280 V360 H182" fill="#c7d7e2" fill-opacity=".08"/>
+<path d="M212 302 C310 272 386 304 472 276 C562 248 658 280 740 250" stroke="#94aec1" stroke-opacity=".20" stroke-width="1.5"/>
+<path d="M642 230 H846 M734 184 V338" stroke="#6f91ab" stroke-opacity=".14" stroke-width="1"/>
+<path d="M890 112 A84 84 0 0 1 1045 182" stroke="#8ba7bd" stroke-opacity=".14" stroke-width="1.2"/>
+<path d="M976 184 h70 M1011 149 v70" stroke="#4f7fa3" stroke-opacity=".20" stroke-width="1"/>
+<path d="M842 366 C931 340 1026 366 1124 338" stroke="#6f91ab" stroke-opacity=".18" stroke-width="1" stroke-dasharray="3 9"/>
+<g opacity=".3">
+  <rect x="516" y="332" width="110" height="52" fill="#aec2d0"/>
+  <rect x="594" y="390" width="102" height="42" fill="#c3d4df"/>
+  <rect x="724" y="288" width="86" height="30" fill="#a5bdcc"/>
+</g>
+<path d="M0 432 C196 395 344 447 520 418 C720 385 912 426 1200 386" stroke="#c4d4df" stroke-opacity=".40" stroke-width="14" filter="url(#soft)"/>
+<path d="M0 444 C196 407 344 459 520 430 C720 397 912 438 1200 398" stroke="#9eb6c6" stroke-opacity=".20" stroke-width="1.2"/>
+<g fill="#4f7fa3" fill-opacity=".25">
+ <rect x="421" y="232" width="4" height="4"/><rect x="742" y="214" width="4" height="4"/>
+ <rect x="820" y="318" width="3" height="3"/><rect x="1110" y="268" width="5" height="5"/>
+</g>
+<rect x="0" y="396" width="840" height="90" fill="url(#mist)" filter="url(#soft)" opacity=".62"/>
+</svg>

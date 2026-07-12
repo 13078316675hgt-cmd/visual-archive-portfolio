@@ -1,0 +1,21 @@
+{
+  "version": "v4.5",
+  "purpose": "Move V4.4 from web-card layout toward the new video's central task-selection interface.",
+  "asset_replacements": {
+    "central_core": "central-archive-emblem-v4-5.svg",
+    "label_kit": "archive-task-label-kit-v4-5.svg"
+  },
+  "layout_rules": [
+    "central core occupies 60-72vw and 92-98vh on desktop",
+    "node labels become micro task tags, not wide white cards",
+    "each node group must be visually attached: ring -> short leader -> tiny image/tag",
+    "routes should be short radial branches from core/hub, not long web arcs"
+  ],
+  "motion": [
+    "core fades and breathes",
+    "radial branches draw out",
+    "node ring pulses once or gently loops",
+    "micro task tag clips in",
+    "foreground image crop appears only after tag/frame"
+  ]
+}

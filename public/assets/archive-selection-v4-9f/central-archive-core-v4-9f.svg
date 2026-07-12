@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" fill="none">
+  <title>Central Archive Core V4.9F</title>
+  <desc>Abstract faceted archive-core emblem. Designed to avoid airplane, rocket, wing, drone, bird, weapon, or character silhouette readings.</desc>
+  <defs>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="24" stdDeviation="26" flood-color="#0b1f2b" flood-opacity="0.18"/>
+    </filter>
+    <linearGradient id="plateWhite" x1="600" y1="80" x2="600" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E7EEF3"/>
+    </linearGradient>
+    <linearGradient id="plateCool" x1="310" y1="290" x2="890" y2="520" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#EDF3F6"/>
+      <stop offset="0.45" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#DCE6EC"/>
+    </linearGradient>
+  </defs>
+
+  <g id="CENTRAL_ARCHIVE_CORE_V4_9F" filter="url(#softShadow)">
+    <!-- Rear stacked archive slabs: deliberately rectangular / folded, not wing-shaped -->
+    <g id="REAR_ARCHIVE_SLABS" opacity="0.92">
+      <path id="REAR_SLAB_TOP" d="M438 126H762L822 192L772 258H428L378 192L438 126Z" fill="#E9F0F4"/>
+      <path id="REAR_SLAB_MID" d="M330 274H870L918 358L870 442H330L282 358L330 274Z" fill="#DCE6EC"/>
+      <path id="REAR_SLAB_LOW" d="M414 472H786L826 532L786 592H414L374 532L414 472Z" fill="#E5EDF2"/>
+    </g>
+
+    <!-- Main faceted archive emblem -->
+    <g id="FRONT_FACETED_CORE">
+      <path id="CORE_TOP_ARCHIVE_PLATE" d="M520 86H680L788 182L750 338L600 410L450 338L412 182L520 86Z" fill="url(#plateWhite)"/>
+      <path id="CORE_LEFT_FOLDED_PLATE" d="M424 312L264 378L324 512L516 472L600 410L450 338Z" fill="url(#plateCool)"/>
+      <path id="CORE_RIGHT_FOLDED_PLATE" d="M776 312L936 378L876 512L684 472L600 410L750 338Z" fill="url(#plateCool)"/>
+      <path id="CORE_BOTTOM_ARCHIVE_BLOCK" d="M516 472H684L666 642H534L516 472Z" fill="#F2F6F8"/>
+      <path id="CORE_BOTTOM_BASE" d="M548 642H652L632 686H568L548 642Z" fill="#DCE6EC"/>
+    </g>
+
+    <!-- Facet overlays to avoid a literal vehicle silhouette -->
+    <g id="FACET_TONES" opacity="0.82">
+      <path d="M450 338L600 410L516 472L324 512L424 312Z" fill="#E6EEF3"/>
+      <path d="M750 338L600 410L684 472L876 512L776 312Z" fill="#DAE5EB"/>
+      <path d="M520 86L600 410L680 86H520Z" fill="#F8FBFC" opacity="0.82"/>
+      <path d="M516 472L600 410L684 472L666 642H534L516 472Z" fill="#EEF4F7" opacity="0.9"/>
+    </g>
+
+    <!-- Archive rings and system lines -->
+    <g id="CORE_SYSTEM_GEOMETRY">
+      <circle id="CORE_RING_OUTER" cx="600" cy="410" r="108" stroke="#8EA8B8" stroke-width="5" opacity="0.9"/>
+      <circle id="CORE_RING_INNER" cx="600" cy="410" r="58" stroke="#8EA8B8" stroke-width="4" stroke-dasharray="16 14" opacity="0.86"/>
+      <circle id="CORE_NODE_CENTER" cx="600" cy="410" r="16" fill="#1E89E5"/>
+      <path id="VERTICAL_AXIS" d="M600 150V666" stroke="#86A3B7" stroke-width="5" stroke-linecap="round"/>
+      <circle id="AXIS_TOP_DOT" cx="600" cy="176" r="8" fill="#1E89E5"/>
+      <path id="HORIZONTAL_AXIS" d="M374 410H826" stroke="#8EA8B8" stroke-width="4" stroke-linecap="round" opacity="0.72"/>
+      <path id="DIAGONAL_AXIS_L" d="M460 340L600 410" stroke="#8EA8B8" stroke-width="4" stroke-linecap="round" opacity="0.72"/>
+      <path id="DIAGONAL_AXIS_R" d="M740 340L600 410" stroke="#8EA8B8" stroke-width="4" stroke-linecap="round" opacity="0.72"/>
+    </g>
+
+    <!-- Short blue core guide: keeps selection interface identity, not rocket exhaust -->
+    <g id="CORE_BLUE_GUIDES">
+      <path d="M600 548V632" stroke="#1E89E5" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="600" cy="632" r="30" stroke="#1E89E5" stroke-width="4" stroke-dasharray="6 8"/>
+    </g>
+
+    <!-- Edge lines -->
+    <g id="ARCHIVE_FACET_EDGES" opacity="0.36" stroke="#7693A3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M412 182L450 338L600 410L750 338L788 182"/>
+      <path d="M264 378L324 512L516 472"/>
+      <path d="M936 378L876 512L684 472"/>
+      <path d="M534 642H666"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="180" viewBox="0 0 420 180" fill="none">
+  <defs>
+    <symbol id="archive-label-small" viewBox="0 0 180 56">
+      <rect x="0" y="0" width="180" height="56" fill="#F7F9FA" stroke="#1A1E23" stroke-width="1"/>
+      <rect x="0" y="0" width="180" height="13" fill="#11161B"/>
+      <path d="M9 7H54" stroke="#F8FBFF" stroke-width="1.2"/>
+      <path d="M14 27H96" stroke="#11161B" stroke-width="3"/>
+      <path d="M14 40H124" stroke="#48535E" stroke-width="1.4" opacity="0.7"/>
+    </symbol>
+
+    <symbol id="archive-label-wide" viewBox="0 0 250 76">
+      <rect x="0" y="0" width="250" height="76" fill="#F7F9FA" stroke="#1A1E23" stroke-width="1"/>
+      <rect x="0" y="0" width="250" height="15" fill="#11161B"/>
+      <path d="M10 8H68" stroke="#F8FBFF" stroke-width="1.2"/>
+      <path d="M18 36H136" stroke="#11161B" stroke-width="4"/>
+      <path d="M18 52H196" stroke="#48535E" stroke-width="1.4" opacity="0.7"/>
+    </symbol>
+
+    <symbol id="black-info-chip" viewBox="0 0 118 72">
+      <rect x="0" y="0" width="118" height="72" fill="#11161B"/>
+      <path d="M14 18H56" stroke="#F8FBFF" stroke-width="2"/>
+      <path d="M14 34H96" stroke="#F8FBFF" stroke-width="1" opacity="0.55"/>
+      <path d="M14 48H70" stroke="#F8FBFF" stroke-width="1" opacity="0.35"/>
+      <rect x="84" y="12" width="22" height="22" stroke="#1268F4" stroke-width="1"/>
+    </symbol>
+  </defs>
+
+  <g transform="translate(20 20)"><use href="#archive-label-small"/></g>
+  <g transform="translate(20 98)"><use href="#archive-label-wide"/></g>
+  <g transform="translate(290 30)"><use href="#black-info-chip"/></g>
+</svg>
