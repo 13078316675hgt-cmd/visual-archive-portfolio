@@ -3,20 +3,24 @@ import { createRoot } from 'react-dom/client'
 import { useEffect, useLayoutEffect } from 'react'
 import './styles.css'
 import './gallery.css'
+import './content-layout.css'
 import { initArchiveMotion } from './motion/archiveMotion.js'
 import {
-  additionalCharacterDesigns,
+  AdditionalCharacterDesigns,
+  CharacterSheets,
+  CostumeDetail,
+  PortraitStudies,
+  SelectedWorks,
+} from './components/ContentPortfolioPages.jsx'
+import {
   artworkManifest,
   artworkOne,
   artworkThree,
   artworkTwo,
-  characterSheets,
-  contactHandsTech,
   contentsV6CleanAtmosphere,
   contentsChapters,
-  costumeDetailAsset,
-  portraitStudies,
-  selectedWorks,
+  endPageArtwork,
+  homeV9Artwork,
 } from './data/artworkManifest.js'
 
 function PageMeta({ number, label }) {
@@ -83,15 +87,17 @@ function usePortfolioMotion() {
 
     const waitForAnchorLayout = async (target) => {
       await document.fonts?.ready
-      const precedingImages = Array.from(document.images).filter((image) => {
+      const targetSection = target.closest('section.page') || target
+      const layoutImages = Array.from(document.images).filter((image) => {
+        if (targetSection.contains(image)) return true
         const section = image.closest('section.page')
         if (!section || section.matches('#title, #contents')) return false
         return Boolean(image.compareDocumentPosition(target) & Node.DOCUMENT_POSITION_FOLLOWING)
       })
-      const loadingModes = precedingImages.map((image) => image.getAttribute('loading'))
-      precedingImages.forEach((image) => { image.loading = 'eager' })
-      await Promise.allSettled(precedingImages.map((image) => image.decode()))
-      precedingImages.forEach((image, index) => {
+      const loadingModes = layoutImages.map((image) => image.getAttribute('loading'))
+      layoutImages.forEach((image) => { image.loading = 'eager' })
+      await Promise.allSettled(layoutImages.map((image) => image.decode()))
+      layoutImages.forEach((image, index) => {
         const loading = loadingModes[index]
         if (loading == null) image.removeAttribute('loading')
         else image.setAttribute('loading', loading)
@@ -200,13 +206,18 @@ function usePortfolioMotion() {
     scene('#portrait-studies', 'portraits', 'artwork-sequence', '--motion-section')
     scene('#selected-works', 'selected', 'artwork-sequence', '--motion-section')
     scene('#additional-designs', 'additional', 'section-intro', '--motion-section')
-    scene('#resume-contact', 'final', 'contact-ending', '--motion-section')
+    scene('#end', 'final', 'contact-ending', '--motion-slow')
 
     setMotion('.title-rule-a, .title-rule-b', 'registration-rule', { stagger: 40, maxDelay: 80 })
     setMotion('.title-lockup h1 span', 'intro-title', { delay: 80, stagger: 60, maxDelay: 200 })
     setMotion('.title-lockup h2, .title-lockup p, .title-contact a, .title-contact p, .title-meta span', 'intro-meta', { delay: 220, stagger: 40, maxDelay: 240 })
     setMotion('.title-cobalt-field', 'intro-field')
     setMotion('.title-scan', 'intro-panel', { stagger: 40, maxDelay: 120 })
+    setMotion('.home-v9-artwork', 'home-v9-artwork', { delay: 120, mobileDelay: 260 })
+    setMotion('.home-v9-title span', 'home-v9-title', { delay: 360, stagger: 60, maxDelay: 440, mobileDelay: 80, mobileStagger: 50, mobileMaxDelay: 130 })
+    setMotion('.home-v9-eyebrow, .home-v9-subheading, .home-v9-description, .home-v9-coordinate', 'home-v9-copy', { delay: 580, stagger: 55, maxDelay: 720, mobileDelay: 180, mobileStagger: 45, mobileMaxDelay: 290 })
+    setMotion('.home-v9-enter, .home-v9-scroll', 'home-v9-action', { delay: 760, stagger: 80, maxDelay: 840, mobileDelay: 310, mobileStagger: 55, mobileMaxDelay: 365 })
+    setMotion('.home-v9-rule', 'registration-rule', { delay: 640, stagger: 50, maxDelay: 700, mobileDelay: 220, mobileStagger: 40, mobileMaxDelay: 260 })
 
     setMotion('.key-visual-page .kv-number-row', 'section-title')
     setMotion('.key-visual-page .kv-title-rule', 'registration-rule', { delay: 40 })
@@ -221,7 +232,7 @@ function usePortfolioMotion() {
     setMotion('.editorial-head p', 'section-copy', { delay: 80 })
     setMotion('.sheet-main', 'artwork-primary', { delay: 40 })
     setMotion('.sheet-support', 'artwork-support', { delay: 100, stagger: 40, maxDelay: 220 })
-    setMotion('.detail-main', 'artwork-primary', { delay: 40 })
+    setMotion('.costume-primary', 'artwork-primary', { delay: 40 })
     setMotion('.detail-crop', 'artwork-support', { delay: 120, stagger: 50, maxDelay: 220 })
     setMotion('.portrait-item', 'artwork-support', { delay: 40, stagger: 70, maxDelay: 120 })
     setMotion('.selected-primary img', 'artwork-primary', { delay: 80, mobileDelay: 40 })
@@ -230,10 +241,8 @@ function usePortfolioMotion() {
     setMotion('.selected-support figcaption', 'section-copy', { delay: 340, stagger: 60, maxDelay: 400, mobileDelay: 200, mobileStagger: 40, mobileMaxDelay: 240 })
     setMotion('.additional-item', 'artwork-support', { delay: 60, stagger: 40, maxDelay: 220 })
 
-    setMotion('.final-hands', 'contact-field')
-    setMotion('.final-chapter-label, .final-identity, .final-resume-panel', 'contact-copy', { delay: 80, stagger: 50, maxDelay: 180 })
-    setMotion('.final-contact-panel', 'contact-copy', { delay: 220 })
-    setMotion('.hand-study-overlay .study-axis, .hand-study-overlay .study-measure, .hand-study-overlay .study-cross', 'contact-guide', { delay: 40, stagger: 50, maxDelay: 140 })
+    setMotion('.end-page-image', 'end-page-field')
+    setMotion('.end-page-hotspot-anchor', 'end-page-control', { delay: 680, stagger: 90, maxDelay: 770, mobileDelay: 520, mobileStagger: 70, mobileMaxDelay: 590 })
     setMotion('.page-meta', 'micro-copy', { delay: 160 })
     setMotion('.selected .page-meta', 'micro-copy', { delay: 400, mobileDelay: 240, mobileMaxDelay: 240 })
 
@@ -358,6 +367,43 @@ function TitleSection() {
       <span>CHARACTER ART</span>
       <span>X 23.47 / Y 06.12</span>
     </div>
+  </section>
+}
+
+function HomeV9Preview() {
+  const { width, height } = getAssetDimensions(homeV9Artwork)
+
+  return <section id="title" className="home-v9-preview" data-home-visual="v9master">
+    <Nav />
+    <div className="home-v9-artwork">
+      <picture>
+        <source type="image/webp" srcSet={homeV9Artwork.srcSet} sizes={homeV9Artwork.sizes} />
+        <img
+          src={homeV9Artwork.src}
+          alt={homeV9Artwork.alt}
+          width={width}
+          height={height}
+          loading="eager"
+          decoding="async"
+          fetchPriority="high"
+        />
+      </picture>
+    </div>
+    <div className="home-v9-copy">
+      <p className="home-v9-eyebrow">SELECTED WORKS / 2026</p>
+      <h1 className="home-v9-title"><span>VISUAL</span><span>ARCHIVE</span></h1>
+      <p className="home-v9-subheading">CONCEPT ART PORTFOLIO</p>
+      <p className="home-v9-description">Character design, key visuals,<br />and visual development.</p>
+      <a className="home-v9-enter" href="#contents">
+        <span>ENTER ARCHIVE</span>
+        <svg viewBox="0 0 56 12" aria-hidden="true"><path d="M0 6h52M47 1l5 5-5 5" /></svg>
+      </a>
+    </div>
+    <div className="home-v9-index" aria-hidden="true"><span>00</span><b>HOME / MASTER</b></div>
+    <p className="home-v9-coordinate" aria-hidden="true">ARCHIVE FIELD / X 35.8 / Y 06.2</p>
+    <i className="home-v9-rule home-v9-rule-a" aria-hidden="true" />
+    <i className="home-v9-rule home-v9-rule-b" aria-hidden="true" />
+    <a className="home-v9-scroll" href="#contents"><span>SCROLL</span><i aria-hidden="true" /></a>
   </section>
 }
 
@@ -544,7 +590,7 @@ function KeyVisualPage({ id, number, title, asset, variant }) {
       </div>
     </div>
     <figure className="kv-main">
-      <img {...imageAttrs(asset)} alt={asset.alt} loading="lazy" decoding="async" />
+      <img {...imageAttrs(asset)} alt={asset.alt} loading={id === 'key-visual-01' ? 'eager' : 'lazy'} decoding="async" />
       {variant !== 'three' ? <span className="motion-curtain" aria-hidden="true" /> : null}
     </figure>
     <div className="kv-red-shape" aria-hidden="true" />
@@ -573,154 +619,50 @@ function imageAttrs(asset) {
   }
 }
 
-function SheetFigure({ asset, index, className }) {
-  return <figure className={`sheet ${className}`}>
-    <img {...imageAttrs(asset)} alt={asset.alt} loading="lazy" decoding="async" />
-    <figcaption><b>{String(index + 1).padStart(2, '0')}</b><span>{asset.label}</span></figcaption>
-  </figure>
-}
+const END_PAGE_HOTSPOTS = Object.freeze({
+  returnToBeginning: { left: '92.34%', top: '76.73%', width: '3.23%', height: '5.74%' },
+})
 
-function CharacterSheets() {
-  const [primary, ...supporting] = characterSheets
-  return <section id="character-sheets" className="sheets page white-page">
-    <header className="editorial-head compact"><div><span>CHARACTER SHEETS</span><h2>TECHNICAL READABILITY</h2></div><p>正面 / 侧面 / 背面，保留设定图的完整信息。</p></header>
-    <div className="sheet-list">
-      <SheetFigure asset={primary} index={0} className="sheet-main" />
-      <div className="sheet-supporting">
-        {supporting.map((asset, index) => <SheetFigure asset={asset} index={index + 1} className={`sheet-support sheet-support-${index + 2}`} key={asset.id} />)}
-      </div>
-    </div>
-    <PageMeta number="04" label="CHARACTER SHEETS" />
-  </section>
-}
+function EndPageSection() {
+  const { width, height } = getAssetDimensions(endPageArtwork)
 
-function CostumeDetail() {
-  return <section id="costume-detail" className="detail page paper-page">
-    <header className="editorial-head"><div><span>COSTUME DETAIL</span><h2>FORM, LAYER<br />AND ORNAMENT</h2></div><p>局部展示仅放大原图中可辨认的衣装结构，不补绘、不拆分隐藏部件。</p></header>
-    <div className="detail-grid">
-      <figure className="detail-main"><img {...imageAttrs(costumeDetailAsset)} alt={`${costumeDetailAsset.alt}整体视图`} loading="lazy" decoding="async" /><figcaption>COSTUME REFERENCE</figcaption></figure>
-      <figure className="detail-crop detail-upper"><div><img {...imageAttrs(costumeDetailAsset)} alt="角色上身兜帽、胸前装饰与腰部配件细节" loading="lazy" decoding="async" /></div><figcaption>UPPER BODY / ORNAMENT</figcaption></figure>
-      <figure className="detail-crop detail-back"><div><img {...imageAttrs(costumeDetailAsset)} alt="角色背部兜帽与十字纹样细节" loading="lazy" decoding="async" /></div><figcaption>BACK / SILHOUETTE</figcaption></figure>
-    </div>
-    <PageMeta number="05" label="COSTUME DETAIL" />
-  </section>
-}
+  return <section id="end" className="end-page page" aria-label="Portfolio ending">
+    <span id="resume-contact-resume" className="end-page-legacy-anchor" aria-hidden="true" />
+    <span id="resume-contact-contact" className="end-page-legacy-anchor" aria-hidden="true" />
+    <link rel="prefetch" as="image" href={endPageArtwork.src} />
 
-function PortraitStudies() {
-  return <section id="portrait-studies" className="portraits page white-page">
-    <header className="editorial-head compact"><div><span>PORTRAIT STUDY</span><h2>IDENTITY & EXPRESSION</h2></div><p>保留两张肖像，形成深色与浅色的双页关系。</p></header>
-    <div className="portrait-pair">
-      {portraitStudies.map((asset, index) => <figure className={`portrait-item portrait-${index + 1}`} key={asset.id}>
-        <img {...imageAttrs(asset)} alt={asset.alt} loading="lazy" decoding="async" />
-        <figcaption>{asset.label}</figcaption>
-      </figure>)}
-    </div>
-    <PageMeta number="06" label="PORTRAIT STUDIES" />
-  </section>
-}
+    <div className="end-page-stage">
+      <img
+        className="end-page-image"
+        src={endPageArtwork.src}
+        alt={endPageArtwork.alt}
+        width={width}
+        height={height}
+        loading="lazy"
+        decoding="async"
+      />
 
-function SelectedWorks() {
-  const [principal, ...supporting] = selectedWorks
-  return <section id="selected-works" className="selected page paper-page">
-    <header className="editorial-head compact"><div><span>CHARACTER PRESENTATION / IMAGE STUDIES</span><h2>SELECTED WORKS</h2></div><p>保留非 Key Visual 的展示页与横向图像研究，不重复 01–03 的独立作品页。</p></header>
-    <div className="selected-layout">
-      <figure className="selected-item selected-primary selected-1">
-        <img {...imageAttrs(principal)} alt={principal.alt} loading="lazy" decoding="async" />
-        <figcaption>{principal.label}</figcaption>
-      </figure>
-      <div className="selected-supporting">
-        {supporting.map((asset, index) => <figure className={`selected-item selected-support selected-${index + 2}`} key={asset.id}>
-          <img {...imageAttrs(asset)} alt={asset.alt} loading="lazy" decoding="async" />
-          <figcaption>{asset.label}</figcaption>
-        </figure>)}
-      </div>
-    </div>
-    <PageMeta number="07" label="SELECTED WORKS" />
-  </section>
-}
+      <aside className="end-page-system-log" aria-labelledby="end-page-system-log-title">
+        <header><span><i aria-hidden="true" />SYSTEM PROFILE</span></header>
+        <div className="end-page-system-log-body">
+          <h2 id="end-page-system-log-title">{`\u9EC4\u56FD\u6CF0`}</h2>
+          <p>CONCEPT ARTIST / CHARACTER DESIGNER</p>
+          <dl>
+            <div><dt>EMAIL</dt><dd><a href="mailto:2488731102@qq.com">2488731102@qq.com</a></dd></div>
+            <div><dt>PORTFOLIO</dt><dd><a href="https://www.marlsa.cc.cd/" target="_blank" rel="noreferrer">www.marlsa.cc.cd</a></dd></div>
+            <div><dt>WECHAT</dt><dd>Veiko_9029</dd></div>
+          </dl>
+        </div>
+        <footer><span>// SYSTEM LOG / ACTIVE</span><i aria-hidden="true" /></footer>
+      </aside>
 
-function AdditionalCharacterDesigns() {
-  return <section id="additional-designs" className="additional page white-page">
-    <header className="editorial-head compact"><div><span>TECHNICAL SHEETS / CHARACTER RANGE</span><h2>ADDITIONAL CHARACTER DESIGNS</h2></div><p>更多角色三视图设定，仅保留完整技术表可读性。</p></header>
-    <div className="additional-grid">
-      {additionalCharacterDesigns.map((asset) => {
-        return <figure className="additional-item" key={asset.id}>
-          <img {...imageAttrs(asset)} alt={asset.alt} loading="lazy" decoding="async" />
-          <figcaption>{asset.label}</figcaption>
-        </figure>
-      })}
-    </div>
-    <PageMeta number="08" label="ADDITIONAL CHARACTER DESIGNS" />
-  </section>
-}
-
-function ResumeContactSection() {
-  return <section id="resume-contact" className="resume-contact final-chapter final-anatomy page">
-    <div className="final-chapter-label" aria-label="Final chapter">
-      <span>09 / FINAL CONTACT</span>
-      <span>RESUME + CONTACT</span>
+      <span className="end-page-hotspot-anchor end-page-return-anchor" style={END_PAGE_HOTSPOTS.returnToBeginning}>
+        <a className="end-page-hotspot end-page-return-hotspot" href="#title" aria-label="Return to beginning">
+          <span>RETURN TO BEGINNING</span>
+        </a>
+      </span>
     </div>
 
-    <figure className="contact-hands final-hands" style={{ '--contact-image': `url(${contactHandsTech.src})` }}>
-      <img {...imageAttrs(contactHandsTech)} alt={contactHandsTech.alt} loading="lazy" decoding="async" />
-      <svg className="hand-study-overlay" viewBox="0 0 1440 760" preserveAspectRatio="none" aria-hidden="true">
-        <path className="study-arc study-arc-a" d="M318 588 C470 276 912 222 1104 546" />
-        <path className="study-arc study-arc-b" d="M408 640 C560 404 838 370 1004 612" />
-        <path className="study-guide study-axis" d="M720 204 L720 568" />
-        <path className="study-guide" d="M474 392 L676 380" />
-        <path className="study-guide" d="M764 380 L968 398" />
-        <path className="study-guide study-guide-secondary" d="M544 444 L672 402" />
-        <path className="study-guide study-guide-secondary" d="M768 402 L902 448" />
-        <path className="study-dotline study-dotline-secondary" d="M604 330 L676 360" />
-        <path className="study-dotline study-dotline-secondary" d="M764 360 L842 330" />
-        <g className="study-cross">
-          <path d="M704 382 H736" />
-          <path d="M720 366 V398" />
-        </g>
-        <path className="study-measure" d="M740 382 H806" />
-        <text className="study-number" x="812" y="386">C-09</text>
-        <circle className="study-joint" cx="388" cy="372" r="16" />
-        <circle className="study-joint" cx="456" cy="342" r="12" />
-        <circle className="study-joint" cx="526" cy="358" r="10" />
-        <circle className="study-joint" cx="592" cy="392" r="13" />
-        <circle className="study-joint" cx="650" cy="380" r="8" />
-        <circle className="study-joint" cx="790" cy="380" r="8" />
-        <circle className="study-joint" cx="854" cy="394" r="13" />
-        <circle className="study-joint" cx="916" cy="356" r="10" />
-        <circle className="study-joint" cx="988" cy="342" r="12" />
-        <circle className="study-joint" cx="1054" cy="374" r="16" />
-        <circle className="study-marker" cx="720" cy="382" r="4" />
-        <circle className="study-marker" cx="456" cy="342" r="3" />
-        <circle className="study-marker" cx="650" cy="380" r="3" />
-        <circle className="study-marker" cx="790" cy="380" r="3" />
-        <circle className="study-marker" cx="988" cy="342" r="3" />
-      </svg>
-    </figure>
-
-    <div className="final-identity">
-      <h2>{'\u9EC4\u56FD\u6CF0'}</h2>
-      <p>CHARACTER CONCEPT ARTIST</p>
-    </div>
-
-    <div id="resume-contact-resume" className="resume-contact-resume resume-anchor final-resume-panel">
-      <p className="resume-profile">中国广东，角色原画师 / 角色概念设计。动漫制作技术专业背景，曾负责手游角色设定设计，并参与素材建模与贴图绘制。</p>
-      <div className="resume-compact-facts">
-        <p><span>LOCATION</span>中国广东</p>
-        <p><span>EDUCATION</span>广东文理职业学院 / 动漫制作技术</p>
-        <p><span>INTENTION</span>角色原画师 / 角色概念设计</p>
-      </div>
-      <div className="resume-compact-experience">
-        <h3>EXPERIENCE</h3>
-        <article><time>2021.11 – 2024.11</time><h4>深圳市知返科技有限公司</h4><p>手游角色设定设计；根据世界观与策划文案完成角色概念、造型、服饰与道具设计。</p></article>
-        <article><time>2021.01 – 2021.06</time><h4>茂名风采品牌策划有限公司 / 美术实习生</h4><p>参与素材建模与贴图绘制，根据反馈协作迭代设计，并将成果应用于项目终版。</p></article>
-      </div>
-    </div>
-
-    <div id="resume-contact-contact" className="contact-page hand-contact contact-subsection contact-anchor final-contact-panel">
-      <a href="mailto:2488731102@qq.com"><span>EMAIL</span>2488731102@qq.com</a>
-      <p><span>WECHAT</span>Veiko_9029</p>
-      <a href="#title"><span>BACK TO TOP</span></a>
-    </div>
   </section>
 }
 
@@ -729,8 +671,8 @@ function App() {
   const query = new URLSearchParams(window.location.search)
   const directContentsCapture = query.get('contentsCapture') === '1'
 
-  return <main className={directContentsCapture ? 'contents-capture-direct' : undefined}>
-    <TitleSection />
+  return <main className={[directContentsCapture ? 'contents-capture-direct' : '', 'home-v9-preview-mode'].filter(Boolean).join(' ') || undefined}>
+    <HomeV9Preview />
     <ContentsSection />
     <KeyVisualPage id="key-visual-01" number="01" title="KEY VISUAL 01" asset={artworkOne} variant="one" />
     <KeyVisualPage id="key-visual-02" number="02" title="KEY VISUAL 02" asset={artworkTwo} variant="two" />
@@ -740,7 +682,7 @@ function App() {
     <PortraitStudies />
     <SelectedWorks />
     <AdditionalCharacterDesigns />
-    <ResumeContactSection />
+    <EndPageSection />
   </main>
 }
 

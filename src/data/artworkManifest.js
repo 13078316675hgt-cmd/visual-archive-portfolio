@@ -2,6 +2,7 @@ const appBase = import.meta.env?.BASE_URL ?? '/'
 const approved = `${appBase}assets/approved/`
 const web = `${approved}web/`
 const contentsV64 = `${appBase}assets/contents-v6-4/`
+const homeV9 = `${appBase}assets/home-v9/`
 
 const buildSrcSet = (entries) => entries.map(([filename, width]) => `${web}${filename} ${width}w`).join(', ')
 
@@ -28,6 +29,22 @@ export const contentsV6CleanAtmosphere = {
   label: 'V6.4 CLEAN ATMOSPHERE PLATE',
   ratio: 'landscape',
   sizes: '100vw',
+}
+
+export const homeV9Artwork = {
+  id: 'home-v9-clean-master',
+  src: `${homeV9}home-v9-clean-master-2560x1440.png`,
+  srcSet: [
+    `${homeV9}home-v9-clean-1800.webp 1800w`,
+    `${homeV9}home-v9-clean-2560.webp 2560w`,
+  ].join(', '),
+  sizes: '(max-width: 900px) 100vw, 93.5vw',
+  filename: 'home-v9-clean-master-2560x1440.png',
+  sourcePath: 'home_v9_clean_asset_pack / home_v9_clean_master_2560x1440.png',
+  resolution: '2560 x 1440',
+  alt: '浅色拼贴画面，右侧包含古典雕塑头像、倾斜装饰画框、黑色圆形、蓝色图形碎片、山地与飞鸟',
+  label: 'HOME V9 CLEAN MASTER',
+  ratio: 'landscape',
 }
 
 const titleBackground = asset({
@@ -99,12 +116,24 @@ export const contactHandsTech = asset({
   sizes: '(max-width: 900px) 100vw, 88vw',
 })
 
+export const endPageArtwork = asset({
+  id: 'end-page-master',
+  filename: 'end-page-master.png',
+  sourcePath: 'project root / end-page-master.png',
+  resolution: '1672 x 941',
+  alt: '明亮的未来列车内部，两只半透明解剖结构手从两侧伸向彼此，画面包含 E、N、D、T、THE END 与 SYSTEM LOG 字样',
+  label: 'END PAGE MASTER',
+  ratio: 'landscape',
+  sizes: '100vw',
+})
+
 export const artworkManifest = {
   titleBackground,
   artworkOne,
   artworkTwo,
   artworkThree,
   contactHandsTech,
+  endPageArtwork,
   heroPrimary: artworkOne,
   heroSecondary: artworkTwo,
 }

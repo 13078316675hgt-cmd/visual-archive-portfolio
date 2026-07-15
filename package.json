@@ -9,6 +9,7 @@
     "build:pages": "vite build --base=/visual-archive-portfolio/",
     "preview": "vite preview",
     "review:assets": "node scripts/audit-portfolio-assets.mjs",
+    "review:assets:dist": "node scripts/audit-portfolio-assets.mjs --dist",
     "review:package": "node scripts/review-package.mjs",
     "review:navigation": "node scripts/test-anchor-navigation.mjs"
   },

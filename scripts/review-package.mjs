@@ -45,8 +45,8 @@ const screenshotTargets = [
   ['08-portrait-studies.png', '#portrait-studies'],
   ['09-selected-works.png', '#selected-works'],
   ['10-additional-character-designs.png', '#additional-designs'],
-  ['11-resume.png', '#resume-contact-resume'],
-  ['12-contact.png', '#resume-contact-contact'],
+  ['11-resume.png', '#end'],
+  ['12-contact.png', '#end'],
 ]
 
 const mobileScreenshotTargets = [
@@ -55,8 +55,8 @@ const mobileScreenshotTargets = [
   ['mobile-03-key-visual-01.png', '#key-visual-01'],
   ['mobile-04-key-visual-02.png', '#key-visual-02'],
   ['mobile-05-key-visual-03.png', '#key-visual-03'],
-  ['mobile-11-resume.png', '#resume-contact-resume'],
-  ['mobile-12-contact.png', '#resume-contact-contact'],
+  ['mobile-11-resume.png', '#end'],
+  ['mobile-12-contact.png', '#end'],
 ]
 
 const excluded = [
@@ -1445,127 +1445,123 @@ async function launchBrowser() {
   }
 }
 
-async function readTitleGeometry(page) {
+async function readHomeV9Geometry(page) {
   return page.evaluate(() => {
+    const rootSelector = '#title[data-home-visual="v9master"]'
+    const requiredSelectors = [
+      rootSelector,
+      `${rootSelector} .top-nav`,
+      `${rootSelector} .home-v9-artwork`,
+      `${rootSelector} .home-v9-artwork img`,
+      `${rootSelector} .home-v9-copy`,
+      `${rootSelector} .home-v9-title`,
+      `${rootSelector} .home-v9-enter[href="#contents"]`,
+      `${rootSelector} .home-v9-index`,
+      `${rootSelector} .home-v9-scroll[href="#contents"]`,
+    ]
+    const missing = requiredSelectors.filter((selector) => !document.querySelector(selector))
+    if (missing.length) {
+      const detectedTitle = document.querySelector('#title')
+      const detectedVisual = detectedTitle?.getAttribute('data-home-visual') || '(missing)'
+      const detectedClass = detectedTitle?.className || '(missing)'
+      throw new Error(
+        `Home V9 review prerequisite failed on the normal site URL. ` +
+        `Expected #title[data-home-visual="v9master"] and its required review targets. ` +
+        `Missing: ${missing.join(', ')}. ` +
+        `Detected #title data-home-visual=${detectedVisual}; class=${detectedClass}.`,
+      )
+    }
+
     const round = (value) => Math.round(value * 100) / 100
     const rect = (selector) => {
-      const node = document.querySelector(selector)
-      if (!node) throw new Error(`Missing geometry target: ${selector}`)
-      const value = node.getBoundingClientRect()
+      const value = document.querySelector(selector).getBoundingClientRect()
       return Object.fromEntries(['x', 'y', 'top', 'right', 'bottom', 'left', 'width', 'height'].map((key) => [key, round(value[key])]))
     }
-    const selectors = ['.title-band', '.title-art-main', '.title-art-side', '.title-checker', '.title-signal', '.title-strokes', '.title-lockup h1', '.title-lockup h2']
-    const rects = Object.fromEntries(selectors.map((selector) => [selector, rect(selector)]))
-    const pageNode = document.querySelector('.title-page')
-    const pageRect = pageNode.getBoundingClientRect()
-    const footerStyle = getComputedStyle(pageNode, '::after')
-    const footerWidth = parseFloat(footerStyle.width)
-    const footerHeight = parseFloat(footerStyle.height)
-    const footerLeft = pageRect.left + parseFloat(footerStyle.left)
-    const footerBottom = pageRect.bottom - parseFloat(footerStyle.bottom)
-    const footerRule = {
-      x: round(footerLeft), y: round(footerBottom - footerHeight), top: round(footerBottom - footerHeight),
-      right: round(footerLeft + footerWidth), bottom: round(footerBottom), left: round(footerLeft),
-      width: round(footerWidth), height: round(footerHeight),
+    const selectors = {
+      root: rootSelector,
+      navigation: `${rootSelector} .top-nav`,
+      artwork: `${rootSelector} .home-v9-artwork`,
+      image: `${rootSelector} .home-v9-artwork img`,
+      copy: `${rootSelector} .home-v9-copy`,
+      title: `${rootSelector} .home-v9-title`,
+      enter: `${rootSelector} .home-v9-enter[href="#contents"]`,
+      index: `${rootSelector} .home-v9-index`,
+      scroll: `${rootSelector} .home-v9-scroll[href="#contents"]`,
     }
+    const rects = Object.fromEntries(Object.entries(selectors).map(([name, selector]) => [name, rect(selector)]))
+    const image = document.querySelector(selectors.image)
+    const title = document.querySelector(selectors.title)
+    const root = document.querySelector(rootSelector)
+    const imageStyle = getComputedStyle(image)
+
     return {
-      viewport: { width: innerWidth, height: innerHeight }, rects, footerRule,
-      derived: { panelGap: round(rects['.title-art-side'].left - rects['.title-art-main'].right) },
+      visual: root.dataset.homeVisual,
+      viewport: { width: innerWidth, height: innerHeight },
+      rects,
+      content: {
+        title: [...title.querySelectorAll('span')].map((node) => node.textContent.trim()).filter(Boolean).join(' ') || title.textContent.trim().replace(/\s+/g, ' '),
+        enterHref: document.querySelector(selectors.enter).getAttribute('href'),
+        scrollHref: document.querySelector(selectors.scroll).getAttribute('href'),
+      },
+      image: {
+        src: image.currentSrc || image.src,
+        complete: image.complete,
+        naturalWidth: image.naturalWidth,
+        naturalHeight: image.naturalHeight,
+        objectFit: imageStyle.objectFit,
+        objectPosition: imageStyle.objectPosition,
+      },
+      overflowX: Math.max(0, document.documentElement.scrollWidth - document.documentElement.clientWidth),
     }
   })
 }
 
-function validateDesktopGeometry(desktop) {
-  const values = [
-    ['poster collage top', desktop.rects['.title-band'].top, 170, 190],
-    ['poster collage height', desktop.rects['.title-band'].height, 660, 680],
-    ['primary scan width', desktop.rects['.title-art-main'].width, 600, 700],
-    ['scan overlap offset', desktop.derived.panelGap, -330, -230],
-    ['large grain width', desktop.rects['.title-checker'].width, 430, 450],
-    ['large grain height', desktop.rects['.title-checker'].height, 430, 450],
-    ['cobalt signal width', desktop.rects['.title-signal'].width, 145, 160],
+function validateHomeV9Geometry(view) {
+  const { rects, viewport, content, image } = view
+  const withinRoot = (rect) => (
+    rect.left >= rects.root.left - 1 &&
+    rect.right <= rects.root.right + 1 &&
+    rect.top >= rects.root.top - 1 &&
+    rect.bottom <= rects.root.bottom + 1
+  )
+  const checks = [
+    { name: 'normal URL renders HomeV9Preview', passed: view.visual === 'v9master', actual: view.visual },
+    { name: 'homepage covers viewport width', passed: rects.root.width >= viewport.width - 2, actual: rects.root.width },
+    { name: 'homepage covers viewport height', passed: rects.root.height >= viewport.height * .95, actual: rects.root.height },
+    { name: 'artwork has rendered area', passed: rects.artwork.width > 0 && rects.artwork.height > 0, actual: `${rects.artwork.width}x${rects.artwork.height}` },
+    { name: 'artwork image decoded', passed: image.complete && image.naturalWidth > 0 && image.naturalHeight > 0, actual: `${image.complete}/${image.naturalWidth}x${image.naturalHeight}` },
+    { name: 'title is inside homepage', passed: withinRoot(rects.title), actual: JSON.stringify(rects.title) },
+    { name: 'enter action is inside homepage', passed: withinRoot(rects.enter), actual: JSON.stringify(rects.enter) },
+    { name: 'current title copy found', passed: content.title === 'VISUAL ARCHIVE', actual: content.title },
+    { name: 'archive actions target Contents', passed: content.enterHref === '#contents' && content.scrollHref === '#contents', actual: `${content.enterHref}/${content.scrollHref}` },
+    { name: 'no horizontal overflow', passed: view.overflowX <= 1, actual: view.overflowX },
   ]
-  const checks = values.map(([name, value, min, max]) => ({ name, value, min, max, passed: value >= min && value <= max }))
   return { passed: checks.every((check) => check.passed), checks }
 }
 
-async function writeTitleReview(metrics) {
-  const d = metrics.desktop
-  const m = metrics.mobile
-  const text = `# Homepage Title geometry rebuild
+async function writeHomeV9Review(metrics) {
+  const viewSummary = (label, view) => `## ${label} — ${view.viewport.width} x ${view.viewport.height}
 
-All values below are browser-computed values from \`title-layout-metrics.json\`.
-
-## Desktop — ${d.viewport.width} × ${d.viewport.height}
-
-- Image strip: top ${d.rects['.title-band'].top}px; height ${d.rects['.title-band'].height}px; bottom ${d.rects['.title-band'].bottom}px.
-- Primary panel width: ${d.rects['.title-art-main'].width}px.
-- Panel gap: ${d.derived.panelGap}px.
-- Secondary panel width: ${d.rects['.title-art-side'].width}px.
-- Diamond band: ${d.rects['.title-checker'].width}px × ${d.rects['.title-checker'].height}px.
-- Homepage lime line: ${d.rects['.title-signal'].width}px × ${d.rects['.title-signal'].height}px.
-- Title: left ${d.rects['.title-lockup h1'].left}px; width ${d.rects['.title-lockup h1'].width}px; bottom ${d.rects['.title-lockup h1'].bottom}px.
-- Role text: top ${d.rects['.title-lockup h2'].top}px; left ${d.rects['.title-lockup h2'].left}px.
-- Footer rule: ${d.footerRule.width}px × ${d.footerRule.height}px; bottom ${d.footerRule.bottom}px.
-
-## Mobile — ${m.viewport.width} × ${m.viewport.height}
-
-- Image strip: top ${m.rects['.title-band'].top}px; height ${m.rects['.title-band'].height}px; bottom ${m.rects['.title-band'].bottom}px.
-- Primary panel width: ${m.rects['.title-art-main'].width}px; panel gap: ${m.derived.panelGap}px; secondary width: ${m.rects['.title-art-side'].width}px.
-- Diamond band: ${m.rects['.title-checker'].width}px × ${m.rects['.title-checker'].height}px.
-- Homepage lime line width: ${m.rects['.title-signal'].width}px.
-- Title: left ${m.rects['.title-lockup h1'].left}px; width ${m.rects['.title-lockup h1'].width}px.
-- Role text: top ${m.rects['.title-lockup h2'].top}px; left ${m.rects['.title-lockup h2'].left}px.
-
-## Verified integrity
-
-- Geometry validation passed: ${metrics.validation.passed}.
-- Diamond pattern uses explicit SVG rhombus polygons; no square checkerboard remains.
-- Homepage lime is isolated to the Title line and diagonal stroke cluster.
-- No line texture overlays the architecture artwork.
-- The architecture artwork was not modified.
-- The former role sticker remains removed.
+- Visual source marker: \`${view.visual}\`.
+- Section: ${view.rects.root.width}px x ${view.rects.root.height}px.
+- Artwork field: ${view.rects.artwork.width}px x ${view.rects.artwork.height}px.
+- Artwork source: \`${view.image.src}\`; intrinsic ${view.image.naturalWidth}px x ${view.image.naturalHeight}px; object-fit \`${view.image.objectFit}\`.
+- Title: \`${view.content.title}\`.
+- ENTER / SCROLL targets: \`${view.content.enterHref}\` / \`${view.content.scrollHref}\`.
+- Horizontal overflow: ${view.overflowX}px.
 `
-  await writeFile(path.join(reviewDir, 'homepage-title-rebuild.md'), text, 'utf8')
-}
+  const text = `# Homepage V9 review geometry audit
 
-async function writeTitleReviewV343(metrics) {
-  const d = metrics.desktop
-  const m = metrics.mobile
-  const text = `# Homepage Title V3.43 editorial poster audit
+All values below are browser-computed from the normal site URL and stored in \`title-layout-metrics.json\`.
 
-All values below are browser-computed values from \`title-layout-metrics.json\`.
+${viewSummary('Desktop', metrics.desktop)}
+${viewSummary('Mobile', metrics.mobile)}
+## Verification
 
-## Desktop — ${d.viewport.width} x ${d.viewport.height}
-
-- Architecture scan collage: top ${d.rects['.title-band'].top}px; height ${d.rects['.title-band'].height}px; bottom ${d.rects['.title-band'].bottom}px.
-- Primary scan panel: ${d.rects['.title-art-main'].width}px x ${d.rects['.title-art-main'].height}px.
-- Secondary scan overlap value: ${d.derived.panelGap}px.
-- Secondary scan panel: ${d.rects['.title-art-side'].width}px x ${d.rects['.title-art-side'].height}px.
-- Large black print texture: ${d.rects['.title-checker'].width}px x ${d.rects['.title-checker'].height}px.
-- Cobalt signal bar: ${d.rects['.title-signal'].width}px x ${d.rects['.title-signal'].height}px.
-- Title: left ${d.rects['.title-lockup h1'].left}px; width ${d.rects['.title-lockup h1'].width}px; bottom ${d.rects['.title-lockup h1'].bottom}px.
-- Role text: top ${d.rects['.title-lockup h2'].top}px; left ${d.rects['.title-lockup h2'].left}px.
-- Footer rule: ${d.footerRule.width}px x ${d.footerRule.height}px; bottom ${d.footerRule.bottom}px.
-
-## Mobile — ${m.viewport.width} x ${m.viewport.height}
-
-- Architecture scan collage: top ${m.rects['.title-band'].top}px; height ${m.rects['.title-band'].height}px; bottom ${m.rects['.title-band'].bottom}px.
-- Primary scan width: ${m.rects['.title-art-main'].width}px; secondary overlap value: ${m.derived.panelGap}px; secondary width: ${m.rects['.title-art-side'].width}px.
-- Large black print texture: ${m.rects['.title-checker'].width}px x ${m.rects['.title-checker'].height}px.
-- Cobalt signal bar width: ${m.rects['.title-signal'].width}px.
-- Title: left ${m.rects['.title-lockup h1'].left}px; width ${m.rects['.title-lockup h1'].width}px.
-- Role text: top ${m.rects['.title-lockup h2'].top}px; left ${m.rects['.title-lockup h2'].left}px.
-
-## Verified integrity
-
-- V3.43 poster geometry validation passed: ${metrics.validation.passed}.
-- Title uses the approved architecture image as cropped scan panels.
-- Cobalt field is flat and Title-only.
-- Black print textures are abstract grain objects only.
-- Supplied-reference statues, rococo frames, birds, Japanese copy, copied blue-square placement, and copied circle placement were intentionally avoided.
-- The architecture artwork was not modified.
-- Non-title pages were not part of this audit.
+- HomeV9Preview selector: \`#title[data-home-visual="v9master"]\`.
+- Required real child targets were present on desktop and mobile.
+- Responsive invariant validation passed: ${metrics.validation.passed}.
+- The audit no longer depends on removed legacy Title collage selectors or their fixed V3.43 geometry.
 `
   await writeFile(path.join(reviewDir, 'homepage-title-rebuild.md'), text, 'utf8')
 }
@@ -1590,7 +1586,7 @@ async function ensureCharacterSheetImages(page) {
     dimensions.push(size)
     await page.waitForTimeout(100)
   }
-  const detailImage = page.locator('.detail-main img')
+  const detailImage = page.locator('.costume-context > img')
   if (await detailImage.count() !== 1) throw new Error('Expected one Costume Detail reference image')
   await detailImage.scrollIntoViewIfNeeded()
   await detailImage.evaluate(async (node) => { if (typeof node.decode === 'function') await node.decode() })
@@ -1663,11 +1659,15 @@ async function validatePageStructure(page) {
 async function validateImagePresentation(page) {
   const result = await page.evaluate(() => {
     const viewport = { width: innerWidth, height: innerHeight }
-    const visualSelectors = ['.kv-main img', '.archive-route-window', '.sheet img', '.detail-main img', '.detail-crop>div', '.portrait-item img', '.selected-item img', '.additional-item img']
-    const visuals = visualSelectors.flatMap((selector) => [...document.querySelectorAll(selector)].map((node) => ({ selector, height: node.getBoundingClientRect().height, width: node.getBoundingClientRect().width })))
-    const overHeightCeiling = innerWidth > 900 ? visuals.filter((visual) => visual.height > innerHeight * .705) : []
+    const visualSelectors = ['.kv-main img', '.archive-route-window', '.sheet img', '.costume-crop-window', '.costume-context > img', '.portrait-item img', '.content-selected .content-figure img', '.additional-item img']
+    const visuals = visualSelectors.flatMap((selector) => [...document.querySelectorAll(selector)].map((node) => {
+      const sectionId = node.closest('section')?.id || ''
+      const heightLimit = sectionId === 'portrait-studies' ? .78 : sectionId === 'selected-works' ? .85 : .705
+      return { selector, sectionId, heightLimit, height: node.getBoundingClientRect().height, width: node.getBoundingClientRect().width }
+    }))
+    const overHeightCeiling = innerWidth > 900 ? visuals.filter((visual) => visual.height > innerHeight * visual.heightLimit + 1) : []
     const fullScreenImages = [...document.images].filter((image) => {
-      if (image.closest('.contact-hands')) return false
+      if (image.closest('.contact-hands, .end-page-stage')) return false
       if (image.matches('.archive-selection-core, .archive-selection-noise')) return false
       const visibleWindow = image.closest('.kv-main, .detail-crop > div, .archive-route-window, .title-art, .selected-item, .additional-item, .portrait-item, .sheet') || image
       const rect = visibleWindow.getBoundingClientRect()
@@ -1867,6 +1867,17 @@ async function captureV50MotionState(browser, { state, filename, viewport }) {
   }
 }
 
+async function prepareSectionForScreenshot(page, section, selector) {
+  await section.evaluate((node) => node.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'instant' }))
+  await page.waitForFunction((targetSelector) => {
+    const node = document.querySelector(targetSelector)
+    if (!node) return false
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return true
+    return !node.hasAttribute('data-motion-scene') || node.classList.contains('is-complete')
+  }, selector, { timeout: 4000 })
+  await page.waitForTimeout(80)
+}
+
 async function captureScreenshots() {
   await rm(screenshotsDir, { recursive: true, force: true })
   await mkdir(screenshotsDir, { recursive: true })
@@ -1876,7 +1887,7 @@ async function captureScreenshots() {
     await page.goto(baseUrl, { waitUntil: 'networkidle' })
     await page.evaluate(async () => { if (document.fonts?.ready) await document.fonts.ready })
     await validatePageStructure(page)
-    const desktopMetrics = await readTitleGeometry(page)
+    const desktopMetrics = await readHomeV9Geometry(page)
     await ensureCharacterSheetImages(page)
     await ensureAllPageImages(page)
     await validateImagePresentation(page)
@@ -1887,6 +1898,21 @@ async function captureScreenshots() {
       }
       const section = page.locator(selector)
       if (await section.count() !== 1) throw new Error(`Expected exactly one section for ${selector}`)
+      await prepareSectionForScreenshot(page, section, selector)
+      if (selector === '#end') {
+        await page.locator('.end-page-image').evaluate(async (image) => {
+          if (!image.complete) await new Promise((resolve, reject) => {
+            image.addEventListener('load', resolve, { once: true })
+            image.addEventListener('error', reject, { once: true })
+          })
+          if (typeof image.decode === 'function') await image.decode()
+        })
+        await page.waitForTimeout(1100)
+        if (filename === '12-contact.png') {
+          const systemLog = page.locator('.end-page-system-log')
+          if (await systemLog.count() !== 1 || !await systemLog.isVisible()) throw new Error('Expected one persistent desktop SYSTEM LOG')
+        }
+      }
       await section.screenshot({ path: path.join(screenshotsDir, filename), animations: 'disabled' })
     }
     await captureContentsCentral(page, 'contents-central-archive-initial-1920.png', 0.17, ['01', '02'])
@@ -1929,7 +1955,7 @@ async function captureScreenshots() {
     const mobilePage = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 })
     await mobilePage.goto(baseUrl, { waitUntil: 'networkidle' })
     await mobilePage.evaluate(async () => { if (document.fonts?.ready) await document.fonts.ready })
-    const mobileMetrics = await readTitleGeometry(mobilePage)
+    const mobileMetrics = await readHomeV9Geometry(mobilePage)
     await ensureCharacterSheetImages(mobilePage)
     await ensureAllPageImages(mobilePage)
     await validateImagePresentation(mobilePage)
@@ -1940,6 +1966,21 @@ async function captureScreenshots() {
       }
       const section = mobilePage.locator(selector)
       if (await section.count() !== 1) throw new Error(`Expected exactly one mobile section for ${selector}`)
+      await prepareSectionForScreenshot(mobilePage, section, selector)
+      if (selector === '#end') {
+        await mobilePage.locator('.end-page-image').evaluate(async (image) => {
+          if (!image.complete) await new Promise((resolve, reject) => {
+            image.addEventListener('load', resolve, { once: true })
+            image.addEventListener('error', reject, { once: true })
+          })
+          if (typeof image.decode === 'function') await image.decode()
+        })
+        await mobilePage.waitForTimeout(1100)
+        if (filename === 'mobile-12-contact.png') {
+          const systemLog = mobilePage.locator('.end-page-system-log')
+          if (await systemLog.count() !== 1 || !await systemLog.isVisible()) throw new Error('Expected one persistent mobile SYSTEM LOG')
+        }
+      }
       await section.screenshot({ path: path.join(screenshotsDir, filename), animations: 'disabled' })
     }
     await captureContentsMobile(mobilePage, 'contents-central-archive-mobile-390.png')
@@ -1966,13 +2007,21 @@ async function captureScreenshots() {
       filename: 'contents-v5-00-motion-mobile-390.png',
       viewport: { width: 390, height: 844 },
     })
-    const validation = validateDesktopGeometry(desktopMetrics)
+    const desktopValidation = validateHomeV9Geometry(desktopMetrics)
+    const mobileValidation = validateHomeV9Geometry(mobileMetrics)
+    const validation = {
+      passed: desktopValidation.passed && mobileValidation.passed,
+      checks: [
+        ...desktopValidation.checks.map((check) => ({ ...check, viewport: 'desktop' })),
+        ...mobileValidation.checks.map((check) => ({ ...check, viewport: 'mobile' })),
+      ],
+    }
     const metrics = { desktop: desktopMetrics, mobile: mobileMetrics, validation }
     await writeFile(path.join(reviewDir, 'title-layout-metrics.json'), JSON.stringify(metrics, null, 2), 'utf8')
-    await writeTitleReviewV343(metrics)
+    await writeHomeV9Review(metrics)
     if (!validation.passed) {
-      const failures = validation.checks.filter((check) => !check.passed).map((check) => `${check.name}: ${check.value} not in ${check.min}–${check.max}`).join('; ')
-      throw new Error(`Title geometry audit failed: ${failures}`)
+      const failures = validation.checks.filter((check) => !check.passed).map((check) => `${check.viewport} ${check.name}: ${check.actual}`).join('; ')
+      throw new Error(`Home V9 responsive geometry audit failed: ${failures}`)
     }
     const titlePng = (await readFile(path.join(screenshotsDir, '01-title.png'))).toString('base64')
     const comparisonPage = await browser.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 })
@@ -1980,7 +2029,7 @@ async function captureScreenshots() {
       *{box-sizing:border-box}body{--red:#b53b32;margin:0;background:#17191c;color:#f4f3ef;font-family:Arial,sans-serif;display:grid;grid-template-columns:1536px 384px;min-height:1080px}
       figure{margin:0;display:flex;align-items:center;background:#dfe1dd}img{display:block;width:1536px;height:auto}
       aside{padding:72px 42px;border-left:1px solid #4f5359}h1{font-size:18px;letter-spacing:.12em;margin:0 0 56px}p{font-size:13px;line-height:1.65;margin:0 0 28px;color:#d2d4d7}b{display:block;color:var(--red);font-size:11px;letter-spacing:.14em;margin-bottom:6px}
-    </style><figure><img src="data:image/png;base64,${titlePng}" alt="V3.43 desktop Title"></figure><aside><h1>TITLE / V3.43</h1><p><b>EDITORIAL POSTER</b>${desktopMetrics.rects['.title-band'].top}px top / ${desktopMetrics.rects['.title-band'].height}px collage height</p><p><b>ARCHITECTURE SCANS</b>approved Title image reused as offset cropped panels</p><p><b>COBALT FIELD</b>${desktopMetrics.rects['.title-signal'].width}px signal bar / flat Title-only color</p><p><b>PRINT GRAIN</b>${desktopMetrics.rects['.title-checker'].width}px abstract black texture form</p><p><b>GEOMETRY AUDIT</b>${validation.passed ? 'PASS' : 'FAIL'}</p></aside>`)
+    </style><figure><img src="data:image/png;base64,${titlePng}" alt="Home V9 desktop review"></figure><aside><h1>HOME / V9 MASTER</h1><p><b>VISUAL MARKER</b>${desktopMetrics.visual}</p><p><b>ARTWORK FIELD</b>${desktopMetrics.rects.artwork.width}px × ${desktopMetrics.rects.artwork.height}px</p><p><b>IMAGE SOURCE</b>${desktopMetrics.image.naturalWidth}px × ${desktopMetrics.image.naturalHeight}px / ${desktopMetrics.image.objectFit}</p><p><b>TITLE</b>${desktopMetrics.content.title}</p><p><b>GEOMETRY AUDIT</b>${validation.passed ? 'PASS' : 'FAIL'}</p></aside>`)
     await comparisonPage.screenshot({ path: path.join(screenshotsDir, 'title-layout-comparison.png'), animations: 'disabled' })
     await comparisonPage.close()
   } finally { await browser.close() }
