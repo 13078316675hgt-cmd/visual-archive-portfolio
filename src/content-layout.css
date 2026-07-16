@@ -717,6 +717,52 @@
   line-height: .8;
 }
 
+@media (min-width: 901px) {
+  /* Post-launch V1: retain a quiet lead while bringing each pair closer. */
+  .content-additional .additional-band {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .content-additional .additional-band-a .additional-major,
+  .content-additional .additional-band-b .additional-minor {
+    grid-column: 1;
+  }
+
+  .content-additional .additional-band-a .additional-minor,
+  .content-additional .additional-band-b .additional-major {
+    grid-column: 2;
+  }
+
+  .content-additional .additional-band-a .additional-minor,
+  .content-additional .additional-band-b .additional-minor {
+    width: 94%;
+    margin-bottom: clamp(12px, 1.3vw, 24px);
+  }
+
+  .content-additional .additional-band-a .additional-minor {
+    justify-self: end;
+  }
+
+  /* D01.1: the opening Page 07 pair shares one exact 4:3 display system. */
+  .content-additional .additional-band-a .additional-major,
+  .content-additional .additional-band-a .additional-minor {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    margin-bottom: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .content-additional .additional-band-a .additional-major img,
+  .content-additional .additional-band-a .additional-minor img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: 50% 0;
+  }
+}
+
 @media (max-width: 1100px) {
   .sheets-index-code,
   .archive-close-head > div { grid-column: 1 / 4; }

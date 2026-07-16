@@ -17,8 +17,8 @@ import {
   artworkOne,
   artworkThree,
   artworkTwo,
-  contentsV6CleanAtmosphere,
   contentsChapters,
+  directoryMasterApproved,
   endPageArtwork,
   homeV9Artwork,
 } from './data/artworkManifest.js'
@@ -408,173 +408,72 @@ function HomeV9Preview() {
 }
 
 
-const ARCHIVE_SCENE_WIDTH = 1920
-const ARCHIVE_SCENE_HEIGHT = 1080
-
-const CONTENTS_V6_MASTER_SAFE_AREA = Object.freeze({ left: 48, right: 48, top: 34, bottom: 34 })
-
-const CONTENTS_V6_MASTER_LAYOUT = Object.freeze([
-  { number: '01', title: 'HERO WORKS', descriptor: 'KEY VISUAL 01', marker: { x: 88, y: 530 }, window: { x: 112, y: 503, width: 94, height: 57 }, label: { x: 80, y: 468 }, route: 'M -20 520 C 18 509, 51 511, 88 530' },
-  { number: '02', title: 'CHARACTER DESIGN', descriptor: 'KEY VISUAL 02', marker: { x: 352, y: 610 }, window: { x: 365, y: 575, width: 92, height: 58 }, label: { x: 349, y: 537 }, route: 'M 88 530 C 164 515, 221 482, 274 521 C 314 550, 286 586, 352 610' },
-  { number: '03', title: 'STYLE EXPLORATION', descriptor: 'KEY VISUAL 03', marker: { x: 520, y: 711 }, window: { x: 537, y: 688, width: 96, height: 59 }, label: { x: 464, y: 751 }, route: 'M 352 610 C 395 649, 470 720, 520 711' },
-  { number: '04', title: 'CHARACTER SHEETS', descriptor: 'TURNAROUND DESIGN', marker: { x: 700, y: 555 }, window: { x: 659, y: 467, width: 110, height: 68 }, label: { x: 663, y: 430 }, route: 'M 520 711 C 570 702, 620 565, 700 555' },
-  { number: '05', title: 'PROP DESIGN', descriptor: 'LAYER / ORNAMENT', marker: { x: 946, y: 710 }, window: { x: 884, y: 724, width: 97, height: 56 }, label: { x: 850, y: 789 }, route: 'M 700 555 C 790 540, 830 690, 946 710' },
-  { number: '06', title: 'UI TRANSITION', descriptor: 'IDENTITY / EXPRESSION', marker: { x: 1070, y: 628 }, window: { x: 1058, y: 540, width: 96, height: 59 }, label: { x: 1134, y: 500 }, route: 'M 946 710 C 985 720, 1024 635, 1070 628' },
-  { number: '07', title: 'PROCESS ARCHIVE', descriptor: 'TECHNICAL SHEETS', marker: { x: 1360, y: 562 }, window: { x: 1368, y: 508, width: 96, height: 59 }, label: { x: 1354, y: 468 }, route: 'M 1070 628 C 1120 620, 1205 630, 1262 614 C 1296 604, 1322 558, 1360 562' },
-  { number: '08', title: 'RESUME', descriptor: 'CHARACTER CONCEPT ARTIST', marker: { x: 1488, y: 710 }, window: { x: 1440, y: 696, width: 84, height: 51 }, label: { x: 1496, y: 674 }, route: 'M 1360 562 C 1412 580, 1433 700, 1488 710' },
-  { number: '09', title: 'CONTACT', descriptor: 'EMAIL / WECHAT', marker: { x: 1678, y: 678 }, window: { x: 1645, y: 640, width: 84, height: 53 }, label: { x: 1660, y: 632 }, route: 'M 1488 710 C 1543 720, 1616 660, 1678 678' },
+const DIRECTORY_CARDS = Object.freeze([
+  { number: '01', title: 'KEY VISUALS', href: contentsChapters[0].href, position: 'left-01' },
+  { number: '02', title: 'CHARACTERS', href: contentsChapters[1].href, position: 'left-02' },
+  { number: '03', title: 'CONCEPT ART', href: contentsChapters[2].href, position: 'left-03' },
+  { number: '04', title: 'CHARACTER SHEETS', href: contentsChapters[3].href, position: 'left-04' },
+  { number: '05', title: 'COSTUME CONSTRUCTION', href: contentsChapters[4].href, position: 'right-05' },
+  { number: '06', title: 'IDENTITY & EXPRESSION', href: contentsChapters[5].href, secondaryTitle: 'Character Presentation', secondaryHref: '#selected-works', position: 'right-06' },
+  { number: '07', title: 'CHARACTER DESIGN ARCHIVE', href: contentsChapters[6].href, position: 'right-07' },
+  { number: 'END', title: 'ABOUT / CONTACT', href: '#end', position: 'right-end', motionChapter: '09' },
 ])
 
-function toStagePercent(value, axis) {
-  return `${(value / (axis === 'x' ? ARCHIVE_SCENE_WIDTH : ARCHIVE_SCENE_HEIGHT)) * 100}%`
+function DirectoryCardContent({ card }) {
+  return <>
+    <span className="archive-route-anchor directory-card-hit" aria-hidden="true" />
+    <span className="directory-card-number">{card.number}</span>
+    <span className="directory-card-marks" aria-hidden="true"><i /><i /><i /><i /></span>
+    <strong>{card.title}</strong>
+    <span className="directory-card-arrow" aria-hidden="true">→</span>
+    <span className="directory-card-corner" aria-hidden="true" />
+  </>
 }
 
-function MasterContentsSection() {
-  const chapterMap = new Map(contentsChapters.map((chapter) => [chapter.number, chapter]))
-  const { width, height } = getAssetDimensions(contentsV6CleanAtmosphere)
+function DirectoryCard({ card }) {
+  const className = `directory-card directory-card-${card.position} archive-route-node`
+  if (card.secondaryHref) {
+    return <article className={`${className} directory-card-dual`} data-chapter={card.number}>
+      <a className="directory-card-primary" href={card.href} aria-label={`${card.number} ${card.title}`}>
+        <DirectoryCardContent card={card} />
+      </a>
+      <a className="directory-card-secondary" href={card.secondaryHref}>Character Presentation <span aria-hidden="true">→</span></a>
+    </article>
+  }
 
-  return <section id="contents" className="contents archive-route archive-selection-scene v6-master-contents page paper-page" data-contents-visual="v6master">
-    <div className="archive-selection-frame">
-      <div className="archive-selection-viewport">
-        <div className="archive-selection-map v6-master-map" style={{ '--selection-width': `${ARCHIVE_SCENE_WIDTH}px`, '--selection-height': `${ARCHIVE_SCENE_HEIGHT}px`, '--v6-safe-left': `${CONTENTS_V6_MASTER_SAFE_AREA.left}px`, '--v6-safe-right': `${CONTENTS_V6_MASTER_SAFE_AREA.right}px` }}>
-          <img className="archive-selection-core v6-master-plate" src={contentsV6CleanAtmosphere.src} alt="" aria-hidden="true" loading="eager" decoding="async" fetchPriority="high" width={width} height={height} />
-          <div className="v6-master-atmosphere-veil" aria-hidden="true" />
-          <header className="v6-master-title">
-            <span>ARCHIVE SYSTEM // KEY VISUAL INDEX</span>
-            <h2>CONTENTS</h2>
-            <b>EXPLORE THE ARCHIVE</b>
-            <p>Browse concept art, key visuals,<br />and design notes from selected works.<br />Thank you for visiting.</p>
-          </header>
-          <div className="v6-master-side-meta" aria-hidden="true"><span>PRJ</span><span>NO.</span><span>2.1.4</span><i /></div>
-
-          <svg className="archive-selection-lines v6-master-route" viewBox={`0 0 ${ARCHIVE_SCENE_WIDTH} ${ARCHIVE_SCENE_HEIGHT}`} preserveAspectRatio="none" aria-hidden="true">
-            {CONTENTS_V6_MASTER_LAYOUT.map((item) => <path className={`archive-selection-link archive-selection-link-${item.number}`} d={item.route} data-route-chapter={item.number} key={item.number} pathLength="1" />)}
-          </svg>
-
-          <nav className="archive-route-nodes v6-master-nodes" aria-label="作品集路线目录">
-            {CONTENTS_V6_MASTER_LAYOUT.map((item) => {
-              const chapter = chapterMap.get(item.number)
-              const isImage = chapter?.type === 'image'
-              return <a
-                className={`archive-route-node archive-selection-node v6-master-node ${isImage ? 'v6-master-node-image' : 'archive-route-node-utility v6-master-node-terminal'}`}
-                href={chapter?.href}
-                key={item.number}
-                data-chapter={item.number}
-                aria-label={`${item.number} ${item.title} ${item.descriptor}`}
-                style={{
-                  '--v6-marker-x': toStagePercent(item.marker.x, 'x'),
-                  '--v6-marker-y': toStagePercent(item.marker.y, 'y'),
-                  '--v6-window-x': toStagePercent(item.window.x, 'x'),
-                  '--v6-window-y': toStagePercent(item.window.y, 'y'),
-                  '--v6-window-w': toStagePercent(item.window.width, 'x'),
-                  '--v6-window-h': toStagePercent(item.window.height, 'y'),
-                  '--v6-label-x': toStagePercent(item.label.x, 'x'),
-                  '--v6-label-y': toStagePercent(item.label.y, 'y'),
-                }}
-              >
-                <span className="archive-route-anchor v6-master-marker" aria-hidden="true"><span className="archive-route-index">{item.number}</span></span>
-                {isImage
-                  ? <figure className="archive-route-window v6-master-window">
-                      <img {...imageAttrs(chapter.asset)} alt={`${chapter.asset.alt}目录检索裁切`} loading="eager" decoding="async" fetchPriority="low" />
-                      <span className="v6-master-window-corners" aria-hidden="true" />
-                    </figure>
-                  : null}
-                {isImage
-                  ? <span className="archive-route-label v6-master-label"><b>{item.number}</b><strong>{item.title}</strong><small>{item.descriptor}</small></span>
-                  : <span className="archive-route-utility v6-master-terminal"><b>{item.number}</b><strong>{item.title}</strong><small>{item.descriptor}</small></span>}
-              </a>
-            })}
-          </nav>
-          <div className="v6-master-footer-meta"><span>PROTOCOL SYSTEM</span><span>DISPLAY MODE: INDEX-LINE // FULL / ENGAGE</span></div>
-        </div>
-      </div>
-    </div>
-  </section>
-}
-
-function MobileContentsSection() {
-  const routeChapters = contentsChapters.filter((chapter) => chapter.number !== '10')
-  return <section id="contents" className="contents archive-route archive-selection-scene mobile-contents page paper-page" data-contents-visual="v6master-mobile">
-    <div className="archive-selection-frame">
-      <header className="archive-route-head">
-        <div className="archive-route-kicker">INDEX / 04</div>
-        <h2>ARCHIVE ROUTE · SELECTION MATRIX</h2>
-        <p>MAP 09 · ROUTE STATUS / LIVE</p>
-        <a className="archive-route-return" href="#title">RETURN / TITLE</a>
-      </header>
-
-      <div className="archive-selection-viewport">
-        <div className="archive-selection-map" style={{ '--selection-width': `${ARCHIVE_SCENE_WIDTH}px`, '--selection-height': `${ARCHIVE_SCENE_HEIGHT}px` }}>
-          <div className="archive-route-nodes" aria-label="作品集路线目录">
-            {routeChapters.map((chapter) => {
-              const windowX = chapter.desktopMapX - chapter.routeX
-              const windowY = chapter.desktopMapY - chapter.routeY
-              return <a
-                className={[
-                  'archive-route-node',
-                  'archive-selection-node',
-                  `archive-route-node-${chapter.mapType}`,
-                  `archive-route-size-${chapter.mapSize}`,
-                  `archive-route-place-${chapter.mapPlacement}`,
-                  `archive-route-side-${chapter.mapSide}`,
-                  `archive-selection-zone-${chapter.mapZone}`,
-                ].join(' ')}
-                href={chapter.href}
-                key={chapter.number}
-                data-chapter={chapter.number}
-                data-reveal-start={chapter.revealStart}
-                data-reveal-end={chapter.revealEnd}
-                style={{
-                  '--map-x': `${(chapter.routeX / ARCHIVE_SCENE_WIDTH) * 100}%`,
-                  '--map-y': `${(chapter.routeY / ARCHIVE_SCENE_HEIGHT) * 100}%`,
-                  '--node-w': `${chapter.hitWidth || chapter.windowWidth || 176}px`,
-                  '--window-w': chapter.windowWidth ? `${chapter.windowWidth}px` : undefined,
-                  '--window-h': chapter.windowHeight ? `${chapter.windowHeight}px` : undefined,
-                  '--window-x': `${windowX}px`,
-                  '--window-y': `${windowY}px`,
-                  '--anchor-x': '0px',
-                  '--anchor-y': '0px',
-                  '--label-x': `${windowX + (chapter.labelOffsetX || 0)}px`,
-                  '--label-y': `${windowY + (chapter.labelOffsetY || 0)}px`,
-                  '--label-w': chapter.labelWidth ? `${chapter.labelWidth}px` : undefined,
-                  '--label-h': chapter.labelHeight ? `${chapter.labelHeight}px` : undefined,
-                  '--crop-position': chapter.cropPosition || chapter.objectPosition || '50% 50%',
-                  '--crop-scale': chapter.cropScale || 1,
-                }}
-                aria-label={`${chapter.number} ${chapter.title} ${chapter.archiveSubtitle || chapter.subtitle}`}
-              >
-                <span className="archive-route-anchor" aria-hidden="true">
-                  <span className="archive-route-index">{chapter.number}</span>
-                </span>
-                <span className="archive-selection-leader" aria-hidden="true" />
-                {chapter.mapType === 'image'
-                  ? <figure className="archive-route-window">
-                      <span className="archive-route-strip">ARCHIVE / FILE {chapter.number}</span>
-                      {chapter.number === '04' ? <span className="archive-route-corners" aria-hidden="true" /> : null}
-                      <img {...imageAttrs(chapter.asset)} alt={`${chapter.asset.alt}目录路线裁切预览`} loading="lazy" decoding="async" fetchPriority="low" />
-                    </figure>
-                  : <div className="archive-route-utility">
-                      <span>ARCHIVE / ENDPOINT {chapter.number}</span>
-                  <strong>{chapter.number} / {chapter.archiveTitle || chapter.lines[0]}</strong>
-                      <small>{chapter.lines[1]}</small>
-                    </div>}
-                <span className="archive-route-label">
-                  <b>ARCHIVE / {chapter.number}</b>
-                  <strong>{chapter.number} / {chapter.archiveTitle || chapter.title}</strong>
-                  <small>{chapter.archiveSubtitle || chapter.subtitle}</small>
-                </span>
-              </a>
-            })}
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+  return <a className={className} href={card.href} data-chapter={card.motionChapter || card.number} aria-label={`${card.number} ${card.title}`}>
+    <DirectoryCardContent card={card} />
+  </a>
 }
 
 function ContentsSection() {
-  const mobile = window.matchMedia('(max-width: 1100px)').matches
-  return mobile ? <MobileContentsSection /> : <MasterContentsSection />
+  const { width, height } = getAssetDimensions(directoryMasterApproved)
+
+  return <section id="contents" className="contents archive-route archive-selection-scene d01-directory page" data-contents-visual="d01-approved-master">
+    <div className="directory-stage">
+      <div className="directory-image-frame">
+        <img
+          className="directory-master-image"
+          src={directoryMasterApproved.src}
+          alt={directoryMasterApproved.alt}
+          width={width}
+          height={height}
+          loading="eager"
+          decoding="async"
+          fetchPriority="high"
+        />
+      </div>
+      <header className="directory-heading">
+        <span>CONTENTS</span>
+        <strong>VISUAL ARCHIVE</strong>
+        <small>SELECT YOUR DESTINATION</small>
+      </header>
+      <a className="directory-return" href="#title">RETURN / TITLE</a>
+      <nav className="directory-card-layer" aria-label="作品集目录">
+        {DIRECTORY_CARDS.map((card) => <DirectoryCard card={card} key={card.number} />)}
+      </nav>
+    </div>
+  </section>
 }
 
 function KeyVisualPage({ id, number, title, asset, variant }) {

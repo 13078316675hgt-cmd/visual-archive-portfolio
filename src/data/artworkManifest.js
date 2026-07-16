@@ -3,6 +3,7 @@ const approved = `${appBase}assets/approved/`
 const web = `${approved}web/`
 const contentsV64 = `${appBase}assets/contents-v6-4/`
 const homeV9 = `${appBase}assets/home-v9/`
+const directory = `${appBase}assets/directory/`
 
 const buildSrcSet = (entries) => entries.map(([filename, width]) => `${web}${filename} ${width}w`).join(', ')
 
@@ -27,6 +28,18 @@ export const contentsV6CleanAtmosphere = {
   resolution: '1672 x 941',
   alt: '冷白与浅蓝灰色冰雪氛围场景，中央偏右为半透明女性巨像、遗迹、山体、冰晶结构与飞鸟',
   label: 'V6.4 CLEAN ATMOSPHERE PLATE',
+  ratio: 'landscape',
+  sizes: '100vw',
+}
+
+export const directoryMasterApproved = {
+  id: 'directory-master-approved',
+  src: `${directory}directory-master-approved.png`,
+  filename: 'directory-master-approved.png',
+  sourcePath: 'project root / directory-master-approved.png',
+  resolution: '1672 x 941',
+  alt: '浅灰白技术档案场景，中央为悬浮石材与织物装置，下方设有黑色展示平台',
+  label: 'APPROVED DIRECTORY MASTER',
   ratio: 'landscape',
   sizes: '100vw',
 }
@@ -129,6 +142,7 @@ export const endPageArtwork = asset({
 
 export const artworkManifest = {
   titleBackground,
+  directoryMasterApproved,
   artworkOne,
   artworkTwo,
   artworkThree,
