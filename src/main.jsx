@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect } from 'react'
 import './styles.css'
 import './gallery.css'
 import './content-layout.css'
+import './d02-production-fix.css'
 import { initArchiveMotion } from './motion/archiveMotion.js'
 import {
   AdditionalCharacterDesigns,
@@ -21,7 +22,13 @@ import {
   directoryMasterApproved,
   endPageArtwork,
   homeV9Artwork,
+  selectedWorks,
 } from './data/artworkManifest.js'
+
+const PAGE_TWO_ARTWORKS = Object.freeze({
+  redProfile: selectedWorks.find((item) => item.id === 'study-red-profile'),
+  blueSky: selectedWorks.find((item) => item.id === 'study-blue-sky'),
+})
 
 function PageMeta({ number, label }) {
   return <div className="page-meta"><span>{label}</span><b>{number}</b></div>
@@ -48,30 +55,6 @@ function usePortfolioMotion() {
     root.classList.toggle('motion-reduced', reduceMotion)
     const cleanupArchiveMotion = initArchiveMotion(document.querySelector('.archive-selection-scene'), { reducedMotion: reduceMotion })
 
-    let navigationToken = 0
-    let navigationSettleTimer = 0
-    let navigationScrollEndHandler = null
-
-    const releaseAnchorNavigation = (token) => {
-      if (token !== navigationToken) return
-      if (navigationScrollEndHandler) {
-        window.removeEventListener('scrollend', navigationScrollEndHandler)
-        navigationScrollEndHandler = null
-      }
-      window.clearTimeout(navigationSettleTimer)
-      navigationSettleTimer = 0
-    }
-
-    const cancelPendingAnchorNavigation = () => {
-      navigationToken += 1
-      if (navigationScrollEndHandler) {
-        window.removeEventListener('scrollend', navigationScrollEndHandler)
-        navigationScrollEndHandler = null
-      }
-      window.clearTimeout(navigationSettleTimer)
-      navigationSettleTimer = 0
-    }
-
     const resolveAnchorTarget = (hash) => {
       if (!hash || hash === '#') return false
 
@@ -85,44 +68,12 @@ function usePortfolioMotion() {
       return document.getElementById(targetId)
     }
 
-    const waitForAnchorLayout = async (target) => {
-      await document.fonts?.ready
-      const targetSection = target.closest('section.page') || target
-      const layoutImages = Array.from(document.images).filter((image) => {
-        if (targetSection.contains(image)) return true
-        const section = image.closest('section.page')
-        if (!section || section.matches('#title, #contents')) return false
-        return Boolean(image.compareDocumentPosition(target) & Node.DOCUMENT_POSITION_FOLLOWING)
-      })
-      const loadingModes = layoutImages.map((image) => image.getAttribute('loading'))
-      layoutImages.forEach((image) => { image.loading = 'eager' })
-      await Promise.allSettled(layoutImages.map((image) => image.decode()))
-      layoutImages.forEach((image, index) => {
-        const loading = loadingModes[index]
-        if (loading == null) image.removeAttribute('loading')
-        else image.setAttribute('loading', loading)
-      })
-      await new Promise((resolve) => window.requestAnimationFrame(() => window.requestAnimationFrame(resolve)))
-    }
-
-    const navigateToAnchorOnce = async (hash, target = resolveAnchorTarget(hash)) => {
+    const navigateToAnchorOnce = (hash, target = resolveAnchorTarget(hash)) => {
       if (!target) return false
-
-      cancelPendingAnchorNavigation()
-      const token = navigationToken
-      await waitForAnchorLayout(target)
-      if (token !== navigationToken) return false
-
       target.scrollIntoView({
         block: 'start',
-        behavior: reduceMotion ? 'auto' : 'smooth',
+        behavior: 'instant',
       })
-
-      navigationScrollEndHandler = () => releaseAnchorNavigation(token)
-      if ('onscrollend' in window) {
-        window.addEventListener('scrollend', navigationScrollEndHandler, { once: true })
-      }
-      navigationSettleTimer = window.setTimeout(() => releaseAnchorNavigation(token), reduceMotion ? 100 : 1400)
       return true
     }
 
@@ -150,7 +101,6 @@ function usePortfolioMotion() {
     if (reduceMotion) {
       return () => {
         window.cancelAnimationFrame(initialHashFrame)
-        cancelPendingAnchorNavigation()
         document.removeEventListener('click', handleAnchorClick)
         root.classList.remove('motion-reduced')
         cleanupArchiveMotion()
@@ -187,9 +137,10 @@ function usePortfolioMotion() {
           const baseDelay = mobileMotion && options.mobileDelay != null ? options.mobileDelay : (options.delay || 0)
           const stagger = mobileMotion && options.mobileStagger != null ? options.mobileStagger : (options.stagger || 0)
           const delay = baseDelay + stagger * index
-          const maxDelay = mobileMotion
-            ? (options.mobileMaxDelay ?? Math.min(options.maxDelay || 240, 180))
-            : (options.maxDelay || 240)
+          const requestedMax = mobileMotion
+            ? (options.mobileMaxDelay ?? options.maxDelay ?? 110)
+            : (options.maxDelay ?? 140)
+          const maxDelay = Math.min(requestedMax, mobileMotion ? 110 : 140)
           node.style.setProperty('--motion-delay', `${Math.min(delay, maxDelay)}ms`)
         }
         touch(node)
@@ -224,6 +175,7 @@ function usePortfolioMotion() {
     setMotion('.key-visual-page .kv-title-copy', 'section-copy', { delay: 80 })
     setMotion('.key-visual-one .kv-main', 'artwork-primary', { variant: 'diagonal', delay: 40 })
     setMotion('.key-visual-two .kv-main', 'artwork-primary', { variant: 'horizontal', delay: 40 })
+    setMotion('.key-visual-two .kv-secondary', 'artwork-support', { delay: 75 })
     setMotion('.key-visual-one .kv-red-shape, .key-visual-one .kv-local-plane, .key-visual-one .kv-rule, .key-visual-one .kv-mark', 'registration-detail', { delay: 160, stagger: 40, maxDelay: 240 })
     setMotion('.key-visual-two .kv-red-shape, .key-visual-two .kv-local-plane, .key-visual-two .kv-rule, .key-visual-two .kv-mark', 'registration-detail', { delay: 120, stagger: 40, maxDelay: 240 })
     setMotion('.key-visual-three .kv-red-shape, .key-visual-three .kv-local-plane, .key-visual-three .kv-rule, .key-visual-three .kv-mark', 'registration-detail', { delay: 80, stagger: 40, maxDelay: 140 })
@@ -249,7 +201,7 @@ function usePortfolioMotion() {
     const activateScene = (node) => {
       if (node.classList.contains('is-inview')) return
       node.classList.add('is-inview')
-      const completionDelay = window.matchMedia('(max-width: 900px)').matches ? 620 : 900
+      const completionDelay = window.matchMedia('(max-width: 900px)').matches ? 460 : 520
       const timer = window.setTimeout(() => {
         node.classList.add('is-complete')
         completionTimers.delete(timer)
@@ -313,7 +265,6 @@ function usePortfolioMotion() {
 
     return () => {
       window.cancelAnimationFrame(initialHashFrame)
-      cancelPendingAnchorNavigation()
       document.removeEventListener('click', handleAnchorClick)
       sceneObserver.disconnect()
       navObserver.disconnect()
@@ -477,6 +428,9 @@ function ContentsSection() {
 }
 
 function KeyVisualPage({ id, number, title, asset, variant }) {
+  const hasStudyPair = variant === 'two'
+  const primaryAsset = hasStudyPair ? PAGE_TWO_ARTWORKS.redProfile : asset
+
   return <section id={id} className={`key-visual-page key-visual-${variant} page`}>
     <div className="kv-meta kv-title-module">
       <div className="kv-number-row">
@@ -488,10 +442,29 @@ function KeyVisualPage({ id, number, title, asset, variant }) {
         <p>CHARACTER ILLUSTRATION</p>
       </div>
     </div>
-    <figure className="kv-main">
-      <img {...imageAttrs(asset)} alt={asset.alt} loading={id === 'key-visual-01' ? 'eager' : 'lazy'} decoding="async" />
+    <figure className={`kv-main${hasStudyPair ? ' kv-study kv-study-red' : ''}`}>
+      <div className={hasStudyPair ? 'kv-study-frame' : undefined}>
+        <img
+          {...imageAttrs(primaryAsset)}
+          alt={hasStudyPair ? '浅绿色与淡青色环境中的红发侧脸角色' : primaryAsset.alt}
+          loading={id === 'key-visual-01' ? 'eager' : 'lazy'}
+          decoding="async"
+        />
+      </div>
       {variant !== 'three' ? <span className="motion-curtain" aria-hidden="true" /> : null}
+      {hasStudyPair ? <figcaption>IMAGE STUDY / 03 / RED PROFILE</figcaption> : null}
     </figure>
+    {hasStudyPair ? <figure className="kv-secondary kv-study kv-study-blue">
+      <div className="kv-study-frame">
+        <img
+          {...imageAttrs(PAGE_TWO_ARTWORKS.blueSky)}
+          alt="蓝天与山景背景中的银白发角色"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+      <figcaption>IMAGE STUDY / 04 / BLUE SKY</figcaption>
+    </figure> : null}
     <div className="kv-red-shape" aria-hidden="true" />
     <div className="kv-local-plane" aria-hidden="true" />
     <div className="kv-rule kv-rule-a" aria-hidden="true" />

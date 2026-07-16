@@ -47,9 +47,11 @@ function ContentPageMeta({ number, label }) {
   return <div className="page-meta content-page-meta"><span>{label}</span><b>{number}</b></div>
 }
 
-function FullSheetFigure({ asset, index, className = '', characterSheet = false, linkLabel = 'VIEW FULL SHEET' }) {
+function FullSheetFigure({ asset, index, className = '', characterSheet = false, linkLabel = 'VIEW FULL SHEET', normalizedFrame = false }) {
+  const artwork = <img {...imageAttrs(asset)} alt={assetAlt(asset)} loading="lazy" decoding="async" />
+
   return <figure className={`content-figure ${characterSheet ? 'sheet' : ''} ${className}`.trim()}>
-    <img {...imageAttrs(asset)} alt={assetAlt(asset)} loading="lazy" decoding="async" />
+    {normalizedFrame ? <div className="additional-normalized-frame">{artwork}</div> : artwork}
     <figcaption>
       <span><b>{String(index).padStart(2, '0')}</b>{asset.label}</span>
       <a href={asset.src} target="_blank" rel="noreferrer">{linkLabel}</a>
@@ -209,8 +211,8 @@ export function AdditionalCharacterDesigns() {
       </header>
 
       <div className="additional-band additional-band-a content-spread">
-        <FullSheetFigure asset={designOne} index={1} className="additional-item additional-major" />
-        <FullSheetFigure asset={designTwo} index={2} className="additional-item additional-minor" />
+        <FullSheetFigure asset={designOne} index={1} className="additional-item additional-major" normalizedFrame />
+        <FullSheetFigure asset={designTwo} index={2} className="additional-item additional-minor" normalizedFrame />
       </div>
 
       <div className="additional-band additional-band-b content-spread">

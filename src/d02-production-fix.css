@@ -1,0 +1,472 @@
+/* D02 Production Reality Fix — final scoped production authority. */
+:root {
+  --motion-instant: 150ms;
+  --motion-fast: 180ms;
+  --motion-standard: 400ms;
+  --motion-section: 460ms;
+  --motion-slow: 500ms;
+  --ease-resolve: cubic-bezier(.16, 1, .3, 1);
+  --ease-controlled: cubic-bezier(.16, 1, .3, 1);
+}
+
+html {
+  scroll-behavior: auto !important;
+}
+
+/* No persistent fixed header exists outside the opening page. Anchor targets own the viewport edge. */
+.page {
+  scroll-margin-top: 0 !important;
+}
+
+/* Homepage: preserve geometry and typography while correcting actual contrast. */
+.home-v9-title {
+  color: #263845 !important;
+  opacity: 1 !important;
+  mix-blend-mode: normal !important;
+}
+
+/* Directory: one immersive 16:9 desktop plate with only unavoidable pale edge space. */
+@media (min-width: 1101px) {
+  #contents.d01-directory {
+    min-height: 100svh !important;
+    height: 100svh;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+
+  #contents.d01-directory .directory-stage {
+    width: min(100vw, calc(100svh * 1.776833));
+    max-width: none;
+    height: auto;
+    max-height: 100svh;
+    aspect-ratio: 1672 / 941;
+    margin: 0;
+  }
+}
+
+#contents.d01-directory,
+#contents.d01-directory *,
+#contents.d01-directory *::before,
+#contents.d01-directory *::after {
+  animation: none !important;
+}
+
+html.motion-enabled #contents.d01-directory.is-archive-complete[data-archive-motion-ready][data-archive-review] .archive-route-anchor,
+html.motion-enabled #contents.d01-directory.is-archive-complete[data-archive-motion-ready][data-archive-review] .archive-selection-emblem,
+html.motion-enabled #contents.d01-directory.is-archive-complete[data-archive-motion-ready][data-archive-review] .archive-selection-energy {
+  animation: none !important;
+  filter: none !important;
+}
+
+#contents.d01-directory .directory-card {
+  transition:
+    transform 160ms var(--ease-resolve),
+    border-color 160ms var(--ease-controlled),
+    background-color 160ms var(--ease-controlled),
+    color 160ms var(--ease-controlled),
+    box-shadow 160ms var(--ease-controlled) !important;
+}
+
+html.motion-enabled #contents.d01-directory[data-archive-motion-ready] .directory-card {
+  opacity: var(--node-progress, 1) !important;
+  transform: translate3d(0, calc((1 - var(--node-progress, 1)) * 8px), 0) !important;
+}
+
+html.motion-enabled #contents.d01-directory[data-archive-motion-ready] .directory-card:hover,
+html.motion-enabled #contents.d01-directory[data-archive-motion-ready] .directory-card:focus-visible,
+html.motion-enabled #contents.d01-directory[data-archive-motion-ready] .directory-card:focus-within {
+  transform: translate3d(0, -2px, 0) !important;
+}
+
+/* D02.1 Page 02: two distinct approved image studies in one matched editorial pair. */
+.key-visual-two {
+  display: grid;
+  min-height: 100svh;
+  padding: clamp(66px, 5vw, 92px) var(--safe) clamp(52px, 4vw, 76px);
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-rows: auto minmax(0, 1fr);
+  align-items: start;
+  column-gap: clamp(18px, 1.8vw, 34px);
+  row-gap: clamp(18px, 2vw, 32px);
+  overflow: hidden;
+  background: #f7f7f4;
+}
+
+.key-visual-two::before,
+.key-visual-two::after,
+.key-visual-two .kv-main::before,
+.key-visual-two .kv-main::after {
+  content: none !important;
+  display: none !important;
+}
+
+.key-visual-two .kv-red-shape,
+.key-visual-two .kv-local-plane,
+.key-visual-two .kv-rule,
+.key-visual-two .kv-mark {
+  display: none !important;
+}
+
+.key-visual-two .kv-meta {
+  position: static;
+  grid-column: 2 / 6;
+  grid-row: 1;
+  align-self: start;
+  justify-self: start;
+  width: 100%;
+  max-width: 430px;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.key-visual-two .kv-number-row {
+  width: 100%;
+  flex-direction: row;
+}
+
+.key-visual-two .kv-title-copy,
+.key-visual-two .kv-title-copy::after {
+  margin-left: 0;
+}
+
+.key-visual-two .kv-study {
+  position: relative;
+  grid-row: 2;
+  align-self: start;
+  justify-self: stretch;
+  width: 100%;
+  margin: 0;
+  overflow: visible;
+  transform: none !important;
+}
+
+.key-visual-two .kv-study-red {
+  grid-column: 2 / 7;
+}
+
+.key-visual-two .kv-study-blue {
+  grid-column: 7 / 12;
+}
+
+.key-visual-two .kv-study-frame {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: clamp(280px, min(36vw, 58svh), 620px);
+  overflow: hidden;
+  background: transparent;
+}
+
+.key-visual-two .kv-study-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  object-fit: contain;
+  object-position: 50% 50%;
+  transform: none;
+}
+
+.key-visual-two .kv-study figcaption {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  min-height: 38px;
+  margin: 0;
+  padding: 11px 0 0;
+  border-top: 1px solid rgba(23, 25, 28, .34);
+  color: rgba(23, 25, 28, .72);
+  font-size: 9px;
+  font-weight: 650;
+  line-height: 1.35;
+  letter-spacing: .16em;
+}
+
+/* Page 07: compensate for internal source whitespace, not just equal CSS boxes. */
+.content-additional .additional-normalized-frame {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: transparent;
+}
+
+.content-additional .additional-normalized-frame img {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none;
+  max-height: none;
+  object-fit: contain !important;
+  object-position: 50% 0 !important;
+}
+
+@media (min-width: 901px) {
+  .content-additional .additional-band-a .additional-major,
+  .content-additional .additional-band-a .additional-minor {
+    width: 100%;
+    aspect-ratio: auto;
+    display: grid;
+    grid-template-rows: auto auto;
+    align-content: start;
+    align-items: start;
+    overflow: visible;
+  }
+
+  .content-additional .additional-band-a .additional-minor .additional-normalized-frame img {
+    transform: translateY(-1.7%) scale(1.046);
+    transform-origin: 50% 0;
+  }
+}
+
+/* End page: make the real information area approximately 40% larger and fully static. */
+.end-page-system-log {
+  left: 37%;
+  top: 60.5%;
+  width: clamp(490px, 27.5%, 540px);
+  max-width: calc(100% - 48px);
+  animation: none !important;
+  will-change: auto;
+}
+
+.end-page-system-log header {
+  height: 36px;
+}
+
+.end-page-system-log header span {
+  gap: 8px;
+  padding-left: 19px;
+  font-size: 8px;
+}
+
+.end-page-system-log-body {
+  padding: 22px 25px 18px;
+}
+
+.end-page-system-log h2 {
+  font-size: clamp(32px, 2vw, 38px);
+}
+
+.end-page-system-log-body > p {
+  margin: 8px 0 16px;
+  font-size: 7.5px;
+  line-height: 1.45;
+}
+
+.end-page-system-log dl div {
+  grid-template-columns: 86px 1fr;
+  gap: 12px;
+  padding: 9px 0;
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
+.end-page-system-log dt {
+  font-size: 7px;
+}
+
+.end-page-system-log footer {
+  min-height: 32px;
+  padding: 0 20px;
+  font-size: 6.5px;
+}
+
+/* D02 restrained motion language. Layout transforms stay independent through translate. */
+.motion-curtain {
+  display: none !important;
+}
+
+html.motion-enabled [data-motion-scene]:not(#contents) [data-motion] {
+  transition-delay: min(var(--motion-delay, 0ms), 140ms) !important;
+}
+
+html.motion-enabled [data-motion="registration-rule"] {
+  transition-duration: var(--motion-standard) !important;
+}
+
+html.motion-enabled [data-motion="intro-title"],
+html.motion-enabled [data-motion="section-title"],
+html.motion-enabled [data-motion="intro-meta"],
+html.motion-enabled [data-motion="section-copy"],
+html.motion-enabled [data-motion="micro-copy"],
+html.motion-enabled [data-motion="contact-copy"],
+html.motion-enabled [data-motion="home-v9-title"],
+html.motion-enabled [data-motion="home-v9-copy"],
+html.motion-enabled [data-motion="home-v9-action"] {
+  opacity: 1;
+  clip-path: none !important;
+  filter: none !important;
+  transform: none !important;
+  transition:
+    opacity var(--motion-standard) var(--ease-resolve),
+    transform var(--motion-standard) var(--ease-resolve) !important;
+}
+
+html.motion-enabled [data-motion-scene]:not(.is-inview) [data-motion="intro-title"],
+html.motion-enabled [data-motion-scene]:not(.is-inview) [data-motion="section-title"],
+html.motion-enabled [data-motion-scene]:not(.is-inview) [data-motion="intro-meta"],
+html.motion-enabled [data-motion-scene]:not(.is-inview) [data-motion="section-copy"],
+html.motion-enabled [data-motion-scene]:not(.is-inview) [data-motion="micro-copy"],
+html.motion-enabled [data-motion-scene]:not(.is-inview) [data-motion="contact-copy"],
+html.motion-enabled [data-motion-scene]:not(.is-inview) [data-motion="home-v9-title"],
+html.motion-enabled [data-motion-scene]:not(.is-inview) [data-motion="home-v9-copy"],
+html.motion-enabled [data-motion-scene]:not(.is-inview) [data-motion="home-v9-action"] {
+  opacity: 0;
+  transform: translate3d(0, 10px, 0) !important;
+}
+
+html.motion-enabled [data-motion="artwork-primary"],
+html.motion-enabled [data-motion="artwork-support"],
+html.motion-enabled [data-motion="home-v9-artwork"],
+html.motion-enabled [data-motion="end-page-field"] {
+  opacity: 1;
+  clip-path: none !important;
+  filter: none !important;
+  translate: 0 0;
+  transition:
+    opacity var(--motion-section) var(--ease-resolve),
+    translate var(--motion-section) var(--ease-resolve) !important;
+}
+
+html.motion-enabled [data-motion-scene]:not(.is-inview) [data-motion="artwork-primary"],
+html.motion-enabled [data-motion-scene]:not(.is-inview) [data-motion="artwork-support"],
+html.motion-enabled [data-motion-scene]:not(.is-inview) [data-motion="home-v9-artwork"],
+html.motion-enabled [data-motion-scene]:not(.is-inview) [data-motion="end-page-field"] {
+  opacity: 0;
+  clip-path: none !important;
+  filter: none !important;
+  translate: 0 12px;
+}
+
+.directory-card:hover,
+.directory-card:focus-visible,
+.directory-card:focus-within,
+.content-figure a:hover,
+.content-figure a:focus-visible,
+.end-page-system-log a:hover,
+.end-page-system-log a:focus-visible {
+  transition-duration: 160ms !important;
+}
+
+@media (max-width: 700px) {
+  .key-visual-two {
+    min-height: auto;
+    padding: 58px 22px 76px;
+    display: block;
+    overflow: hidden;
+  }
+
+  .key-visual-two .kv-meta {
+    width: min(78vw, 320px);
+    max-width: 320px;
+    margin: 0 0 26px;
+    padding: 0;
+    text-align: left;
+  }
+
+  .key-visual-two .kv-study {
+    width: 100%;
+    margin: 0;
+  }
+
+  .key-visual-two .kv-study-frame {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1600 / 1067;
+  }
+
+  .key-visual-two .kv-secondary {
+    width: 100%;
+    height: auto;
+    margin: 24px 0 0;
+  }
+
+  .key-visual-two .kv-title-copy,
+  .key-visual-two .kv-title-copy::after {
+    margin-left: 0;
+  }
+
+  .content-additional .additional-band-a .additional-minor .additional-normalized-frame img {
+    transform: translateY(-1.7%) scale(1.046);
+    transform-origin: 50% 0;
+  }
+
+  .end-page {
+    min-height: 100svh;
+  }
+
+  .end-page-system-log {
+    left: 50%;
+    top: calc(100% + 10px);
+    width: calc(100vw - 36px);
+    max-width: 394px;
+    translate: -50% 0;
+  }
+
+  .end-page-system-log header {
+    height: 31px;
+  }
+
+  .end-page-system-log-body {
+    padding: 18px 18px 14px;
+  }
+
+  .end-page-system-log h2 {
+    font-size: 29px;
+  }
+
+  .end-page-system-log-body > p {
+    margin: 7px 0 12px;
+    font-size: 6.8px;
+  }
+
+  .end-page-system-log dl div {
+    grid-template-columns: 72px 1fr;
+    padding: 8px 0;
+    font-size: 10.5px;
+  }
+
+  .end-page-system-log footer {
+    min-height: 28px;
+    padding: 0 16px;
+    font-size: 6px;
+  }
+}
+
+@media (max-width: 900px) and (min-width: 641px) {
+  #contents.d01-directory .directory-master-image {
+    transform: scale(1.95);
+    clip-path: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  [data-motion-scene],
+  [data-motion-scene] *,
+  [data-motion-scene] *::before,
+  [data-motion-scene] *::after {
+    animation: none !important;
+    transition: none !important;
+    transition-delay: 0ms !important;
+  }
+
+  [data-motion] {
+    opacity: 1 !important;
+    clip-path: none !important;
+    filter: none !important;
+    translate: none !important;
+  }
+
+  #contents.d01-directory .directory-card {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
