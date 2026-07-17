@@ -1,11 +1,16 @@
 ﻿import React from 'react'
 import { createRoot } from 'react-dom/client'
-import { useEffect, useLayoutEffect } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import './styles.css'
 import './gallery.css'
 import './content-layout.css'
 import './d02-production-fix.css'
+import './d03-spread-edge-fix.css'
+import './d03-1-directory-motion.css'
+import './d03-3-static-integration-motion.css'
+import './d03-3-end-dvd-window.css'
 import { initArchiveMotion } from './motion/archiveMotion.js'
+import { initEndPageDvdMotion } from './motion/endPageDvdMotion.js'
 import {
   AdditionalCharacterDesigns,
   CharacterSheets,
@@ -19,8 +24,8 @@ import {
   artworkThree,
   artworkTwo,
   contentsChapters,
-  directoryMasterApproved,
-  endPageArtwork,
+  directoryMasterIntegrated,
+  endPageIntegrated,
   homeV9Artwork,
   selectedWorks,
 } from './data/artworkManifest.js'
@@ -77,6 +82,22 @@ function usePortfolioMotion() {
       return true
     }
 
+    const navigateHome = (target) => {
+      const cleanHomeUrl = window.location.pathname || '/'
+      if (window.location.hash || window.location.search) {
+        window.history.pushState(null, '', cleanHomeUrl)
+      }
+      target.scrollIntoView({
+        block: 'start',
+        behavior: 'instant',
+      })
+      if (target instanceof HTMLElement) target.focus({ preventScroll: true })
+      document.querySelectorAll('.top-nav a[href^="#"]').forEach((link) => {
+        link.classList.toggle('is-active', link.getAttribute('href') === '#title')
+      })
+      return true
+    }
+
     const handleAnchorClick = (event) => {
       if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
       const anchor = event.target instanceof Element ? event.target.closest('a[href^="#"]') : null
@@ -87,13 +108,32 @@ function usePortfolioMotion() {
       if (!hash || !target) return
 
       event.preventDefault()
+      if (hash === '#title') {
+        navigateHome(target)
+        return
+      }
       if (window.location.hash !== hash) {
         window.history.pushState(null, '', `${window.location.pathname}${window.location.search}${hash}`)
       }
       void navigateToAnchorOnce(hash, target)
     }
 
+    let historyNavigationFrame = 0
+    const handleHistoryNavigation = () => {
+      window.cancelAnimationFrame(historyNavigationFrame)
+      historyNavigationFrame = window.requestAnimationFrame(() => {
+        historyNavigationFrame = 0
+        if (window.location.hash) {
+          void navigateToAnchorOnce(window.location.hash)
+          return
+        }
+        const home = document.getElementById('title')
+        if (home) navigateToAnchorOnce('#title', home)
+      })
+    }
+
     document.addEventListener('click', handleAnchorClick)
+    window.addEventListener('popstate', handleHistoryNavigation)
     const initialHashFrame = window.requestAnimationFrame(() => {
       if (window.location.hash) void navigateToAnchorOnce(window.location.hash)
     })
@@ -101,7 +141,9 @@ function usePortfolioMotion() {
     if (reduceMotion) {
       return () => {
         window.cancelAnimationFrame(initialHashFrame)
+        window.cancelAnimationFrame(historyNavigationFrame)
         document.removeEventListener('click', handleAnchorClick)
+        window.removeEventListener('popstate', handleHistoryNavigation)
         root.classList.remove('motion-reduced')
         cleanupArchiveMotion()
       }
@@ -265,7 +307,9 @@ function usePortfolioMotion() {
 
     return () => {
       window.cancelAnimationFrame(initialHashFrame)
+      window.cancelAnimationFrame(historyNavigationFrame)
       document.removeEventListener('click', handleAnchorClick)
+      window.removeEventListener('popstate', handleHistoryNavigation)
       sceneObserver.disconnect()
       navObserver.disconnect()
       completionTimers.forEach((timer) => window.clearTimeout(timer))
@@ -324,7 +368,7 @@ function TitleSection() {
 function HomeV9Preview() {
   const { width, height } = getAssetDimensions(homeV9Artwork)
 
-  return <section id="title" className="home-v9-preview" data-home-visual="v9master">
+  return <section id="title" className="home-v9-preview" data-home-visual="v9master" tabIndex={-1}>
     <Nav />
     <div className="home-v9-artwork">
       <picture>
@@ -364,27 +408,43 @@ const DIRECTORY_CARDS = Object.freeze([
   { number: '02', title: 'CHARACTERS', href: contentsChapters[1].href, position: 'left-02' },
   { number: '03', title: 'CONCEPT ART', href: contentsChapters[2].href, position: 'left-03' },
   { number: '04', title: 'CHARACTER SHEETS', href: contentsChapters[3].href, position: 'left-04' },
-  { number: '05', title: 'COSTUME CONSTRUCTION', href: contentsChapters[4].href, position: 'right-05' },
-  { number: '06', title: 'IDENTITY & EXPRESSION', href: contentsChapters[5].href, secondaryTitle: 'Character Presentation', secondaryHref: '#selected-works', position: 'right-06' },
-  { number: '07', title: 'CHARACTER DESIGN ARCHIVE', href: contentsChapters[6].href, position: 'right-07' },
+  { number: '05', title: 'COSTUME CONSTRUCTION', titleLines: ['COSTUME', 'CONSTRUCTION'], href: contentsChapters[4].href, position: 'right-05' },
+  { number: '06', title: 'IDENTITY & EXPRESSION', titleLines: ['IDENTITY &', 'EXPRESSION'], href: contentsChapters[5].href, secondaryTitle: 'Character Presentation', secondaryHref: '#selected-works', position: 'right-06' },
+  { number: '07', title: 'CHARACTER DESIGN ARCHIVE', titleLines: ['CHARACTER DESIGN', 'ARCHIVE'], href: contentsChapters[6].href, position: 'right-07' },
   { number: 'END', title: 'ABOUT / CONTACT', href: '#end', position: 'right-end', motionChapter: '09' },
 ])
 
+const DIRECTORY_CARD_INITIAL_MOTION = Object.freeze({
+  '--node-progress': 1,
+  '--anchor-progress': 0,
+  '--leader-progress': 0,
+  '--frame-progress': 0,
+  '--image-progress': 0,
+  '--strip-progress': 0,
+  '--label-progress': 0,
+  '--utility-progress': 0,
+  '--secondary-progress': 0,
+  '--archive-mobile-item-progress': 0,
+})
+
 function DirectoryCardContent({ card }) {
-  return <>
+  return <span className="directory-card-content">
     <span className="archive-route-anchor directory-card-hit" aria-hidden="true" />
     <span className="directory-card-number">{card.number}</span>
     <span className="directory-card-marks" aria-hidden="true"><i /><i /><i /><i /></span>
-    <strong>{card.title}</strong>
+    <strong className="directory-card-title">
+      {(card.titleLines || [card.title]).map((line) => <span className="directory-card-title-line" key={line}>{line}</span>)}
+    </strong>
     <span className="directory-card-arrow" aria-hidden="true">→</span>
     <span className="directory-card-corner" aria-hidden="true" />
-  </>
+    <span className="directory-card-confirm-rule" aria-hidden="true" />
+  </span>
 }
 
 function DirectoryCard({ card }) {
   const className = `directory-card directory-card-${card.position} archive-route-node`
   if (card.secondaryHref) {
-    return <article className={`${className} directory-card-dual`} data-chapter={card.number}>
+    return <article className={`${className} directory-card-dual`} data-chapter={card.number} style={DIRECTORY_CARD_INITIAL_MOTION}>
       <a className="directory-card-primary" href={card.href} aria-label={`${card.number} ${card.title}`}>
         <DirectoryCardContent card={card} />
       </a>
@@ -392,27 +452,50 @@ function DirectoryCard({ card }) {
     </article>
   }
 
-  return <a className={className} href={card.href} data-chapter={card.motionChapter || card.number} aria-label={`${card.number} ${card.title}`}>
+  return <a className={className} href={card.href} data-chapter={card.motionChapter || card.number} aria-label={`${card.number} ${card.title}`} style={DIRECTORY_CARD_INITIAL_MOTION}>
     <DirectoryCardContent card={card} />
   </a>
 }
 
 function ContentsSection() {
-  const { width, height } = getAssetDimensions(directoryMasterApproved)
+  const { width, height } = getAssetDimensions(directoryMasterIntegrated)
 
-  return <section id="contents" className="contents archive-route archive-selection-scene d01-directory page" data-contents-visual="d01-approved-master">
+  return <section
+    id="contents"
+    className="contents archive-route archive-selection-scene d01-directory page"
+    data-contents-visual="d03-3-integrated-master"
+    data-archive-motion-ready="true"
+    data-archive-phase="initial"
+    style={{
+      '--archive-index-progress': 0,
+      '--archive-axis-progress': 0,
+      '--archive-signal-progress': 0,
+      '--archive-complete-progress': 0,
+    }}
+  >
     <div className="directory-stage">
       <div className="directory-image-frame">
         <img
           className="directory-master-image"
-          src={directoryMasterApproved.src}
-          alt={directoryMasterApproved.alt}
+          src={directoryMasterIntegrated.src}
+          alt={directoryMasterIntegrated.alt}
           width={width}
           height={height}
           loading="eager"
           decoding="async"
           fetchPriority="high"
         />
+      </div>
+      <div className="directory-motion-system" aria-hidden="true">
+        <span className="directory-motion-number-line">01&nbsp;&nbsp;02&nbsp;&nbsp;03&nbsp;&nbsp;04&nbsp;&nbsp;&nbsp;&nbsp;05&nbsp;&nbsp;06&nbsp;&nbsp;07&nbsp;&nbsp;END</span>
+        <span className="directory-motion-axis" />
+        <span className="directory-motion-index directory-motion-index-left">
+          {Array.from({ length: 10 }, (_, index) => <i key={`left-${index}`} />)}
+        </span>
+        <span className="directory-motion-index directory-motion-index-right">
+          {Array.from({ length: 10 }, (_, index) => <i key={`right-${index}`} />)}
+        </span>
+        <span className="directory-motion-signal"><i /></span>
       </div>
       <header className="directory-heading">
         <span>CONTENTS</span>
@@ -431,7 +514,8 @@ function KeyVisualPage({ id, number, title, asset, variant }) {
   const hasStudyPair = variant === 'two'
   const primaryAsset = hasStudyPair ? PAGE_TWO_ARTWORKS.redProfile : asset
 
-  return <section id={id} className={`key-visual-page key-visual-${variant} page`}>
+  return <section id={id} className={`key-visual-page key-visual-${variant}${hasStudyPair ? ' d03-paired-spread' : ''} page`}>
+    {hasStudyPair ? <span id="page-02" className="page-deep-link-alias" aria-hidden="true" /> : null}
     <div className="kv-meta kv-title-module">
       <div className="kv-number-row">
         <b>{number}</b>
@@ -443,7 +527,7 @@ function KeyVisualPage({ id, number, title, asset, variant }) {
       </div>
     </div>
     <figure className={`kv-main${hasStudyPair ? ' kv-study kv-study-red' : ''}`}>
-      <div className={hasStudyPair ? 'kv-study-frame' : undefined}>
+      <div className={hasStudyPair ? 'kv-study-frame paired-spread-frame' : undefined}>
         <img
           {...imageAttrs(primaryAsset)}
           alt={hasStudyPair ? '浅绿色与淡青色环境中的红发侧脸角色' : primaryAsset.alt}
@@ -455,7 +539,7 @@ function KeyVisualPage({ id, number, title, asset, variant }) {
       {hasStudyPair ? <figcaption>IMAGE STUDY / 03 / RED PROFILE</figcaption> : null}
     </figure>
     {hasStudyPair ? <figure className="kv-secondary kv-study kv-study-blue">
-      <div className="kv-study-frame">
+      <div className="kv-study-frame paired-spread-frame">
         <img
           {...imageAttrs(PAGE_TWO_ARTWORKS.blueSky)}
           alt="蓝天与山景背景中的银白发角色"
@@ -496,25 +580,37 @@ const END_PAGE_HOTSPOTS = Object.freeze({
 })
 
 function EndPageSection() {
-  const { width, height } = getAssetDimensions(endPageArtwork)
+  const { width, height } = getAssetDimensions(endPageIntegrated)
+  const sectionRef = useRef(null)
+  const panelRef = useRef(null)
 
-  return <section id="end" className="end-page page" aria-label="Portfolio ending">
+  useLayoutEffect(() => initEndPageDvdMotion(sectionRef.current, panelRef.current), [])
+
+  return <section ref={sectionRef} id="end" className="end-page page" aria-label="Portfolio ending">
     <span id="resume-contact-resume" className="end-page-legacy-anchor" aria-hidden="true" />
     <span id="resume-contact-contact" className="end-page-legacy-anchor" aria-hidden="true" />
-    <link rel="prefetch" as="image" href={endPageArtwork.src} />
+    <link rel="prefetch" as="image" href={endPageIntegrated.src} />
 
     <div className="end-page-stage">
-      <img
-        className="end-page-image"
-        src={endPageArtwork.src}
-        alt={endPageArtwork.alt}
-        width={width}
-        height={height}
-        loading="lazy"
-        decoding="async"
-      />
+      <div className="end-page-artwork-field">
+        <img
+          className="end-page-image"
+          src={endPageIntegrated.src}
+          alt={endPageIntegrated.alt}
+          width={width}
+          height={height}
+          loading="lazy"
+          decoding="async"
+        />
 
-      <aside className="end-page-system-log" aria-labelledby="end-page-system-log-title">
+        <span className="end-page-hotspot-anchor end-page-return-anchor" style={END_PAGE_HOTSPOTS.returnToBeginning}>
+          <a className="end-page-hotspot end-page-return-hotspot" href="#title" aria-label="Return to beginning">
+            <span>RETURN TO BEGINNING</span>
+          </a>
+        </span>
+      </div>
+
+      <aside ref={panelRef} className="end-page-system-log" aria-labelledby="end-page-system-log-title">
         <header><span><i aria-hidden="true" />SYSTEM PROFILE</span></header>
         <div className="end-page-system-log-body">
           <h2 id="end-page-system-log-title">{`\u9EC4\u56FD\u6CF0`}</h2>
@@ -527,12 +623,6 @@ function EndPageSection() {
         </div>
         <footer><span>// SYSTEM LOG / ACTIVE</span><i aria-hidden="true" /></footer>
       </aside>
-
-      <span className="end-page-hotspot-anchor end-page-return-anchor" style={END_PAGE_HOTSPOTS.returnToBeginning}>
-        <a className="end-page-hotspot end-page-return-hotspot" href="#title" aria-label="Return to beginning">
-          <span>RETURN TO BEGINNING</span>
-        </a>
-      </span>
     </div>
 
   </section>

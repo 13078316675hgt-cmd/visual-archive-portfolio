@@ -1,7 +1,5 @@
-const DESKTOP_DURATION = 600
-const MOBILE_DURATION = 500
-const CARD_STAGGER = 35
-const CARD_DURATION = 280
+const DESKTOP_DURATION = 1080
+const MOBILE_DURATION = 840
 
 const REVIEW_STATES = Object.freeze([
   'initial',
@@ -15,37 +13,79 @@ const REVIEW_STATES = Object.freeze([
   'end',
 ])
 
-const setProgress = (node, property, value) => node?.style.setProperty(property, String(value))
+const clamp = (value) => Math.max(0, Math.min(1, value))
+const setProgress = (node, property, value) => node?.style.setProperty(property, String(clamp(value)))
 
-function setSceneProgress(scene, progress) {
-  const value = Math.max(0, Math.min(1, progress))
-  setProgress(scene, '--archive-stage-progress', value)
-  setProgress(scene, '--archive-core-progress', value)
-  setProgress(scene, '--archive-axis-progress', value)
-  setProgress(scene, '--archive-timeline-progress', value)
-
-  scene.querySelectorAll('.archive-selection-link, .archive-selection-core-ring, .archive-selection-hub').forEach((node) => {
-    setProgress(node, '--route-progress', value)
-  })
+function setSceneState(scene, { index = 0, axis = 0, signal = 0, complete = 0 } = {}) {
+  setProgress(scene, '--archive-stage-progress', 1)
+  setProgress(scene, '--archive-index-progress', index)
+  setProgress(scene, '--archive-axis-progress', axis)
+  setProgress(scene, '--archive-signal-progress', signal)
+  setProgress(scene, '--archive-complete-progress', complete)
 }
 
-function setCardProgress(node, value) {
-  setProgress(node, '--node-progress', value)
-  setProgress(node, '--anchor-progress', value)
-  setProgress(node, '--leader-progress', value)
-  setProgress(node, '--frame-progress', value)
-  setProgress(node, '--image-progress', value)
-  setProgress(node, '--strip-progress', value)
-  setProgress(node, '--label-progress', value)
-  setProgress(node, '--utility-progress', value)
-  setProgress(node, '--archive-mobile-item-progress', value)
+function setCardState(node, {
+  frame = 0,
+  number = 0,
+  label = 0,
+  utility = 0,
+  secondary = 0,
+  mobile = frame,
+} = {}) {
+  // The old route system still reads these variables. Keep the card itself
+  // interactive from the first frame and animate only its editorial layers.
+  setProgress(node, '--node-progress', 1)
+  setProgress(node, '--anchor-progress', number)
+  setProgress(node, '--leader-progress', frame)
+  setProgress(node, '--frame-progress', frame)
+  setProgress(node, '--image-progress', frame)
+  setProgress(node, '--strip-progress', utility)
+  setProgress(node, '--label-progress', label)
+  setProgress(node, '--utility-progress', utility)
+  setProgress(node, '--secondary-progress', secondary)
+  setProgress(node, '--archive-mobile-item-progress', mobile)
 }
 
 function applyComplete(scene, nodes) {
-  setSceneProgress(scene, 1)
-  nodes.forEach((node) => setCardProgress(node, 1))
+  setSceneState(scene, { index: 1, axis: 1, signal: 1, complete: 1 })
+  nodes.forEach((node) => setCardState(node, { frame: 1, number: 1, label: 1, utility: 1, secondary: 1, mobile: 1 }))
   scene.dataset.archivePhase = 'complete'
   scene.classList.add('is-archive-complete')
+}
+
+function applyReviewState(scene, nodes, state) {
+  const order = REVIEW_STATES.indexOf(state)
+  if (order <= 0) {
+    setSceneState(scene)
+    nodes.forEach((node) => setCardState(node))
+    scene.dataset.archivePhase = 'initial'
+    return
+  }
+
+  const number = order >= 2 ? 1 : 0
+  const frame = order >= 4 ? 1 : order >= 3 ? 0.48 : 0
+  const label = order >= 6 ? 1 : order >= 5 ? 0.5 : 0
+  const utility = order >= 6 ? 1 : 0
+  const secondary = order >= 7 ? 1 : 0
+  setSceneState(scene, {
+    index: order >= 1 ? 1 : 0,
+    axis: order >= 3 ? 1 : 0,
+    signal: order >= 8 ? 1 : 0,
+    complete: order >= 8 ? 1 : 0,
+  })
+  nodes.forEach((node, index) => {
+    const terminal = index === nodes.length - 1
+    setCardState(node, {
+      frame: terminal && order < 7 ? 0 : frame,
+      number: terminal && order < 7 ? 0 : number,
+      label: terminal && order < 7 ? 0 : label,
+      utility: terminal && order < 7 ? 0 : utility,
+      secondary: terminal && order < 7 ? 0 : secondary,
+      mobile: terminal && order < 7 ? 0 : frame,
+    })
+  })
+  scene.dataset.archivePhase = state
+  if (order >= 8) scene.classList.add('is-archive-complete')
 }
 
 function setActiveNode(scene, chapter) {
@@ -65,12 +105,16 @@ export function initArchiveMotion(scene, { reducedMotion = false } = {}) {
   const queryValue = new URLSearchParams(window.location.search).get('archiveMotion')
   const explicitReview = REVIEW_STATES.includes(queryValue)
   const nodes = Array.from(scene.querySelectorAll('.archive-route-node'))
+  const mobile = window.matchMedia('(max-width: 900px)').matches
   const disposers = []
   const timers = new Set()
   let observer = null
   let played = false
+  const navigationType = performance.getEntriesByType?.('navigation')?.[0]?.type
+  const directContentsEntry = window.location.hash === '#contents'
 
   scene.dataset.archiveMotionReady = 'true'
+  scene.dataset.archiveMotionDirection = 'archive-index'
   scene.dataset.archiveReview = explicitReview ? queryValue : ''
 
   const schedule = (callback, delay) => {
@@ -81,34 +125,68 @@ export function initArchiveMotion(scene, { reducedMotion = false } = {}) {
     timers.add(timer)
   }
 
+  const playDesktop = () => {
+    schedule(() => setSceneState(scene, { index: 1 }), 20)
+    schedule(() => {
+      setSceneState(scene, { index: 1, axis: 1 })
+      nodes.forEach((node) => setCardState(node, { number: 1 }))
+    }, 100)
+
+    nodes.slice(0, 4).forEach((node, index) => {
+      schedule(() => setCardState(node, { frame: 1, number: 1 }), 190 + index * 60)
+      schedule(() => setCardState(node, { frame: 1, number: 1, label: 1, utility: 1 }), 420 + index * 50)
+    })
+    nodes.slice(4, 7).forEach((node, index) => {
+      schedule(() => setCardState(node, { frame: 1, number: 1 }), 260 + index * 65)
+      schedule(() => setCardState(node, { frame: 1, number: 1, label: 1, utility: 1 }), 530 + index * 55)
+    })
+
+    const identityCard = nodes.find((node) => node.dataset.chapter === '06')
+    if (identityCard) schedule(() => setCardState(identityCard, { frame: 1, number: 1, label: 1, utility: 1, secondary: 1 }), 760)
+
+    const terminal = nodes[nodes.length - 1]
+    if (terminal) {
+      schedule(() => setCardState(terminal, { frame: 1, number: 1 }), 680)
+      schedule(() => setCardState(terminal, { frame: 1, number: 1, label: 1, utility: 1, secondary: 1 }), 760)
+    }
+    schedule(() => setSceneState(scene, { index: 1, axis: 1, signal: 1 }), 930)
+    schedule(() => applyComplete(scene, nodes), DESKTOP_DURATION)
+  }
+
+  const playMobile = () => {
+    schedule(() => setSceneState(scene, { index: 1, axis: 1 }), 20)
+    nodes.forEach((node, index) => {
+      const row = Math.floor(index / 2)
+      schedule(() => setCardState(node, { frame: 1, number: 1, mobile: 1 }), 80 + row * 110)
+      schedule(() => setCardState(node, { frame: 1, number: 1, label: 1, utility: 1, mobile: 1 }), 170 + row * 110)
+    })
+    const identityCard = nodes.find((node) => node.dataset.chapter === '06')
+    if (identityCard) schedule(() => setCardState(identityCard, { frame: 1, number: 1, label: 1, utility: 1, secondary: 1, mobile: 1 }), 650)
+    schedule(() => setSceneState(scene, { index: 1, axis: 1, signal: 1 }), 740)
+    schedule(() => applyComplete(scene, nodes), MOBILE_DURATION)
+  }
+
   const play = () => {
     if (played) return
     played = true
     observer?.disconnect()
     scene.dataset.archivePhase = 'reveal'
-    setSceneProgress(scene, 0)
-    nodes.forEach((node) => setCardProgress(node, 0))
-
-    window.requestAnimationFrame(() => {
-      setSceneProgress(scene, 1)
-      nodes.forEach((node, index) => schedule(() => setCardProgress(node, 1), index * CARD_STAGGER))
-      schedule(() => applyComplete(scene, nodes), Math.max(DESKTOP_DURATION, (nodes.length - 1) * CARD_STAGGER + CARD_DURATION))
-    })
+    mobile ? playMobile() : playDesktop()
   }
 
   if (reducedMotion || queryValue === 'end') {
     if (reducedMotion) scene.dataset.archiveReduced = 'true'
     applyComplete(scene, nodes)
-  } else if (explicitReview && queryValue === 'initial') {
-    setSceneProgress(scene, 0)
-    nodes.forEach((node) => setCardProgress(node, 0))
-    scene.dataset.archivePhase = 'initial'
   } else if (explicitReview) {
+    applyReviewState(scene, nodes, queryValue)
+  } else if (directContentsEntry || navigationType === 'back_forward') {
+    // Direct deep links and browser-history restoration must never paint a
+    // completed frame and then reset. Resolve them directly to the final state.
+    played = true
     applyComplete(scene, nodes)
-    scene.dataset.archiveReview = queryValue
   } else {
-    setSceneProgress(scene, 0)
-    nodes.forEach((node) => setCardProgress(node, 0))
+    setSceneState(scene)
+    nodes.forEach((node) => setCardState(node))
     scene.dataset.archivePhase = 'initial'
 
     observer = new IntersectionObserver((entries) => {
@@ -157,7 +235,9 @@ export function initArchiveMotion(scene, { reducedMotion = false } = {}) {
     disposers.forEach((dispose) => dispose())
     setActiveNode(scene, null)
     scene.classList.remove('is-archive-complete')
-    delete scene.dataset.archiveMotionReady
+    // data-archive-motion-ready is part of the rendered initial contract. Do
+    // not remove it during an effect cleanup and briefly expose fallback UI.
+    delete scene.dataset.archiveMotionDirection
     delete scene.dataset.archiveReview
     delete scene.dataset.archiveReduced
     delete scene.dataset.archivePhase

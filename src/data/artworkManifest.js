@@ -44,6 +44,18 @@ export const directoryMasterApproved = {
   sizes: '100vw',
 }
 
+export const directoryMasterIntegrated = {
+  id: 'directory-master-integrated-v3',
+  src: `${approved}directory-master-integrated-v3.png`,
+  filename: 'directory-master-integrated-v3.png',
+  sourcePath: 'Figma / 05 — D03.3 STATIC + MOTION CORRECTION / selected option A',
+  resolution: '2560 x 1440',
+  alt: '\u51b7\u767d\u8272\u6863\u6848\u7a7a\u95f4\u4e0e\u4e2d\u592e\u60ac\u6d6e\u77f3\u6750\u7ec7\u7269\u88c5\u7f6e\uff0c\u8fb9\u7f18\u4ee5\u5efa\u7b51\u7ed3\u6784\u7ebf\u5ef6\u5c55',
+  label: 'D03.3 INTEGRATED DIRECTORY MASTER',
+  ratio: 'landscape',
+  sizes: '100vw',
+}
+
 export const homeV9Artwork = {
   id: 'home-v9-clean-master',
   src: `${homeV9}home-v9-clean-master-2560x1440.png`,
@@ -140,14 +152,27 @@ export const endPageArtwork = asset({
   sizes: '100vw',
 })
 
+export const endPageIntegrated = asset({
+  id: 'end-page-master-integrated-v3',
+  filename: 'end-page-master-integrated-v3.png',
+  sourcePath: 'Figma / 05 — D03.3 STATIC + MOTION CORRECTION / selected option A',
+  resolution: '2560 x 1440',
+  alt: '\u660e\u4eae\u7684\u51b7\u8272\u672a\u6765\u8f66\u53a2\u4e2d\uff0c\u4e24\u53ea\u534a\u900f\u660e\u89e3\u5256\u7ed3\u6784\u624b\u4ece\u5de6\u4e0a\u4e0e\u53f3\u4e0b\u65b9\u4f38\u5411\u5f7c\u6b64\uff0c\u753b\u9762\u53f3\u4e0a\u4e3a THE END \u5b57\u6837',
+  label: 'D03.3 INTEGRATED END PAGE MASTER',
+  ratio: 'landscape',
+  sizes: '100vw',
+})
+
 export const artworkManifest = {
   titleBackground,
   directoryMasterApproved,
+  directoryMasterIntegrated,
   artworkOne,
   artworkTwo,
   artworkThree,
   contactHandsTech,
   endPageArtwork,
+  endPageIntegrated,
   heroPrimary: artworkOne,
   heroSecondary: artworkTwo,
 }

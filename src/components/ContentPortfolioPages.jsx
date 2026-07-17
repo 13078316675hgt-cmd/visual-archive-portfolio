@@ -47,11 +47,12 @@ function ContentPageMeta({ number, label }) {
   return <div className="page-meta content-page-meta"><span>{label}</span><b>{number}</b></div>
 }
 
-function FullSheetFigure({ asset, index, className = '', characterSheet = false, linkLabel = 'VIEW FULL SHEET', normalizedFrame = false }) {
+function FullSheetFigure({ asset, index, className = '', characterSheet = false, linkLabel = 'VIEW FULL SHEET', normalizedFrame = false, pairedFrame = false }) {
   const artwork = <img {...imageAttrs(asset)} alt={assetAlt(asset)} loading="lazy" decoding="async" />
+  const frameClassName = [pairedFrame ? 'paired-spread-frame' : '', normalizedFrame ? 'additional-normalized-frame' : ''].filter(Boolean).join(' ')
 
   return <figure className={`content-figure ${characterSheet ? 'sheet' : ''} ${className}`.trim()}>
-    {normalizedFrame ? <div className="additional-normalized-frame">{artwork}</div> : artwork}
+    {frameClassName ? <div className={frameClassName}>{artwork}</div> : artwork}
     <figcaption>
       <span><b>{String(index).padStart(2, '0')}</b>{asset.label}</span>
       <a href={asset.src} target="_blank" rel="noreferrer">{linkLabel}</a>
@@ -83,9 +84,9 @@ export function CharacterSheets() {
         </aside>
       </div>
 
-      <div className="sheet-comparison content-spread" aria-label="角色设定图对照">
-        <FullSheetFigure asset={sheetTwo} index={2} className="sheet-support sheet-comparison-a" characterSheet />
-        <FullSheetFigure asset={sheetThree} index={3} className="sheet-support sheet-comparison-b" characterSheet />
+      <div className="sheet-comparison content-spread d03-paired-spread" aria-label="角色设定图对照">
+        <FullSheetFigure asset={sheetTwo} index={2} className="sheet-support sheet-comparison-a" characterSheet pairedFrame />
+        <FullSheetFigure asset={sheetThree} index={3} className="sheet-support sheet-comparison-b" characterSheet pairedFrame />
       </div>
 
       <div className="sheet-closing content-spread">
@@ -166,13 +167,13 @@ export function PortraitStudies() {
       </div>
     </div>
 
-    <div className="content-shell portrait-study-sequence content-spread" aria-label="横向人物图像研究">
+    <div className="content-shell portrait-study-sequence content-spread d03-paired-spread" aria-label="横向人物图像研究">
       <figure className="content-figure portrait-item portrait-study-red">
-        <img {...imageAttrs(redProfile)} alt={assetAlt(redProfile)} loading="lazy" decoding="async" />
+        <div className="paired-spread-frame"><img {...imageAttrs(redProfile)} alt={assetAlt(redProfile)} loading="lazy" decoding="async" /></div>
         <figcaption><span>IMAGE STUDY / 03 / RED PROFILE</span></figcaption>
       </figure>
       <figure className="content-figure portrait-item portrait-study-blue">
-        <img {...imageAttrs(blueSky)} alt={assetAlt(blueSky)} loading="lazy" decoding="async" />
+        <div className="paired-spread-frame"><img {...imageAttrs(blueSky)} alt={assetAlt(blueSky)} loading="lazy" decoding="async" /></div>
         <figcaption><span>IMAGE STUDY / 04 / BLUE SKY</span></figcaption>
       </figure>
     </div>
@@ -210,14 +211,14 @@ export function AdditionalCharacterDesigns() {
         <p>四张三视图保持完整技术可读性，以两组证据带完成内容收束。</p>
       </header>
 
-      <div className="additional-band additional-band-a content-spread">
-        <FullSheetFigure asset={designOne} index={1} className="additional-item additional-major" normalizedFrame />
-        <FullSheetFigure asset={designTwo} index={2} className="additional-item additional-minor" normalizedFrame />
+      <div className="additional-band additional-band-a content-spread d03-paired-spread">
+        <FullSheetFigure asset={designOne} index={1} className="additional-item additional-major" normalizedFrame pairedFrame />
+        <FullSheetFigure asset={designTwo} index={2} className="additional-item additional-minor" normalizedFrame pairedFrame />
       </div>
 
-      <div className="additional-band additional-band-b content-spread">
-        <FullSheetFigure asset={designThree} index={3} className="additional-item additional-minor" />
-        <FullSheetFigure asset={designFour} index={4} className="additional-item additional-major" />
+      <div className="additional-band additional-band-b content-spread d03-paired-spread">
+        <FullSheetFigure asset={designThree} index={3} className="additional-item additional-minor" pairedFrame />
+        <FullSheetFigure asset={designFour} index={4} className="additional-item additional-major" pairedFrame />
       </div>
 
       <footer className="additional-outro" aria-label="内容章节结束">

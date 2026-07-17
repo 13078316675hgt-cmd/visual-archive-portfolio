@@ -69,6 +69,27 @@ async function exists(target) {
   try { await access(target); return true } catch { return false }
 }
 
+async function validateCurrentProductionSource() {
+  const [mainSource, manifestSource, dvdControllerSource] = await Promise.all([
+    readFile(path.join(root, 'src/main.jsx'), 'utf8'),
+    readFile(path.join(root, 'src/data/artworkManifest.js'), 'utf8'),
+    readFile(path.join(root, 'src/motion/endPageDvdMotion.js'), 'utf8'),
+  ])
+  const requiredSourceMarkers = [
+    ['D03.3 integrated Contents marker', mainSource.includes('data-contents-visual="d03-3-integrated-master"')],
+    ['D03.3 static integration stylesheet', mainSource.includes("import './d03-3-static-integration-motion.css'")],
+    ['DVD window stylesheet', mainSource.includes("import './d03-3-end-dvd-window.css'")],
+    ['DVD window controller import', mainSource.includes("from './motion/endPageDvdMotion.js'")],
+    ['DVD window controller initialization', mainSource.includes('initEndPageDvdMotion(sectionRef.current, panelRef.current)')],
+    ['integrated directory asset mapping', manifestSource.includes('directory-master-integrated-v3.png')],
+    ['integrated end-page asset mapping', manifestSource.includes('end-page-master-integrated-v3.png')],
+    ['minimum DVD travel guard', dvdControllerSource.includes('MIN_TRAVEL_X') && dvdControllerSource.includes('MIN_TRAVEL_Y')],
+  ]
+  const missing = requiredSourceMarkers.filter(([, present]) => !present).map(([label]) => label)
+  if (missing.length) throw new Error(`Current production integration audit failed: ${missing.join(', ')}`)
+  return requiredSourceMarkers.map(([label]) => label)
+}
+
 async function copyIfPresent(relativePath) {
   const source = path.join(root, relativePath)
   if (!await exists(source)) return false
@@ -1628,27 +1649,32 @@ async function validatePageStructure(page) {
   const result = await page.evaluate(() => {
     const anchors = [...document.querySelectorAll('a[href^="#"]')].map((anchor) => anchor.getAttribute('href'))
     const missingAnchors = [...new Set(anchors)].filter((href) => href.length < 2 || !document.querySelector(href))
-    const contentsLinks = [...document.querySelectorAll('#contents .archive-route-node')].map((anchor) => anchor.getAttribute('href'))
-    const contentsNodeCount = document.querySelectorAll('#contents .archive-route-node').length
+    const contentsLinks = [...document.querySelectorAll('#contents .directory-card-layer a')].map((anchor) => anchor.getAttribute('href'))
+    const contentsNodeCount = document.querySelectorAll('#contents .directory-card').length
     const contentsVisual = document.querySelector('#contents')?.dataset.contentsVisual || ''
-    const contentsSelectionSources = [...document.querySelectorAll('#contents .v6-master-plate')].map((image) => image.getAttribute('src') || '')
+    const contentsSelectionSources = [...document.querySelectorAll('#contents .directory-master-image')].map((image) => image.getAttribute('src') || '')
     const contentsOldMapElements = document.querySelectorAll('#contents .archive-map-backgrounds, #contents .archive-map-bg, #contents .archive-map-glyphs, #contents .archive-panorama-track').length
     const contentsLegacyElements = document.querySelectorAll('#contents .archive-selection-noise, #contents .archive-selection-emblem, #contents .archive-selection-energy-layer, #contents .archive-selection-core-ring, #contents .archive-selection-hub').length
-    const contentsCentralScene = !!document.querySelector('#contents.archive-selection-scene .archive-selection-frame .archive-selection-map')
+    const contentsCentralScene = !!document.querySelector('#contents.archive-selection-scene .directory-stage .directory-image-frame')
     const contentsBackgroundArtworkCount = [...document.querySelectorAll('#contents [aria-hidden="true"] img')]
       .filter((image) => (image.getAttribute('src') || '').includes('/assets/approved/')).length
+    const endImageSource = document.querySelector('#end .end-page-image')?.getAttribute('src') || ''
+    const dvdPanelPresent = !!document.querySelector('#end .end-page-system-log')
+    const dvdControllerPresent = typeof window.__END_PAGE_DVD_MOTION__?.getState === 'function'
     const images = [...document.querySelectorAll('img')]
     const missingImageAlts = images.filter((image) => image.getAttribute('alt') === null).length
     const invalidEmptyAlts = images.filter((image) => image.getAttribute('alt') === '' && !image.closest('[aria-hidden="true"]')).length
-    return { missingAnchors, contentsLinks, contentsVisual, contentsNodeCount, contentsSelectionSources, contentsOldMapElements, contentsLegacyElements, contentsCentralScene, contentsBackgroundArtworkCount, missingImageAlts, invalidEmptyAlts }
+    return { missingAnchors, contentsLinks, contentsVisual, contentsNodeCount, contentsSelectionSources, contentsOldMapElements, contentsLegacyElements, contentsCentralScene, contentsBackgroundArtworkCount, endImageSource, dvdPanelPresent, dvdControllerPresent, missingImageAlts, invalidEmptyAlts }
   })
-  const expectedContentsLinks = ['#key-visual-01', '#key-visual-02', '#key-visual-03', '#character-sheets', '#costume-detail', '#portrait-studies', '#additional-designs', '#resume-contact-resume', '#resume-contact-contact']
+  const expectedContentsLinks = ['#key-visual-01', '#key-visual-02', '#key-visual-03', '#character-sheets', '#costume-detail', '#portrait-studies', '#selected-works', '#additional-designs', '#end']
   if (result.missingAnchors.length) throw new Error(`Missing navigation targets: ${result.missingAnchors.join(', ')}`)
   if (JSON.stringify(result.contentsLinks) !== JSON.stringify(expectedContentsLinks)) throw new Error(`Contents anchor order mismatch: ${result.contentsLinks.join(', ')}`)
-  if (result.contentsNodeCount !== 9) throw new Error(`Contents route must use nine nodes, found ${result.contentsNodeCount}`)
-  if (result.contentsVisual !== 'v6master') throw new Error(`Production Contents visual mismatch: ${result.contentsVisual}`)
+  if (result.contentsNodeCount !== 8) throw new Error(`D01 Contents must use eight cards, found ${result.contentsNodeCount}`)
+  if (result.contentsVisual !== 'd03-3-integrated-master') throw new Error(`Production Contents visual mismatch: ${result.contentsVisual}`)
   if (!result.contentsCentralScene) throw new Error('Production Contents central archive scene is missing')
-  if (result.contentsSelectionSources.length !== 1 || !result.contentsSelectionSources[0].endsWith('/assets/contents-v6-4/contents-v6-4-clean-atmosphere-plate.png')) throw new Error(`V6.46 clean atmosphere source audit failed: ${result.contentsSelectionSources.join(', ')}`)
+  if (result.contentsSelectionSources.length !== 1 || !result.contentsSelectionSources[0].endsWith('/assets/approved/directory-master-integrated-v3.png')) throw new Error(`D03.3 integrated directory asset audit failed: ${result.contentsSelectionSources.join(', ')}`)
+  if (!result.endImageSource.endsWith('/assets/approved/end-page-master-integrated-v3.png')) throw new Error(`D03.3 integrated end-page asset audit failed: ${result.endImageSource}`)
+  if (!result.dvdPanelPresent || !result.dvdControllerPresent) throw new Error('D03.3 DVD information-window production integration is missing')
   if (result.contentsOldMapElements) throw new Error(`Old Contents panorama/map elements remain: ${result.contentsOldMapElements}`)
   if (result.contentsLegacyElements) throw new Error(`Legacy Contents runtime elements remain: ${result.contentsLegacyElements}`)
   if (result.contentsBackgroundArtworkCount) throw new Error(`Contents background still uses ${result.contentsBackgroundArtworkCount} approved project artwork image(s)`)
@@ -1668,7 +1694,7 @@ async function validateImagePresentation(page) {
     const overHeightCeiling = innerWidth > 900 ? visuals.filter((visual) => visual.height > innerHeight * visual.heightLimit + 1) : []
     const fullScreenImages = [...document.images].filter((image) => {
       if (image.closest('.contact-hands, .end-page-stage')) return false
-      if (image.matches('.archive-selection-core, .archive-selection-noise')) return false
+      if (image.matches('.archive-selection-core, .archive-selection-noise, .directory-master-image')) return false
       const visibleWindow = image.closest('.kv-main, .detail-crop > div, .archive-route-window, .title-art, .selected-item, .additional-item, .portrait-item, .sheet') || image
       const rect = visibleWindow.getBoundingClientRect()
       return rect.width >= innerWidth * .95 && rect.height >= innerHeight * .9
@@ -1758,7 +1784,7 @@ async function scrollContentsToProgress(page, progress) {
 }
 
 async function ensureArchiveSelectionImages(page) {
-  await page.locator('#contents .archive-selection-noise, #contents .archive-selection-core').evaluateAll(async (images) => {
+  await page.locator('#contents .archive-selection-noise, #contents .archive-selection-core, #contents .directory-master-image').evaluateAll(async (images) => {
     await Promise.all(images.map(async (node) => {
       if (!node.complete) await new Promise((resolve, reject) => {
         node.addEventListener('load', resolve, { once: true })
@@ -1806,6 +1832,19 @@ async function captureContentsCentral(page, filename, progress, expectedChapters
   if (viewport) await page.setViewportSize(viewport)
   const reviewState = progress < .3 ? 'nodes' : progress < .8 ? 'windows' : 'end'
   await page.goto(`${baseUrl}/?archiveMotion=${reviewState}#contents`, { waitUntil: 'networkidle' })
+  if (await page.locator('#contents.d01-directory').count() === 1) {
+    await ensureArchiveSelectionImages(page)
+    await page.locator('#contents').evaluate((node) => {
+      document.documentElement.style.scrollBehavior = 'auto'
+      document.body.style.scrollBehavior = 'auto'
+      scrollTo(0, node.offsetTop)
+      node.querySelectorAll('.directory-card').forEach((card) => card.style.setProperty('--node-progress', '1'))
+    })
+    await page.waitForFunction(() => document.querySelectorAll('#contents .directory-card').length === 8)
+    await page.waitForTimeout(160)
+    await page.screenshot({ path: path.join(screenshotsDir, filename), animations: 'disabled' })
+    return
+  }
   await page.waitForFunction((state) => {
     const scene = document.querySelector('#contents[data-archive-motion-ready="true"]')
     if (!scene) return false
@@ -1843,6 +1882,18 @@ async function captureV50MotionState(browser, { state, filename, viewport }) {
   const page = await browser.newPage({ viewport, deviceScaleFactor: 1 })
   try {
     await page.goto(`${baseUrl}/?archiveMotion=${state}#contents`, { waitUntil: 'networkidle' })
+    if (await page.locator('#contents.d01-directory').count() === 1) {
+      await ensureArchiveSelectionImages(page)
+      await page.locator('#contents').evaluate((node) => {
+        document.documentElement.style.scrollBehavior = 'auto'
+        document.body.style.scrollBehavior = 'auto'
+        scrollTo(0, node.offsetTop)
+        node.querySelectorAll('.directory-card').forEach((card) => card.style.setProperty('--node-progress', '1'))
+      })
+      await page.waitForTimeout(120)
+      await page.screenshot({ path: path.join(screenshotsDir, filename), animations: 'disabled' })
+      return
+    }
     await page.evaluate(async () => {
       if (document.fonts?.ready) await document.fonts.ready
       const contents = document.querySelector('#contents')
@@ -1946,10 +1997,13 @@ async function captureScreenshots() {
     await central1440.close()
     await page.screenshot({ path: path.join(screenshotsDir, 'full-page.png'), fullPage: true, animations: 'disabled' })
     await page.goto(`${baseUrl}/?archiveMotion=end#contents`, { waitUntil: 'networkidle' })
-    await page.waitForFunction(() => document.querySelector('#contents')?.dataset.archivePhase === 'complete')
-    const hoverChapter = page.locator('.v6-master-node[data-chapter="03"]')
+    await page.waitForFunction(() => {
+      const contents = document.querySelector('#contents')
+      return contents?.classList.contains('d01-directory') || contents?.dataset.archivePhase === 'complete'
+    })
+    const hoverChapter = page.locator('#contents [data-chapter="03"]')
     if (await hoverChapter.count() !== 1) throw new Error('Expected exactly one Contents chapter 03 entry')
-    await hoverChapter.locator('.v6-master-marker').hover()
+    await hoverChapter.hover()
     await page.waitForTimeout(300)
     await page.locator('#contents').screenshot({ path: path.join(screenshotsDir, 'contents-hover-03.png'), animations: 'disabled' })
     const mobilePage = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 })
@@ -2088,6 +2142,7 @@ async function report() {
 let server
 try {
   await auditPortfolioAssets()
+  await validateCurrentProductionSource()
   server = await createServer({ root, server: { host, port, strictPort: true }, logLevel: 'warn' })
   await server.listen()
   await captureScreenshots()

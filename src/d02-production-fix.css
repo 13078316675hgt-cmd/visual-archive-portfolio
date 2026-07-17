@@ -9,6 +9,16 @@
   --ease-controlled: cubic-bezier(.16, 1, .3, 1);
 }
 
+.page-deep-link-alias {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+  scroll-margin-top: 0 !important;
+}
+
 html {
   scroll-behavior: auto !important;
 }

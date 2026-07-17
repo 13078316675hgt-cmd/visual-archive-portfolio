@@ -1,0 +1,201 @@
+/* D03 Paired-Spread Alignment + Edge Integration
+   This layer intentionally follows D02 so the approved navigation and motion
+   behavior remains authoritative while presentation geometry is normalized. */
+
+:root {
+  --d03-pair-gap: clamp(22px, 1.8vw, 36px);
+  --d03-caption-height: 54px;
+}
+
+/* One outer-frame and caption-baseline system for active artwork pairs. */
+.d03-paired-spread {
+  --d03-frame-height: clamp(320px, 32vw, 600px);
+  align-items: start !important;
+}
+
+.sheet-comparison.d03-paired-spread,
+.portrait-study-sequence.d03-paired-spread,
+.additional-band.d03-paired-spread {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  column-gap: var(--d03-pair-gap) !important;
+  row-gap: 0 !important;
+  align-items: start !important;
+}
+
+.sheet-comparison.d03-paired-spread { --d03-frame-height: clamp(360px, 32vw, 620px); }
+.portrait-study-sequence.d03-paired-spread { --d03-frame-height: clamp(300px, 29vw, 560px); }
+.additional-band.d03-paired-spread { --d03-frame-height: clamp(350px, 33vw, 640px); }
+
+/* Reserve the two non-paired sheet plates before lazy decoding. Their final
+   rendered geometry is unchanged, but later deep links no longer drift when
+   these preceding images finish loading. */
+.content-sheets .sheet-opening-art > img {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 1536 / 1024;
+}
+
+.content-sheets .sheet-closing-art > img {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 1800 / 1761;
+}
+
+.d03-paired-spread > .content-figure {
+  grid-column: auto !important;
+  align-self: start !important;
+  width: 100% !important;
+  height: auto !important;
+  margin: 0 !important;
+  display: grid !important;
+  grid-template-rows: var(--d03-frame-height) var(--d03-caption-height);
+  align-content: start;
+  align-items: start;
+}
+
+.paired-spread-frame {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: var(--d03-frame-height);
+  min-height: 0;
+  overflow: hidden;
+  background: transparent;
+}
+
+.paired-spread-frame > img {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100%;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  object-position: 50% 50%;
+}
+
+.sheet-comparison .paired-spread-frame > img,
+.additional-band .paired-spread-frame > img {
+  object-position: 50% 0;
+}
+
+.d03-paired-spread > .content-figure figcaption {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--d03-caption-height);
+  margin: 0 !important;
+  padding-top: 11px;
+  align-items: flex-start;
+}
+
+.d03-paired-spread > .content-figure figcaption span,
+.d03-paired-spread > .content-figure figcaption a {
+  align-self: start;
+}
+
+/* Page 02 already has an approved pair; only its shared frame contract is named. */
+.key-visual-two.d03-paired-spread .paired-spread-frame {
+  height: clamp(280px, min(36vw, 58svh), 620px);
+}
+
+/* Full-canvas atmospheric continuations remove the centered-sheet edge without
+   changing the approved crisp mother images or their card/hotspot geometry. */
+.directory-ambient-image,
+.end-page-ambient-image {
+  display: none;
+  pointer-events: none;
+  user-select: none;
+}
+
+@media (min-width: 1101px) {
+  #contents.d01-directory,
+  .end-page {
+    position: relative;
+  }
+
+  .directory-ambient-image,
+  .end-page-ambient-image {
+    position: absolute;
+    z-index: 0;
+    inset: -5%;
+    display: block;
+    width: 110%;
+    height: 110%;
+    object-fit: cover;
+    object-position: 50% 50%;
+    transform: scale(1.02);
+    filter: blur(24px) saturate(.58) contrast(.92);
+  }
+
+  .directory-ambient-image { opacity: .24; }
+  .end-page-ambient-image { opacity: .21; }
+
+  #contents.d01-directory::before,
+  .end-page::before {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  #contents.d01-directory::before { background: rgba(244, 246, 244, .42); }
+  .end-page::before { background: rgba(248, 251, 253, .38); }
+
+  #contents.d01-directory .directory-stage,
+  .end-page .end-page-stage {
+    z-index: 1;
+  }
+}
+
+/* Tablet keeps two columns only while each technical image remains readable. */
+@media (min-width: 901px) and (max-width: 1200px) {
+  .sheet-comparison.d03-paired-spread { --d03-frame-height: clamp(300px, 36vw, 430px); }
+  .portrait-study-sequence.d03-paired-spread { --d03-frame-height: clamp(270px, 31vw, 370px); }
+  .additional-band.d03-paired-spread { --d03-frame-height: clamp(300px, 36vw, 430px); }
+}
+
+/* Stacked spreads remove every inherited stagger and retain natural image ratios. */
+@media (max-width: 900px) {
+  .sheet-comparison.d03-paired-spread,
+  .portrait-study-sequence.d03-paired-spread,
+  .additional-band.d03-paired-spread {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: clamp(42px, 9vw, 58px) !important;
+  }
+
+  .d03-paired-spread > .content-figure {
+    grid-template-rows: auto var(--d03-caption-height);
+    margin: 0 !important;
+  }
+
+  .d03-paired-spread > .content-figure + .content-figure {
+    margin-top: 0 !important;
+  }
+
+  .paired-spread-frame:not(.additional-normalized-frame) {
+    height: auto;
+    overflow: visible;
+  }
+
+  .paired-spread-frame:not(.additional-normalized-frame) > img {
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  .portrait-study-blue,
+  .sheet-comparison-b,
+  .additional-band .additional-minor,
+  .additional-band .additional-major {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .directory-ambient-image,
+  .end-page-ambient-image {
+    animation: none !important;
+    transition: none !important;
+  }
+}

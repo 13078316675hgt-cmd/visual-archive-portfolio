@@ -1,0 +1,250 @@
+/* D03.1 / Figma-selected Option B: ARCHIVE INDEX.
+   This layer changes motion choreography only; approved D03 geometry remains
+   authoritative. All links stay interactive from the first frame. */
+
+#contents.d01-directory {
+  --archive-index-progress: 1;
+  --archive-axis-progress: 1;
+  --archive-signal-progress: 1;
+}
+
+#contents.d01-directory .directory-motion-system {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+#contents.d01-directory .directory-motion-number-line {
+  position: absolute;
+  left: 50%;
+  top: 4.9%;
+  color: var(--directory-red);
+  font-size: clamp(5px, .34vw, 7px);
+  font-weight: 700;
+  letter-spacing: .12em;
+  opacity: var(--archive-index-progress, 1);
+  clip-path: inset(0 calc((1 - var(--archive-index-progress, 1)) * 100%) 0 0);
+  translate: -50% 0;
+  transition: opacity 180ms ease, clip-path 260ms cubic-bezier(.16, 1, .3, 1);
+}
+
+#contents.d01-directory .directory-motion-axis {
+  position: absolute;
+  left: 31%;
+  top: 50%;
+  width: 38%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(55, 69, 76, .34) 16%, var(--directory-red) 50%, rgba(55, 69, 76, .34) 84%, transparent);
+  transform: scaleX(var(--archive-axis-progress, 1));
+  transform-origin: 50% 50%;
+  transition: transform 300ms cubic-bezier(.16, 1, .3, 1);
+}
+
+#contents.d01-directory .directory-motion-index {
+  position: absolute;
+  top: 20.5%;
+  width: 3.1%;
+  display: grid;
+  gap: clamp(5px, .58vw, 11px);
+  opacity: calc(.1 + var(--archive-index-progress, 1) * .48);
+}
+
+#contents.d01-directory .directory-motion-index-left { left: 5.7%; }
+#contents.d01-directory .directory-motion-index-right { right: 5.7%; }
+
+#contents.d01-directory .directory-motion-index i {
+  display: block;
+  width: calc((38% + var(--archive-index-progress, 1) * 62%));
+  height: 1px;
+  background: var(--directory-ink);
+  transform: scaleX(var(--archive-index-progress, 1));
+  transform-origin: left center;
+  transition: transform 260ms cubic-bezier(.16, 1, .3, 1), width 260ms cubic-bezier(.16, 1, .3, 1);
+}
+
+#contents.d01-directory .directory-motion-index-right i { margin-left: auto; transform-origin: right center; }
+#contents.d01-directory .directory-motion-index i:nth-child(4),
+#contents.d01-directory .directory-motion-index i:nth-child(7) { background: var(--directory-red); }
+
+#contents.d01-directory .directory-motion-signal {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: clamp(15px, 1.15vw, 22px);
+  aspect-ratio: 1;
+  border: 1px solid rgba(181, 59, 50, calc(var(--archive-signal-progress, 1) * .9));
+  border-radius: 50%;
+  opacity: var(--archive-signal-progress, 1);
+  transform: translate(-50%, -50%) scale(calc(.65 + var(--archive-signal-progress, 1) * .35));
+  transition: opacity 180ms ease, transform 260ms cubic-bezier(.16, 1, .3, 1), border-color 180ms ease;
+}
+
+#contents.d01-directory .directory-motion-signal i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--directory-red);
+  transform: translate(-50%, -50%);
+}
+
+#contents.d01-directory .directory-card-content { display: contents; }
+
+#contents.d01-directory .directory-card-confirm-rule {
+  position: absolute;
+  z-index: 3;
+  left: clamp(12px, 1.22vw, 23px);
+  bottom: 18%;
+  width: 35%;
+  height: 1px;
+  background: var(--directory-red);
+  opacity: var(--utility-progress, 1);
+  transform: scaleX(calc(.42 + var(--utility-progress, 1) * .58));
+  transform-origin: left center;
+  transition: transform 150ms cubic-bezier(.16, 1, .3, 1), opacity 150ms ease;
+}
+
+html.motion-enabled #contents.d01-directory[data-archive-motion-ready] .directory-card {
+  opacity: 1 !important;
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+html.motion-enabled #contents.d01-directory[data-archive-motion-ready] .directory-card::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: var(--directory-card);
+  border: 1px solid var(--directory-border);
+  box-shadow: 0 5px 17px rgba(27, 35, 39, .045);
+  transform: scaleX(var(--frame-progress, 1));
+  transform-origin: left center;
+  transition: transform 260ms cubic-bezier(.16, 1, .3, 1), border-color 150ms ease, background-color 150ms ease;
+}
+
+html.motion-enabled #contents.d01-directory[data-archive-motion-ready] .directory-card-number {
+  position: relative;
+  z-index: 2;
+  opacity: var(--anchor-progress, 1);
+  clip-path: inset(0 calc((1 - var(--anchor-progress, 1)) * 100%) 0 0);
+  transition: opacity 150ms ease, clip-path 210ms cubic-bezier(.16, 1, .3, 1);
+}
+
+html.motion-enabled #contents.d01-directory[data-archive-motion-ready] .directory-card strong {
+  z-index: 2;
+  opacity: var(--label-progress, 1);
+  clip-path: inset(0 calc((1 - var(--label-progress, 1)) * 100%) 0 0);
+  transition: opacity 160ms ease, clip-path 240ms cubic-bezier(.16, 1, .3, 1), color 150ms ease;
+}
+
+html.motion-enabled #contents.d01-directory[data-archive-motion-ready] .directory-card-marks,
+html.motion-enabled #contents.d01-directory[data-archive-motion-ready] .directory-card-arrow,
+html.motion-enabled #contents.d01-directory[data-archive-motion-ready] .directory-card-corner,
+html.motion-enabled #contents.d01-directory[data-archive-motion-ready] .directory-card-secondary,
+html.motion-enabled #contents.d01-directory[data-archive-motion-ready] .directory-card::after,
+html.motion-enabled #contents.d01-directory[data-archive-motion-ready] .directory-card-primary::after {
+  opacity: var(--utility-progress, 1);
+  transition: opacity 150ms ease, color 150ms ease, transform 150ms cubic-bezier(.16, 1, .3, 1);
+}
+
+html.motion-enabled #contents.d01-directory[data-archive-motion-ready] .directory-card-arrow {
+  transform: translateX(calc((1 - var(--utility-progress, 1)) * -4px));
+}
+
+#contents.d01-directory .directory-card:hover,
+#contents.d01-directory .directory-card:focus-visible,
+#contents.d01-directory .directory-card:focus-within,
+html.motion-enabled #contents.d01-directory[data-archive-motion-ready] .directory-card:hover,
+html.motion-enabled #contents.d01-directory[data-archive-motion-ready] .directory-card:focus-visible,
+html.motion-enabled #contents.d01-directory[data-archive-motion-ready] .directory-card:focus-within {
+  transform: translate3d(0, -1px, 0) !important;
+}
+
+#contents.d01-directory .directory-card:hover::before,
+#contents.d01-directory .directory-card:focus-visible::before,
+#contents.d01-directory .directory-card:focus-within::before {
+  background: rgba(253, 254, 253, .985) !important;
+  border-color: rgba(181, 59, 50, .72) !important;
+}
+
+#contents.d01-directory .directory-card:hover .directory-card-confirm-rule,
+#contents.d01-directory .directory-card:focus-visible .directory-card-confirm-rule,
+#contents.d01-directory .directory-card:focus-within .directory-card-confirm-rule {
+  transform: scaleX(1);
+}
+
+#contents.d01-directory .directory-card:hover .directory-card-arrow,
+#contents.d01-directory .directory-card:focus-visible .directory-card-arrow,
+#contents.d01-directory .directory-card:focus-within .directory-card-arrow {
+  color: var(--directory-red);
+  transform: translateX(4px) !important;
+}
+
+#contents.d01-directory .directory-card:hover .directory-card-number,
+#contents.d01-directory .directory-card:focus-visible .directory-card-number,
+#contents.d01-directory .directory-card:focus-within .directory-card-number {
+  color: var(--red-hover);
+}
+
+@media (max-width: 900px) {
+  #contents.d01-directory .directory-motion-system {
+    position: absolute;
+    height: clamp(500px, 62svh, 720px);
+  }
+
+  #contents.d01-directory .directory-motion-number-line,
+  #contents.d01-directory .directory-motion-index { display: none; }
+
+  #contents.d01-directory .directory-motion-axis {
+    left: 14px;
+    top: auto;
+    bottom: 8px;
+    width: calc(100% - 28px);
+    transform-origin: left center;
+  }
+
+  #contents.d01-directory .directory-motion-signal { top: 54%; }
+
+  html.motion-enabled #contents.d01-directory[data-archive-motion-ready] .directory-card {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  #contents.d01-directory .directory-card-confirm-rule {
+    left: 13px;
+    bottom: 19%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #contents.d01-directory {
+    --archive-index-progress: 1 !important;
+    --archive-axis-progress: 1 !important;
+    --archive-signal-progress: 1 !important;
+  }
+
+  #contents.d01-directory .directory-card {
+    --frame-progress: 1 !important;
+    --anchor-progress: 1 !important;
+    --label-progress: 1 !important;
+    --utility-progress: 1 !important;
+    --secondary-progress: 1 !important;
+    --archive-mobile-item-progress: 1 !important;
+  }
+
+  #contents.d01-directory .directory-motion-system *,
+  #contents.d01-directory .directory-card,
+  #contents.d01-directory .directory-card *,
+  #contents.d01-directory .directory-card::before,
+  #contents.d01-directory .directory-card::after {
+    animation: none !important;
+    transition-duration: .01ms !important;
+  }
+}

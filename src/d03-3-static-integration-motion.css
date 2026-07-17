@@ -1,0 +1,385 @@
+/* D03.3 — selected Figma static integration and Archive Index V2 correction.
+   The original mother images remain in the repository; production renders the
+   two separate full-canvas derivatives exactly once per section. */
+
+#contents.d01-directory .directory-ambient-image,
+.end-page .end-page-ambient-image {
+  display: none !important;
+}
+
+#contents.d01-directory {
+  --directory-card: #fafbfa;
+}
+
+#contents.d01-directory .directory-card,
+#contents.d01-directory .directory-card::before {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: var(--directory-card) !important;
+}
+
+html.motion-enabled #contents.d01-directory[data-archive-motion-ready] .directory-card {
+  background: var(--directory-card) !important;
+}
+
+#contents.d01-directory .directory-card-title-line {
+  display: block;
+  white-space: nowrap;
+}
+
+#contents.d01-directory .directory-card-dual .directory-card-confirm-rule {
+  bottom: 40%;
+  width: 34%;
+}
+
+/* Reveal whole title groups. Never clip glyphs or expose partial words. */
+html.motion-enabled #contents.d01-directory[data-archive-motion-ready] .directory-card-title {
+  opacity: var(--label-progress, 0);
+  clip-path: none !important;
+  transform: translate3d(0, calc((1 - var(--label-progress, 0)) * 5px), 0);
+  transition:
+    opacity 210ms cubic-bezier(.16, 1, .3, 1),
+    transform 280ms cubic-bezier(.16, 1, .3, 1),
+    color 150ms ease;
+}
+
+html.motion-enabled #contents.d01-directory[data-archive-motion-ready] .directory-card-secondary {
+  opacity: var(--secondary-progress, 0);
+  transform: translate3d(0, calc((1 - var(--secondary-progress, 0)) * 4px), 0);
+  transition:
+    opacity 190ms cubic-bezier(.16, 1, .3, 1),
+    transform 240ms cubic-bezier(.16, 1, .3, 1),
+    color 150ms ease;
+}
+
+@media (min-width: 1101px) {
+  #contents.d01-directory,
+  .end-page {
+    width: 100%;
+    height: 100svh;
+    min-height: 100svh !important;
+    place-items: center;
+    overflow: hidden;
+  }
+
+  #contents.d01-directory .directory-stage,
+  .end-page .end-page-stage {
+    width: max(100vw, calc(100svh * 16 / 9));
+    height: max(100svh, calc(100vw * 9 / 16));
+    max-width: none;
+    max-height: none;
+    aspect-ratio: 16 / 9;
+    flex: none;
+  }
+
+  #contents.d01-directory .directory-master-image,
+  .end-page .end-page-image {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    object-position: 50% 50%;
+    transform: none !important;
+    clip-path: none !important;
+    filter: none !important;
+  }
+
+  #contents.d01-directory .directory-heading {
+    left: calc((100% - 100vw) / 2 + clamp(24px, 3.2vw, 62px));
+  }
+
+  #contents.d01-directory .directory-return {
+    right: calc((100% - 100vw) / 2 + clamp(24px, 3.2vw, 62px));
+  }
+
+  #contents.d01-directory .directory-card {
+    width: clamp(230px, 15%, 320px);
+    height: clamp(112px, 12.2%, 136px);
+    padding: clamp(15px, 1.1vw, 22px) clamp(18px, 1.2vw, 24px);
+  }
+
+  #contents.d01-directory .directory-card-left-01 { left: 18.55%; top: 21.04%; }
+  #contents.d01-directory .directory-card-left-02 { left: 18.55%; top: 34.51%; }
+  #contents.d01-directory .directory-card-left-03 { left: 18.55%; top: 48.19%; }
+  #contents.d01-directory .directory-card-left-04 { left: 18.55%; top: 61.88%; }
+  #contents.d01-directory .directory-card-right-05 { left: 69.06%; top: 21.10%; }
+  #contents.d01-directory .directory-card-right-06 {
+    left: 69.06%;
+    top: 34.58%;
+    width: clamp(244px, 15.8%, 338px);
+    height: clamp(142px, 14.8%, 166px);
+  }
+  #contents.d01-directory .directory-card-right-07 { left: 69.06%; top: 50.25%; }
+  #contents.d01-directory .directory-card-right-end {
+    left: 69.06%;
+    top: 67.15%;
+    height: clamp(82px, 8.7%, 96px);
+  }
+
+  #contents.d01-directory .directory-card strong {
+    left: clamp(18px, 1.2vw, 24px);
+    right: clamp(42px, 2.4vw, 54px);
+    bottom: 21%;
+    font-size: clamp(10.5px, .7vw, 13.5px);
+    line-height: 1.1;
+    letter-spacing: .045em;
+    text-wrap: auto;
+  }
+
+  #contents.d01-directory .directory-card:not(.directory-card-right-05):not(.directory-card-right-07):not(.directory-card-dual) strong {
+    bottom: 26%;
+  }
+
+  #contents.d01-directory .directory-card-dual strong {
+    bottom: 43%;
+  }
+
+  #contents.d01-directory .directory-card-primary {
+    padding: clamp(15px, 1.1vw, 22px) clamp(18px, 1.2vw, 24px);
+  }
+
+  #contents.d01-directory .directory-card-secondary {
+    left: clamp(18px, 1.2vw, 24px);
+    right: 48px;
+    bottom: 7%;
+    min-height: 34px;
+    padding: 8px 0;
+    font-size: clamp(9px, .53vw, 10.5px);
+    line-height: 1.2;
+  }
+
+  #contents.d01-directory .directory-card-arrow {
+    right: clamp(15px, 1vw, 22px);
+    bottom: 15%;
+  }
+
+  .end-page .end-page-system-log {
+    left: calc((100% - 100vw) / 2 + clamp(40px, 4.1vw, 78px));
+    top: auto;
+    bottom: 7.4%;
+    width: clamp(470px, 26.3vw, 505px);
+    max-width: calc(100vw - 80px);
+    translate: none;
+    animation: none !important;
+  }
+}
+
+@media (max-width: 1100px) {
+  #contents.d01-directory .directory-master-image {
+    content-visibility: auto;
+  }
+
+  #contents.d01-directory .directory-card strong.directory-card-title {
+    right: 30px;
+    font-size: clamp(9px, 1.15vw, 11px);
+    line-height: 1.12;
+    letter-spacing: .035em;
+  }
+
+  #contents.d01-directory .directory-card-right-05,
+  #contents.d01-directory .directory-card-right-07 {
+    height: 122px;
+    min-height: 122px;
+  }
+
+  #contents.d01-directory .directory-card-dual {
+    height: 142px;
+    min-height: 142px;
+  }
+
+  #contents.d01-directory .directory-card-dual .directory-card-title {
+    bottom: 58px;
+  }
+
+  #contents.d01-directory .directory-card-secondary {
+    bottom: 10px;
+    min-height: 36px;
+  }
+}
+
+@media (max-width: 900px) {
+  #contents.d01-directory .directory-image-frame {
+    height: clamp(500px, 62svh, 720px);
+  }
+
+  #contents.d01-directory .directory-master-image {
+    object-fit: cover;
+    object-position: 50% 50%;
+    transform: scale(3) !important;
+    transform-origin: 40% 50%;
+    clip-path: none !important;
+  }
+
+  #contents.d01-directory .directory-image-frame::before,
+  #contents.d01-directory .directory-image-frame::after {
+    content: none !important;
+  }
+
+  #contents.d01-directory .directory-card strong.directory-card-title {
+    left: 13px;
+    right: 28px;
+    bottom: 22px;
+    font-size: clamp(9px, 2.35vw, 10px);
+    line-height: 1.12;
+  }
+
+  #contents.d01-directory .directory-card-dual strong.directory-card-title {
+    bottom: 60px;
+  }
+
+  #contents.d01-directory .directory-card-right-05,
+  #contents.d01-directory .directory-card-right-07 {
+    height: clamp(112px, 29vw, 126px);
+    min-height: 112px;
+  }
+
+  #contents.d01-directory .directory-card-dual {
+    height: clamp(132px, 34vw, 148px);
+    min-height: 132px;
+  }
+
+  #contents.d01-directory .directory-card-secondary {
+    left: 13px;
+    right: 28px;
+    bottom: 9px;
+    min-height: 38px;
+    padding: 9px 0;
+    font-size: 8.5px;
+  }
+
+  .end-page {
+    min-height: calc(56.25vw + 410px) !important;
+    overflow: hidden;
+    align-content: start;
+  }
+
+  .end-page .end-page-stage {
+    width: 100vw;
+    max-width: none;
+    aspect-ratio: 16 / 9;
+    margin: 0 auto;
+  }
+
+  .end-page .end-page-image {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: contain;
+  }
+
+  .end-page .end-page-system-log {
+    left: 18px;
+    right: 18px;
+    top: calc(100% + 18px);
+    bottom: auto;
+    width: auto;
+    max-width: none;
+    translate: none;
+    animation: none !important;
+  }
+}
+
+@media (max-width: 900px) and (min-width: 401px) {
+  #contents.d01-directory .directory-card strong.directory-card-title {
+    font-size: clamp(9.5px, 2.4vw, 10.5px);
+    line-height: 1.16;
+  }
+
+  #contents.d01-directory .directory-card-secondary {
+    min-height: 40px;
+    padding: 10px 0;
+    font-size: 9.5px;
+    line-height: 1.18;
+  }
+
+  #contents.d01-directory .directory-card-dual {
+    height: clamp(148px, 36vw, 160px);
+    min-height: 148px;
+  }
+
+  #contents.d01-directory .directory-card-dual strong.directory-card-title {
+    bottom: 64px;
+  }
+}
+
+@media (max-width: 400px) {
+  #contents.d01-directory .directory-card-layer {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    padding: 14px 16px 0;
+  }
+
+  #contents.d01-directory .directory-card,
+  #contents.d01-directory .directory-card-left-01,
+  #contents.d01-directory .directory-card-left-02,
+  #contents.d01-directory .directory-card-left-03,
+  #contents.d01-directory .directory-card-left-04,
+  #contents.d01-directory .directory-card-right-05,
+  #contents.d01-directory .directory-card-right-06,
+  #contents.d01-directory .directory-card-right-07,
+  #contents.d01-directory .directory-card-right-end {
+    width: 100%;
+    height: 104px;
+    min-height: 104px;
+    padding: 15px 14px;
+  }
+
+  #contents.d01-directory .directory-card-right-05,
+  #contents.d01-directory .directory-card-right-07 {
+    height: 116px;
+    min-height: 116px;
+  }
+
+  #contents.d01-directory .directory-card-dual {
+    height: 150px;
+    min-height: 150px;
+    padding: 0;
+  }
+
+  #contents.d01-directory .directory-card-primary {
+    padding: 15px 14px;
+  }
+
+  #contents.d01-directory .directory-card strong.directory-card-title {
+    left: 14px;
+    right: 42px;
+    bottom: 24px;
+    font-size: 12px;
+    line-height: 1.18;
+    letter-spacing: .035em;
+  }
+
+  #contents.d01-directory .directory-card-dual strong.directory-card-title {
+    bottom: 62px;
+  }
+
+  #contents.d01-directory .directory-card-secondary {
+    left: 14px;
+    right: 42px;
+    bottom: 10px;
+    min-height: 42px;
+    padding: 11px 0;
+    font-size: 11px;
+    line-height: 1.2;
+  }
+
+  #contents.d01-directory .directory-card-right-end strong {
+    bottom: 25px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 600px) {
+  #contents.d01-directory .directory-master-image {
+    transform: scale(1.48) !important;
+    transform-origin: 40% 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #contents.d01-directory .directory-card-title,
+  #contents.d01-directory .directory-card-secondary {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
+}
