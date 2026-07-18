@@ -91,112 +91,6 @@ html.motion-enabled #contents.d01-directory[data-archive-motion-ready] .director
   transform: translate3d(0, -2px, 0) !important;
 }
 
-/* D02.1 Page 02: two distinct approved image studies in one matched editorial pair. */
-.key-visual-two {
-  display: grid;
-  min-height: 100svh;
-  padding: clamp(66px, 5vw, 92px) var(--safe) clamp(52px, 4vw, 76px);
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  grid-template-rows: auto minmax(0, 1fr);
-  align-items: start;
-  column-gap: clamp(18px, 1.8vw, 34px);
-  row-gap: clamp(18px, 2vw, 32px);
-  overflow: hidden;
-  background: #f7f7f4;
-}
-
-.key-visual-two::before,
-.key-visual-two::after,
-.key-visual-two .kv-main::before,
-.key-visual-two .kv-main::after {
-  content: none !important;
-  display: none !important;
-}
-
-.key-visual-two .kv-red-shape,
-.key-visual-two .kv-local-plane,
-.key-visual-two .kv-rule,
-.key-visual-two .kv-mark {
-  display: none !important;
-}
-
-.key-visual-two .kv-meta {
-  position: static;
-  grid-column: 2 / 6;
-  grid-row: 1;
-  align-self: start;
-  justify-self: start;
-  width: 100%;
-  max-width: 430px;
-  margin: 0;
-  padding: 0;
-  text-align: left;
-}
-
-.key-visual-two .kv-number-row {
-  width: 100%;
-  flex-direction: row;
-}
-
-.key-visual-two .kv-title-copy,
-.key-visual-two .kv-title-copy::after {
-  margin-left: 0;
-}
-
-.key-visual-two .kv-study {
-  position: relative;
-  grid-row: 2;
-  align-self: start;
-  justify-self: stretch;
-  width: 100%;
-  margin: 0;
-  overflow: visible;
-  transform: none !important;
-}
-
-.key-visual-two .kv-study-red {
-  grid-column: 2 / 7;
-}
-
-.key-visual-two .kv-study-blue {
-  grid-column: 7 / 12;
-}
-
-.key-visual-two .kv-study-frame {
-  display: grid;
-  place-items: center;
-  width: 100%;
-  height: clamp(280px, min(36vw, 58svh), 620px);
-  overflow: hidden;
-  background: transparent;
-}
-
-.key-visual-two .kv-study-frame img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  max-width: none;
-  max-height: none;
-  object-fit: contain;
-  object-position: 50% 50%;
-  transform: none;
-}
-
-.key-visual-two .kv-study figcaption {
-  display: flex;
-  align-items: flex-start;
-  width: 100%;
-  min-height: 38px;
-  margin: 0;
-  padding: 11px 0 0;
-  border-top: 1px solid rgba(23, 25, 28, .34);
-  color: rgba(23, 25, 28, .72);
-  font-size: 9px;
-  font-weight: 650;
-  line-height: 1.35;
-  letter-spacing: .16em;
-}
-
 /* Page 07: compensate for internal source whitespace, not just equal CSS boxes. */
 .content-additional .additional-normalized-frame {
   width: 100%;
@@ -352,6 +246,19 @@ html.motion-enabled [data-motion-scene]:not(.is-inview) [data-motion="end-page-f
   translate: 0 12px;
 }
 
+/* D04.2 Page 02 restoration: the original single standing illustration is
+   static content and must never depend on scene-observer timing. */
+#key-visual-02 [data-motion="artwork-primary"],
+html.motion-enabled #key-visual-02:not(.is-inview) [data-motion="artwork-primary"] {
+  opacity: 1 !important;
+  visibility: visible !important;
+  clip-path: none !important;
+  filter: none !important;
+  transform: none !important;
+  translate: 0 0 !important;
+  transition: none !important;
+}
+
 .directory-card:hover,
 .directory-card:focus-visible,
 .directory-card:focus-within,
@@ -363,43 +270,6 @@ html.motion-enabled [data-motion-scene]:not(.is-inview) [data-motion="end-page-f
 }
 
 @media (max-width: 700px) {
-  .key-visual-two {
-    min-height: auto;
-    padding: 58px 22px 76px;
-    display: block;
-    overflow: hidden;
-  }
-
-  .key-visual-two .kv-meta {
-    width: min(78vw, 320px);
-    max-width: 320px;
-    margin: 0 0 26px;
-    padding: 0;
-    text-align: left;
-  }
-
-  .key-visual-two .kv-study {
-    width: 100%;
-    margin: 0;
-  }
-
-  .key-visual-two .kv-study-frame {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 1600 / 1067;
-  }
-
-  .key-visual-two .kv-secondary {
-    width: 100%;
-    height: auto;
-    margin: 24px 0 0;
-  }
-
-  .key-visual-two .kv-title-copy,
-  .key-visual-two .kv-title-copy::after {
-    margin-left: 0;
-  }
-
   .content-additional .additional-band-a .additional-minor .additional-normalized-frame img {
     transform: translateY(-1.7%) scale(1.046);
     transform-origin: 50% 0;

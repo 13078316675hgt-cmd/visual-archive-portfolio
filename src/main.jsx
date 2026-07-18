@@ -9,8 +9,12 @@ import './d03-spread-edge-fix.css'
 import './d03-1-directory-motion.css'
 import './d03-3-static-integration-motion.css'
 import './d03-3-end-dvd-window.css'
+import './d04-motion-art-direction.css'
+import './d05-page02-poster.css'
 import { initArchiveMotion } from './motion/archiveMotion.js'
 import { initEndPageDvdMotion } from './motion/endPageDvdMotion.js'
+import { initHomeMotion } from './motion/homeMotion.js'
+import { initPage02PosterMotion } from './motion/page02PosterMotion.js'
 import {
   AdditionalCharacterDesigns,
   CharacterSheets,
@@ -27,13 +31,25 @@ import {
   directoryMasterIntegrated,
   endPageIntegrated,
   homeV9Artwork,
-  selectedWorks,
 } from './data/artworkManifest.js'
 
-const PAGE_TWO_ARTWORKS = Object.freeze({
-  redProfile: selectedWorks.find((item) => item.id === 'study-red-profile'),
-  blueSky: selectedWorks.find((item) => item.id === 'study-blue-sky'),
-})
+const PORTFOLIO_URL_ROUTES = Object.freeze([
+  { id: 'title', hash: '', aliases: ['#title'] },
+  { id: 'contents', hash: '#contents', aliases: [] },
+  { id: 'key-visual-01', hash: '#key-visual-01', aliases: [] },
+  { id: 'key-visual-02', hash: '#key-visual-02', aliases: ['#page-02'] },
+  { id: 'key-visual-03', hash: '#key-visual-03', aliases: [] },
+  { id: 'character-sheets', hash: '#character-sheets', aliases: [] },
+  { id: 'costume-detail', hash: '#costume-detail', aliases: [] },
+  { id: 'portrait-studies', hash: '#portrait-studies', aliases: [] },
+  { id: 'selected-works', hash: '#selected-works', aliases: [] },
+  { id: 'additional-designs', hash: '#additional-designs', aliases: [] },
+  { id: 'end', hash: '#end', aliases: ['#resume-contact-resume', '#resume-contact-contact'] },
+])
+
+const getPortfolioRouteForHash = (hash) => PORTFOLIO_URL_ROUTES.find((route) => (
+  route.hash === hash || route.aliases.includes(hash)
+)) || null
 
 function PageMeta({ number, label }) {
   return <div className="page-meta"><span>{label}</span><b>{number}</b></div>
@@ -58,7 +74,6 @@ function usePortfolioMotion() {
     const mobileMotion = window.matchMedia('(max-width: 900px)').matches
 
     root.classList.toggle('motion-reduced', reduceMotion)
-    const cleanupArchiveMotion = initArchiveMotion(document.querySelector('.archive-selection-scene'), { reducedMotion: reduceMotion })
 
     const resolveAnchorTarget = (hash) => {
       if (!hash || hash === '#') return false
@@ -82,7 +97,67 @@ function usePortfolioMotion() {
       return true
     }
 
+    const previousScrollRestoration = window.history.scrollRestoration
+    window.history.scrollRestoration = 'manual'
+    const requestedHash = window.location.hash
+    const requestedRoute = getPortfolioRouteForHash(requestedHash)
+    const requestedTarget = requestedHash ? resolveAnchorTarget(requestedHash) : document.getElementById('title')
+
+    if (requestedHash && (!requestedRoute || !requestedTarget)) {
+      window.history.replaceState(window.history.state, '', `${window.location.pathname}${window.location.search}`)
+    } else if (requestedHash && requestedTarget) {
+      navigateToAnchorOnce(requestedHash, requestedTarget)
+    }
+
+    const cleanupArchiveMotion = initArchiveMotion(document.querySelector('.archive-selection-scene'), { reducedMotion: reduceMotion })
+    const cleanupHomeMotion = initHomeMotion(document.querySelector('.home-v9-preview'), { reducedMotion: reduceMotion })
+
+    let routeSyncFrame = 0
+    let routeSyncUnlockFrame = 0
+    let routeSyncSuspended = Boolean(requestedHash && requestedRoute && requestedTarget)
+    const routeElements = PORTFOLIO_URL_ROUTES.map((route) => ({
+      route,
+      element: document.getElementById(route.id),
+    })).filter(({ element }) => Boolean(element))
+
+    const findViewportRoute = () => {
+      const probeY = Math.min(window.innerHeight * 0.38, 360)
+      return routeElements.find(({ element }) => {
+        const rect = element.getBoundingClientRect()
+        return rect.top <= probeY && rect.bottom > probeY
+      })?.route || null
+    }
+
+    const syncViewportRouteToUrl = () => {
+      routeSyncFrame = 0
+      if (routeSyncSuspended || directoryTransitionFrame) return
+      const viewportRoute = findViewportRoute()
+      if (!viewportRoute) return
+      const currentRoute = getPortfolioRouteForHash(window.location.hash)
+      if (currentRoute?.id === viewportRoute.id) return
+
+      const nextUrl = viewportRoute.id === 'title'
+        ? `${window.location.pathname}${window.location.search}`
+        : `${window.location.pathname}${window.location.search}${viewportRoute.hash}`
+      window.history.replaceState(window.history.state, '', nextUrl)
+    }
+
+    const scheduleViewportRouteSync = () => {
+      window.cancelAnimationFrame(routeSyncFrame)
+      routeSyncFrame = window.requestAnimationFrame(syncViewportRouteToUrl)
+    }
+
+    const releaseRouteSync = () => {
+      window.cancelAnimationFrame(routeSyncUnlockFrame)
+      routeSyncUnlockFrame = window.requestAnimationFrame(() => {
+        routeSyncSuspended = false
+        scheduleViewportRouteSync()
+      })
+    }
+
     const navigateHome = (target) => {
+      routeSyncSuspended = true
+      const shouldReplayHome = Boolean(window.location.hash || window.scrollY > window.innerHeight * 0.6)
       const cleanHomeUrl = window.location.pathname || '/'
       if (window.location.hash || window.location.search) {
         window.history.pushState(null, '', cleanHomeUrl)
@@ -95,6 +170,71 @@ function usePortfolioMotion() {
       document.querySelectorAll('.top-nav a[href^="#"]').forEach((link) => {
         link.classList.toggle('is-active', link.getAttribute('href') === '#title')
       })
+      if (shouldReplayHome) {
+        window.dispatchEvent(new CustomEvent('portfolio:home-enter', { detail: { intentional: true } }))
+      }
+      releaseRouteSync()
+      return true
+    }
+
+    let directoryTransitionFrame = 0
+    const notifyDirectoryTransition = (phase, detail = {}) => {
+      window.dispatchEvent(new CustomEvent(`portfolio:directory-transition-${phase}`, { detail }))
+    }
+
+    const cancelDirectoryTransition = () => {
+      if (!directoryTransitionFrame) return
+      window.cancelAnimationFrame(directoryTransitionFrame)
+      directoryTransitionFrame = 0
+      document.getElementById('title')?.classList.remove('is-directory-transitioning')
+      routeSyncSuspended = false
+      scheduleViewportRouteSync()
+    }
+
+    const navigateToDirectory = (target, { fromHome = false } = {}) => {
+      routeSyncSuspended = true
+      window.cancelAnimationFrame(directoryTransitionFrame)
+      notifyDirectoryTransition('start', { fromHome, reducedMotion: reduceMotion })
+
+      const home = document.getElementById('title')
+      const homeRect = home?.getBoundingClientRect()
+      const homeIsVisible = Boolean(homeRect && homeRect.bottom > 0 && homeRect.top < window.innerHeight * .4)
+      const shouldTransition = fromHome && homeIsVisible && !reduceMotion
+
+      if (!shouldTransition) {
+        target.scrollIntoView({ block: 'start', behavior: 'instant' })
+        target.focus?.({ preventScroll: true })
+        notifyDirectoryTransition('settled', { fromHome: false, reducedMotion: reduceMotion })
+        releaseRouteSync()
+        return true
+      }
+
+      home.classList.add('is-directory-transitioning')
+      const startY = window.scrollY
+      const scrollMargin = Number.parseFloat(getComputedStyle(target).scrollMarginTop) || 0
+      const destinationY = Math.max(0, target.getBoundingClientRect().top + startY - scrollMargin)
+      const duration = 520
+      let startTime = 0
+
+      const finish = () => {
+        directoryTransitionFrame = 0
+        window.scrollTo({ top: destinationY, left: 0, behavior: 'instant' })
+        home.classList.remove('is-directory-transitioning')
+        target.focus?.({ preventScroll: true })
+        notifyDirectoryTransition('settled', { fromHome: true, duration })
+        releaseRouteSync()
+      }
+
+      const step = (now) => {
+        if (!startTime) startTime = now
+        const progress = Math.min(1, (now - startTime) / duration)
+        const eased = 1 - ((1 - progress) ** 4)
+        window.scrollTo(0, startY + (destinationY - startY) * eased)
+        if (progress < 1) directoryTransitionFrame = window.requestAnimationFrame(step)
+        else finish()
+      }
+
+      directoryTransitionFrame = window.requestAnimationFrame(step)
       return true
     }
 
@@ -108,6 +248,7 @@ function usePortfolioMotion() {
       if (!hash || !target) return
 
       event.preventDefault()
+      if (hash !== '#contents') cancelDirectoryTransition()
       if (hash === '#title') {
         navigateHome(target)
         return
@@ -115,37 +256,67 @@ function usePortfolioMotion() {
       if (window.location.hash !== hash) {
         window.history.pushState(null, '', `${window.location.pathname}${window.location.search}${hash}`)
       }
+      if (hash === '#contents') {
+        const home = document.getElementById('title')
+        const homeRect = home?.getBoundingClientRect()
+        const fromHome = Boolean(anchor.closest('#title') && homeRect && homeRect.bottom > 0 && homeRect.top < window.innerHeight * .4)
+        void navigateToDirectory(target, { fromHome })
+        return
+      }
+      routeSyncSuspended = true
       void navigateToAnchorOnce(hash, target)
+      releaseRouteSync()
     }
 
     let historyNavigationFrame = 0
     const handleHistoryNavigation = () => {
+      routeSyncSuspended = true
       window.cancelAnimationFrame(historyNavigationFrame)
       historyNavigationFrame = window.requestAnimationFrame(() => {
         historyNavigationFrame = 0
         if (window.location.hash) {
+          if (window.location.hash === '#contents') {
+            window.dispatchEvent(new CustomEvent('portfolio:directory-history-enter'))
+          }
           void navigateToAnchorOnce(window.location.hash)
+          if (window.location.hash === '#contents') {
+            window.requestAnimationFrame(() => notifyDirectoryTransition('settled', { history: true }))
+          }
+          releaseRouteSync()
           return
         }
         const home = document.getElementById('title')
-        if (home) navigateToAnchorOnce('#title', home)
+        if (home) {
+          navigateToAnchorOnce('#title', home)
+          window.dispatchEvent(new CustomEvent('portfolio:home-enter', { detail: { history: true } }))
+        }
+        releaseRouteSync()
       })
     }
 
     document.addEventListener('click', handleAnchorClick)
     window.addEventListener('popstate', handleHistoryNavigation)
+    window.addEventListener('scroll', scheduleViewportRouteSync, { passive: true })
+    window.addEventListener('resize', scheduleViewportRouteSync)
     const initialHashFrame = window.requestAnimationFrame(() => {
-      if (window.location.hash) void navigateToAnchorOnce(window.location.hash)
+      releaseRouteSync()
     })
 
     if (reduceMotion) {
       return () => {
         window.cancelAnimationFrame(initialHashFrame)
         window.cancelAnimationFrame(historyNavigationFrame)
+        window.cancelAnimationFrame(directoryTransitionFrame)
+        window.cancelAnimationFrame(routeSyncFrame)
+        window.cancelAnimationFrame(routeSyncUnlockFrame)
         document.removeEventListener('click', handleAnchorClick)
         window.removeEventListener('popstate', handleHistoryNavigation)
+        window.removeEventListener('scroll', scheduleViewportRouteSync)
+        window.removeEventListener('resize', scheduleViewportRouteSync)
+        window.history.scrollRestoration = previousScrollRestoration
         root.classList.remove('motion-reduced')
         cleanupArchiveMotion()
+        cleanupHomeMotion()
       }
     }
 
@@ -190,9 +361,7 @@ function usePortfolioMotion() {
       return nodes
     }
 
-    scene('#title', 'title', 'section-intro', '--motion-section')
     scene('#key-visual-01', 'kv01', 'artwork-sequence', '--motion-section')
-    scene('#key-visual-02', 'kv02', 'artwork-sequence', '--motion-section')
     scene('#key-visual-03', 'kv03', 'artwork-static-first', '--motion-standard')
     scene('#character-sheets', 'sheets', 'artwork-sequence', '--motion-section')
     scene('#costume-detail', 'detail', 'artwork-sequence', '--motion-section')
@@ -206,20 +375,11 @@ function usePortfolioMotion() {
     setMotion('.title-lockup h2, .title-lockup p, .title-contact a, .title-contact p, .title-meta span', 'intro-meta', { delay: 220, stagger: 40, maxDelay: 240 })
     setMotion('.title-cobalt-field', 'intro-field')
     setMotion('.title-scan', 'intro-panel', { stagger: 40, maxDelay: 120 })
-    setMotion('.home-v9-artwork', 'home-v9-artwork', { delay: 120, mobileDelay: 260 })
-    setMotion('.home-v9-title span', 'home-v9-title', { delay: 360, stagger: 60, maxDelay: 440, mobileDelay: 80, mobileStagger: 50, mobileMaxDelay: 130 })
-    setMotion('.home-v9-eyebrow, .home-v9-subheading, .home-v9-description, .home-v9-coordinate', 'home-v9-copy', { delay: 580, stagger: 55, maxDelay: 720, mobileDelay: 180, mobileStagger: 45, mobileMaxDelay: 290 })
-    setMotion('.home-v9-enter, .home-v9-scroll', 'home-v9-action', { delay: 760, stagger: 80, maxDelay: 840, mobileDelay: 310, mobileStagger: 55, mobileMaxDelay: 365 })
-    setMotion('.home-v9-rule', 'registration-rule', { delay: 640, stagger: 50, maxDelay: 700, mobileDelay: 220, mobileStagger: 40, mobileMaxDelay: 260 })
-
-    setMotion('.key-visual-page .kv-number-row', 'section-title')
-    setMotion('.key-visual-page .kv-title-rule', 'registration-rule', { delay: 40 })
-    setMotion('.key-visual-page .kv-title-copy', 'section-copy', { delay: 80 })
+    setMotion('.key-visual-page:not(.key-visual-two) .kv-number-row', 'section-title')
+    setMotion('.key-visual-page:not(.key-visual-two) .kv-title-rule', 'registration-rule', { delay: 40 })
+    setMotion('.key-visual-page:not(.key-visual-two) .kv-title-copy', 'section-copy', { delay: 80 })
     setMotion('.key-visual-one .kv-main', 'artwork-primary', { variant: 'diagonal', delay: 40 })
-    setMotion('.key-visual-two .kv-main', 'artwork-primary', { variant: 'horizontal', delay: 40 })
-    setMotion('.key-visual-two .kv-secondary', 'artwork-support', { delay: 75 })
     setMotion('.key-visual-one .kv-red-shape, .key-visual-one .kv-local-plane, .key-visual-one .kv-rule, .key-visual-one .kv-mark', 'registration-detail', { delay: 160, stagger: 40, maxDelay: 240 })
-    setMotion('.key-visual-two .kv-red-shape, .key-visual-two .kv-local-plane, .key-visual-two .kv-rule, .key-visual-two .kv-mark', 'registration-detail', { delay: 120, stagger: 40, maxDelay: 240 })
     setMotion('.key-visual-three .kv-red-shape, .key-visual-three .kv-local-plane, .key-visual-three .kv-rule, .key-visual-three .kv-mark', 'registration-detail', { delay: 80, stagger: 40, maxDelay: 140 })
 
     setMotion('.editorial-head span, .editorial-head h2', 'section-title', { stagger: 40, maxDelay: 80 })
@@ -308,8 +468,14 @@ function usePortfolioMotion() {
     return () => {
       window.cancelAnimationFrame(initialHashFrame)
       window.cancelAnimationFrame(historyNavigationFrame)
+      window.cancelAnimationFrame(directoryTransitionFrame)
+      window.cancelAnimationFrame(routeSyncFrame)
+      window.cancelAnimationFrame(routeSyncUnlockFrame)
       document.removeEventListener('click', handleAnchorClick)
       window.removeEventListener('popstate', handleHistoryNavigation)
+      window.removeEventListener('scroll', scheduleViewportRouteSync)
+      window.removeEventListener('resize', scheduleViewportRouteSync)
+      window.history.scrollRestoration = previousScrollRestoration
       sceneObserver.disconnect()
       navObserver.disconnect()
       completionTimers.forEach((timer) => window.clearTimeout(timer))
@@ -318,6 +484,7 @@ function usePortfolioMotion() {
       root.classList.remove('motion-reduced')
       navLinks.forEach((link) => link.classList.remove('is-active'))
       cleanupArchiveMotion()
+      cleanupHomeMotion()
       scenes.forEach((node) => {
         node.classList.remove('is-inview', 'is-complete')
         node.removeAttribute('data-motion-scene')
@@ -368,21 +535,28 @@ function TitleSection() {
 function HomeV9Preview() {
   const { width, height } = getAssetDimensions(homeV9Artwork)
 
-  return <section id="title" className="home-v9-preview" data-home-visual="v9master" tabIndex={-1}>
+  const artworkPicture = (className, { decorative = false } = {}) => <picture className={className} aria-hidden={decorative || undefined}>
+    <source type="image/webp" srcSet={homeV9Artwork.srcSet} sizes={homeV9Artwork.sizes} />
+    <img
+      src={homeV9Artwork.src}
+      alt={decorative ? '' : homeV9Artwork.alt}
+      width={width}
+      height={height}
+      loading="eager"
+      decoding="async"
+      fetchPriority={decorative ? 'auto' : 'high'}
+    />
+  </picture>
+
+  return <section id="title" className="home-v9-preview" data-home-visual="v9master" data-home-motion="mother-image-pullback" tabIndex={-1}>
     <Nav />
     <div className="home-v9-artwork">
-      <picture>
-        <source type="image/webp" srcSet={homeV9Artwork.srcSet} sizes={homeV9Artwork.sizes} />
-        <img
-          src={homeV9Artwork.src}
-          alt={homeV9Artwork.alt}
-          width={width}
-          height={height}
-          loading="eager"
-          decoding="async"
-          fetchPriority="high"
-        />
-      </picture>
+      {artworkPicture('home-v9-mother home-v9-mother-base')}
+      <div className="home-v9-depth-layers" aria-hidden="true">
+        {artworkPicture('home-v9-mother home-v9-layer home-v9-layer-environment', { decorative: true })}
+        {artworkPicture('home-v9-mother home-v9-layer home-v9-layer-subject', { decorative: true })}
+        {artworkPicture('home-v9-mother home-v9-layer home-v9-layer-foreground', { decorative: true })}
+      </div>
     </div>
     <div className="home-v9-copy">
       <p className="home-v9-eyebrow">SELECTED WORKS / 2026</p>
@@ -414,19 +588,6 @@ const DIRECTORY_CARDS = Object.freeze([
   { number: 'END', title: 'ABOUT / CONTACT', href: '#end', position: 'right-end', motionChapter: '09' },
 ])
 
-const DIRECTORY_CARD_INITIAL_MOTION = Object.freeze({
-  '--node-progress': 1,
-  '--anchor-progress': 0,
-  '--leader-progress': 0,
-  '--frame-progress': 0,
-  '--image-progress': 0,
-  '--strip-progress': 0,
-  '--label-progress': 0,
-  '--utility-progress': 0,
-  '--secondary-progress': 0,
-  '--archive-mobile-item-progress': 0,
-})
-
 function DirectoryCardContent({ card }) {
   return <span className="directory-card-content">
     <span className="archive-route-anchor directory-card-hit" aria-hidden="true" />
@@ -444,7 +605,7 @@ function DirectoryCardContent({ card }) {
 function DirectoryCard({ card }) {
   const className = `directory-card directory-card-${card.position} archive-route-node`
   if (card.secondaryHref) {
-    return <article className={`${className} directory-card-dual`} data-chapter={card.number} style={DIRECTORY_CARD_INITIAL_MOTION}>
+    return <article className={`${className} directory-card-dual`} data-chapter={card.number}>
       <a className="directory-card-primary" href={card.href} aria-label={`${card.number} ${card.title}`}>
         <DirectoryCardContent card={card} />
       </a>
@@ -452,7 +613,7 @@ function DirectoryCard({ card }) {
     </article>
   }
 
-  return <a className={className} href={card.href} data-chapter={card.motionChapter || card.number} aria-label={`${card.number} ${card.title}`} style={DIRECTORY_CARD_INITIAL_MOTION}>
+  return <a className={className} href={card.href} data-chapter={card.motionChapter || card.number} aria-label={`${card.number} ${card.title}`}>
     <DirectoryCardContent card={card} />
   </a>
 }
@@ -463,39 +624,28 @@ function ContentsSection() {
   return <section
     id="contents"
     className="contents archive-route archive-selection-scene d01-directory page"
-    data-contents-visual="d03-3-integrated-master"
+    data-contents-visual="d04-locked-mother-image"
+    data-directory-motion="mother-image-pullback"
     data-archive-motion-ready="true"
     data-archive-phase="initial"
-    style={{
-      '--archive-index-progress': 0,
-      '--archive-axis-progress': 0,
-      '--archive-signal-progress': 0,
-      '--archive-complete-progress': 0,
-    }}
   >
     <div className="directory-stage">
-      <div className="directory-image-frame">
-        <img
-          className="directory-master-image"
-          src={directoryMasterIntegrated.src}
-          alt={directoryMasterIntegrated.alt}
-          width={width}
-          height={height}
-          loading="eager"
-          decoding="async"
-          fetchPriority="high"
-        />
-      </div>
-      <div className="directory-motion-system" aria-hidden="true">
-        <span className="directory-motion-number-line">01&nbsp;&nbsp;02&nbsp;&nbsp;03&nbsp;&nbsp;04&nbsp;&nbsp;&nbsp;&nbsp;05&nbsp;&nbsp;06&nbsp;&nbsp;07&nbsp;&nbsp;END</span>
-        <span className="directory-motion-axis" />
-        <span className="directory-motion-index directory-motion-index-left">
-          {Array.from({ length: 10 }, (_, index) => <i key={`left-${index}`} />)}
-        </span>
-        <span className="directory-motion-index directory-motion-index-right">
-          {Array.from({ length: 10 }, (_, index) => <i key={`right-${index}`} />)}
-        </span>
-        <span className="directory-motion-signal"><i /></span>
+      <div className="directory-motion-parent">
+        <div className="directory-image-frame">
+          <img
+            className="directory-master-image"
+            src={directoryMasterIntegrated.src}
+            alt={directoryMasterIntegrated.alt}
+            width={width}
+            height={height}
+            loading="eager"
+            decoding="async"
+            fetchPriority="high"
+          />
+        </div>
+        <nav className="directory-card-layer" aria-label="作品集目录">
+          {DIRECTORY_CARDS.map((card) => <DirectoryCard card={card} key={card.number} />)}
+        </nav>
       </div>
       <header className="directory-heading">
         <span>CONTENTS</span>
@@ -503,19 +653,13 @@ function ContentsSection() {
         <small>SELECT YOUR DESTINATION</small>
       </header>
       <a className="directory-return" href="#title">RETURN / TITLE</a>
-      <nav className="directory-card-layer" aria-label="作品集目录">
-        {DIRECTORY_CARDS.map((card) => <DirectoryCard card={card} key={card.number} />)}
-      </nav>
     </div>
   </section>
 }
 
 function KeyVisualPage({ id, number, title, asset, variant }) {
-  const hasStudyPair = variant === 'two'
-  const primaryAsset = hasStudyPair ? PAGE_TWO_ARTWORKS.redProfile : asset
-
-  return <section id={id} className={`key-visual-page key-visual-${variant}${hasStudyPair ? ' d03-paired-spread' : ''} page`}>
-    {hasStudyPair ? <span id="page-02" className="page-deep-link-alias" aria-hidden="true" /> : null}
+  return <section id={id} className={`key-visual-page key-visual-${variant} page`}>
+    {variant === 'two' ? <span id="page-02" className="page-deep-link-alias" aria-hidden="true" /> : null}
     <div className="kv-meta kv-title-module">
       <div className="kv-number-row">
         <b>{number}</b>
@@ -526,29 +670,15 @@ function KeyVisualPage({ id, number, title, asset, variant }) {
         <p>CHARACTER ILLUSTRATION</p>
       </div>
     </div>
-    <figure className={`kv-main${hasStudyPair ? ' kv-study kv-study-red' : ''}`}>
-      <div className={hasStudyPair ? 'kv-study-frame paired-spread-frame' : undefined}>
-        <img
-          {...imageAttrs(primaryAsset)}
-          alt={hasStudyPair ? '浅绿色与淡青色环境中的红发侧脸角色' : primaryAsset.alt}
-          loading={id === 'key-visual-01' ? 'eager' : 'lazy'}
-          decoding="async"
-        />
-      </div>
+    <figure className="kv-main">
+      <img
+        {...imageAttrs(asset)}
+        alt={asset.alt}
+        loading={id === 'key-visual-01' ? 'eager' : 'lazy'}
+        decoding="async"
+      />
       {variant !== 'three' ? <span className="motion-curtain" aria-hidden="true" /> : null}
-      {hasStudyPair ? <figcaption>IMAGE STUDY / 03 / RED PROFILE</figcaption> : null}
     </figure>
-    {hasStudyPair ? <figure className="kv-secondary kv-study kv-study-blue">
-      <div className="kv-study-frame paired-spread-frame">
-        <img
-          {...imageAttrs(PAGE_TWO_ARTWORKS.blueSky)}
-          alt="蓝天与山景背景中的银白发角色"
-          loading="lazy"
-          decoding="async"
-        />
-      </div>
-      <figcaption>IMAGE STUDY / 04 / BLUE SKY</figcaption>
-    </figure> : null}
     <div className="kv-red-shape" aria-hidden="true" />
     <div className="kv-local-plane" aria-hidden="true" />
     <div className="kv-rule kv-rule-a" aria-hidden="true" />
@@ -562,6 +692,83 @@ function KeyVisualPage({ id, number, title, asset, variant }) {
 function getAssetDimensions(asset) {
   const [width, height] = asset.resolution.split(/\s*[x脳]\s*/).map(Number)
   return { width, height }
+}
+
+function Page02Poster() {
+  const sectionRef = useRef(null)
+  const asset = artworkTwo
+
+  useLayoutEffect(() => initPage02PosterMotion(sectionRef.current), [])
+
+  return <section ref={sectionRef} id="key-visual-02" className="key-visual-page key-visual-two kv02-poster page">
+    <span id="page-02" className="page-deep-link-alias" aria-hidden="true" />
+    <link rel="preload" as="image" href={asset.src} />
+
+    <div className="kv02-poster-canvas">
+      <div className="kv02-blue-field" aria-hidden="true" />
+      <div className="kv02-paper-plane" aria-hidden="true" />
+      <div className="kv02-ghost-title" aria-hidden="true">
+        <span>CHARACTER</span>
+        <span>ARCHIVE</span>
+      </div>
+
+      <div className="kv02-art-field">
+        <img
+          className="kv02-art kv02-art-main"
+          {...imageAttrs(asset)}
+          alt={asset.alt}
+          loading="eager"
+          decoding="async"
+          fetchPriority="high"
+        />
+        <div className="kv02-art-mask kv02-mask-upper" aria-hidden="true">
+          <img className="kv02-art" {...imageAttrs(asset)} alt="" loading="eager" decoding="async" />
+        </div>
+        <div className="kv02-art-mask kv02-mask-left" aria-hidden="true">
+          <img className="kv02-art" {...imageAttrs(asset)} alt="" loading="eager" decoding="async" />
+        </div>
+        <div className="kv02-art-mask kv02-mask-right" aria-hidden="true">
+          <img className="kv02-art" {...imageAttrs(asset)} alt="" loading="eager" decoding="async" />
+        </div>
+      </div>
+
+      <header className="kv02-poster-copy">
+        <p className="kv02-poster-index">02 / POSTER PLATE <i aria-hidden="true" /></p>
+        <h2><span>KEY VISUAL</span><span>NO. 02</span></h2>
+        <p className="kv02-poster-subtitle">CHARACTER ILLUSTRATION / SINGLE WORK<br />BLACK · WHITE · BLUE · SIGNAL RED</p>
+      </header>
+
+      <p className="kv02-vertical-meta">VISUAL ARCHIVE / CHARACTER CONCEPT</p>
+      <p className="kv02-bottom-meta">ARTWORK 02 / 1800 × 2326</p>
+      <p className="kv02-field-meta">FIELD 02 / FINAL POSTER</p>
+      <i className="kv02-bottom-rule" aria-hidden="true" />
+      <i className="kv02-registration" aria-hidden="true" />
+    </div>
+
+    <div className="kv02-mobile-legacy">
+      <div className="kv-meta kv-title-module">
+        <div className="kv-number-row">
+          <b>02</b>
+          <i className="kv-title-rule" aria-hidden="true" />
+        </div>
+        <div className="kv-title-copy">
+          <h2>KEY VISUAL 02</h2>
+          <p>CHARACTER ILLUSTRATION</p>
+        </div>
+      </div>
+      <figure className="kv-main">
+        <img {...imageAttrs(asset)} alt={asset.alt} loading="lazy" decoding="async" />
+        <span className="motion-curtain" aria-hidden="true" />
+      </figure>
+      <div className="kv-red-shape" aria-hidden="true" />
+      <div className="kv-local-plane" aria-hidden="true" />
+      <div className="kv-rule kv-rule-a" aria-hidden="true" />
+      <div className="kv-rule kv-rule-b" aria-hidden="true" />
+      <div className="kv-mark kv-mark-a" aria-hidden="true">+</div>
+      <div className="kv-mark kv-mark-b" aria-hidden="true">02</div>
+      <PageMeta number="02" label="KEY VISUAL 02" />
+    </div>
+  </section>
 }
 
 function imageAttrs(asset) {
@@ -637,7 +844,7 @@ function App() {
     <HomeV9Preview />
     <ContentsSection />
     <KeyVisualPage id="key-visual-01" number="01" title="KEY VISUAL 01" asset={artworkOne} variant="one" />
-    <KeyVisualPage id="key-visual-02" number="02" title="KEY VISUAL 02" asset={artworkTwo} variant="two" />
+    <Page02Poster />
     <KeyVisualPage id="key-visual-03" number="03" title="KEY VISUAL 03" asset={artworkThree} variant="three" />
     <CharacterSheets />
     <CostumeDetail />

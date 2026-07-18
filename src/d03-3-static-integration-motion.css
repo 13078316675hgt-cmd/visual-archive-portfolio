@@ -34,9 +34,9 @@ html.motion-enabled #contents.d01-directory[data-archive-motion-ready] .director
 
 /* Reveal whole title groups. Never clip glyphs or expose partial words. */
 html.motion-enabled #contents.d01-directory[data-archive-motion-ready] .directory-card-title {
-  opacity: var(--label-progress, 0);
+  opacity: 1;
   clip-path: none !important;
-  transform: translate3d(0, calc((1 - var(--label-progress, 0)) * 5px), 0);
+  transform: none;
   transition:
     opacity 210ms cubic-bezier(.16, 1, .3, 1),
     transform 280ms cubic-bezier(.16, 1, .3, 1),
@@ -44,8 +44,8 @@ html.motion-enabled #contents.d01-directory[data-archive-motion-ready] .director
 }
 
 html.motion-enabled #contents.d01-directory[data-archive-motion-ready] .directory-card-secondary {
-  opacity: var(--secondary-progress, 0);
-  transform: translate3d(0, calc((1 - var(--secondary-progress, 0)) * 4px), 0);
+  opacity: 1;
+  transform: none;
   transition:
     opacity 190ms cubic-bezier(.16, 1, .3, 1),
     transform 240ms cubic-bezier(.16, 1, .3, 1),

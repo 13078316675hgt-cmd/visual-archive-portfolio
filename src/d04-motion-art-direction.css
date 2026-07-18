@@ -1,0 +1,241 @@
+/* D04.4 approved mother-image motion integration.
+   Static D03.4 geometry remains owned by the earlier scoped stylesheets. */
+
+/* HOME / APPROVED D04.3C MOTHER-IMAGE PULLBACK */
+.home-v9-preview[data-home-motion="mother-image-pullback"] .home-v9-artwork {
+  isolation: isolate;
+}
+
+.home-v9-preview[data-home-motion="mother-image-pullback"] .home-v9-mother,
+.home-v9-preview[data-home-motion="mother-image-pullback"] .home-v9-depth-layers {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.home-v9-preview[data-home-motion="mother-image-pullback"] .home-v9-mother-base {
+  z-index: 1;
+}
+
+.home-v9-preview[data-home-motion="mother-image-pullback"] .home-v9-depth-layers {
+  z-index: 2;
+}
+
+.home-v9-preview[data-home-motion="mother-image-pullback"] .home-v9-layer {
+  opacity: 0;
+}
+
+.home-v9-preview[data-home-motion="mother-image-pullback"] .home-v9-layer-environment {
+  clip-path: polygon(20% 0, 100% 0, 100% 47%, 72% 54%, 45% 47%, 20% 38%);
+}
+
+.home-v9-preview[data-home-motion="mother-image-pullback"] .home-v9-layer-subject {
+  clip-path: inset(8% 5% 9% 42%);
+}
+
+.home-v9-preview[data-home-motion="mother-image-pullback"] .home-v9-layer-foreground {
+  clip-path: polygon(21% 55%, 100% 52%, 100% 100%, 18% 100%);
+}
+
+.home-v9-preview[data-home-motion="mother-image-pullback"] :is(
+  .home-v9-mother,
+  .home-v9-copy,
+  .top-nav,
+  .home-v9-index,
+  .home-v9-coordinate,
+  .home-v9-scroll,
+  .home-v9-rule
+) {
+  backface-visibility: hidden;
+}
+
+/* No ambient loop or outgoing-home fade survives the approved timeline. */
+.home-v9-preview[data-home-motion="mother-image-pullback"] .home-v9-artwork,
+.home-v9-preview[data-home-motion="mother-image-pullback"] .home-v9-artwork picture {
+  animation: none !important;
+  transition: none !important;
+}
+
+.home-v9-preview[data-home-motion="mother-image-pullback"].is-directory-transitioning .home-v9-artwork {
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+/* DIRECTORY / APPROVED D04.3C-1 SINGLE MOTHER-IMAGE PULLBACK */
+#contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-motion-system {
+  display: none !important;
+}
+
+#contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-stage,
+#contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-motion-parent,
+#contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-image-frame {
+  backface-visibility: hidden;
+}
+
+#contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-motion-parent {
+  position: absolute;
+  inset: 0;
+}
+
+#contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-master-image {
+  opacity: 1 !important;
+  filter: none !important;
+  transition: none !important;
+}
+
+/* The locked desktop mother image owns all visible card typography and marks.
+   DOM nodes remain semantic hit regions only. */
+@media (min-width: 1101px) {
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card,
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card::before,
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card-primary,
+  html.motion-enabled #contents.d01-directory[data-directory-motion="mother-image-pullback"][data-archive-motion-ready] .directory-card,
+  html.motion-enabled #contents.d01-directory[data-directory-motion="mother-image-pullback"][data-archive-motion-ready] .directory-card::before,
+  html.motion-enabled #contents.d01-directory[data-directory-motion="mother-image-pullback"][data-archive-motion-ready] .directory-card-primary {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card {
+    width: 12.7%;
+    height: 11.3%;
+    min-height: 0;
+    padding: 0;
+    color: transparent;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card-left-01 { left: 18.555%; top: 21.18%; }
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card-left-02 { left: 18.555%; top: 34.64%; }
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card-left-03 { left: 18.555%; top: 48.44%; }
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card-left-04 { left: 18.555%; top: 61.89%; }
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card-right-05 { left: 69.09%; top: 21.18%; }
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card-right-06 { left: 69.09%; top: 34.64%; width: 12.7%; height: 11.3%; }
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card-right-07 { left: 69.09%; top: 48.44%; }
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card-right-end { left: 69.09%; top: 65.54%; width: 12.7%; height: 7.64%; }
+
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] :is(
+    .directory-card-number,
+    .directory-card-marks,
+    .directory-card-title,
+    .directory-card-arrow,
+    .directory-card-corner
+  ),
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card::after,
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card-primary::after,
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card-confirm-rule {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card-secondary {
+    opacity: 1 !important;
+    visibility: visible !important;
+    color: transparent !important;
+    background: transparent !important;
+    font-size: 0 !important;
+    box-shadow: none !important;
+  }
+
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card::after,
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card-primary::after {
+    content: none !important;
+  }
+
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card::before {
+    content: "";
+    display: block;
+    position: absolute;
+    inset: 0;
+    opacity: 1 !important;
+    transition: background-color 150ms ease, border-color 150ms ease !important;
+  }
+
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card:hover,
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card:focus-visible,
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card:focus-within {
+    transform: translate3d(0, -1px, 0) !important;
+  }
+
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card:hover::before,
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card:focus-visible::before,
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card:focus-within::before {
+    background: rgba(181, 59, 50, .026) !important;
+    border: 1px solid rgba(181, 59, 50, .62) !important;
+  }
+
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] :is(
+    .directory-card,
+    .directory-card-primary,
+    .directory-card-secondary
+  ):focus-visible {
+    outline: 2px solid rgba(181, 59, 50, .82) !important;
+    outline-offset: 2px;
+  }
+
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card-primary {
+    inset: 0 0 36% 0;
+  }
+
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card-secondary {
+    z-index: 4;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    min-height: 36%;
+    padding: 0;
+    pointer-events: auto;
+  }
+}
+
+/* Tablet and mobile retain the approved visible card grids. No card-load staging. */
+@media (max-width: 1100px) {
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-motion-parent {
+    position: relative;
+    inset: auto;
+  }
+
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card,
+  html.motion-enabled #contents.d01-directory[data-directory-motion="mother-image-pullback"] .directory-card {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .home-v9-preview[data-home-motion="mother-image-pullback"] .home-v9-depth-layers {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-v9-preview[data-home-motion="mother-image-pullback"] .home-v9-layer {
+    display: none !important;
+  }
+
+  .home-v9-preview[data-home-motion="mother-image-pullback"] :is(
+    .home-v9-mother-base,
+    .home-v9-copy,
+    .top-nav,
+    .home-v9-index,
+    .home-v9-coordinate,
+    .home-v9-scroll,
+    .home-v9-rule
+  ),
+  #contents.d01-directory[data-directory-motion="mother-image-pullback"] :is(.directory-stage, .directory-motion-parent, .directory-image-frame) {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+}

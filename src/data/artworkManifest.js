@@ -45,13 +45,13 @@ export const directoryMasterApproved = {
 }
 
 export const directoryMasterIntegrated = {
-  id: 'directory-master-integrated-v3',
-  src: `${approved}directory-master-integrated-v3.png`,
-  filename: 'directory-master-integrated-v3.png',
-  sourcePath: 'Figma / 05 — D03.3 STATIC + MOTION CORRECTION / selected option A',
-  resolution: '2560 x 1440',
+  id: 'directory-master-d04-locked',
+  src: `${approved}directory-master-d04-locked.png`,
+  filename: 'directory-master-d04-locked.png',
+  sourcePath: 'Q:/A图片/PS/image.png',
+  resolution: '2048 x 1152',
   alt: '\u51b7\u767d\u8272\u6863\u6848\u7a7a\u95f4\u4e0e\u4e2d\u592e\u60ac\u6d6e\u77f3\u6750\u7ec7\u7269\u88c5\u7f6e\uff0c\u8fb9\u7f18\u4ee5\u5efa\u7b51\u7ed3\u6784\u7ebf\u5ef6\u5c55',
-  label: 'D03.3 INTEGRATED DIRECTORY MASTER',
+  label: 'D04 LOCKED DIRECTORY MOTHER IMAGE',
   ratio: 'landscape',
   sizes: '100vw',
 }

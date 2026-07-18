@@ -1,18 +1,13 @@
-const MOTION_MEDIA = '(min-width: 1440px)'
+const MOTION_MEDIA = '(min-width: 1101px)'
 const REDUCED_MEDIA = '(prefers-reduced-motion: reduce)'
-const RESUME_DELAY = 650
-const ENTRY_DELAY = 360
-const MIN_TRAVEL_X = 180
-const MIN_TRAVEL_Y = 90
+const RESUME_DELAY = 700
+const ENTRY_DELAY = 260
+const SPEED = 38
+const TRAJECTORY_RATIO = 0.72
+const MIN_TRAVEL_X = 160
+const MIN_TRAVEL_Y = 110
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
-
-function getMotionSpeed() {
-  if (window.innerWidth >= 2400) return 22
-  if (window.innerWidth >= 1800) return 20
-  if (window.innerWidth >= 1440) return 18
-  return 16
-}
 
 export function initEndPageDvdMotion(section, panel) {
   if (!section || !panel) return () => {}
@@ -40,10 +35,10 @@ export function initEndPageDvdMotion(section, panel) {
   let hasMeaningfulTravel = false
   let bounds = { minX: 0, maxX: 0, minY: 0, maxY: 0 }
 
-  const isViewportMotionEligible = () => motionMedia.matches && !reducedMedia.matches
-  const isMotionEligible = () => isViewportMotionEligible() && hasMeaningfulTravel
   const rangeX = () => Math.max(0, bounds.maxX - bounds.minX)
   const rangeY = () => Math.max(0, bounds.maxY - bounds.minY)
+  const isViewportMotionEligible = () => motionMedia.matches && !reducedMedia.matches
+  const isMotionEligible = () => isViewportMotionEligible() && hasMeaningfulTravel
 
   const writeTransform = () => {
     panel.style.transform = `translate3d(${x.toFixed(3)}px, ${y.toFixed(3)}px, 0)`
@@ -81,7 +76,6 @@ export function initEndPageDvdMotion(section, panel) {
     if (!lastFrameTime) lastFrameTime = now
     const elapsed = Math.min((now - lastFrameTime) / 1000, 0.05)
     lastFrameTime = now
-
     let nextX = x + velocityX * elapsed
     let nextY = y + velocityY * elapsed
     let hitX = false
@@ -125,9 +119,7 @@ export function initEndPageDvdMotion(section, panel) {
 
   const reflectInteractionState = () => {
     panel.dataset.dvdPause = [...pauseReasons].join(',')
-    if (pauseReasons.size && entryReady && isMotionEligible()) {
-      panel.dataset.dvdState = 'paused'
-    }
+    if (pauseReasons.size && entryReady && isMotionEligible()) panel.dataset.dvdState = 'paused'
   }
 
   const pause = (reason) => {
@@ -178,33 +170,30 @@ export function initEndPageDvdMotion(section, panel) {
 
     const previousRangeX = rangeX()
     const previousRangeY = rangeY()
-    const normalizedX = previousRangeX ? (x - bounds.minX) / previousRangeX : 0.18
-    const normalizedY = previousRangeY ? (y - bounds.minY) / previousRangeY : 0.34
+    const normalizedX = previousRangeX ? (x - bounds.minX) / previousRangeX : 0.16
+    const normalizedY = previousRangeY ? (y - bounds.minY) / previousRangeY : 0.20
     const stageRect = stage.getBoundingClientRect()
     const panelWidth = panel.offsetWidth
     const panelHeight = panel.offsetHeight
-    const outerPadding = clamp(window.innerWidth * 0.025, 36, 64)
-
-    const visibleLeft = outerPadding - stageRect.left
-    const visibleRight = window.innerWidth - outerPadding - stageRect.left - panelWidth
-    const protectedRight = stageRect.width * 0.42 - panelWidth
-    const visibleBottom = window.innerHeight - outerPadding - stageRect.top - panelHeight
-    const stageBottom = stageRect.height - panelHeight - outerPadding
-    const maxY = Math.max(outerPadding, Math.min(visibleBottom, stageBottom))
-    const desiredMinY = Math.max(outerPadding, stageRect.height * 0.52)
+    const outerMargin = clamp(window.innerWidth * 0.018, 24, 36)
+    const protectedTop = Math.max(outerMargin, 68)
 
     bounds = {
-      minX: Math.max(outerPadding, visibleLeft),
-      maxX: Math.max(Math.max(outerPadding, visibleLeft), Math.min(visibleRight, protectedRight)),
-      minY: Math.min(desiredMinY, maxY),
-      maxY,
+      minX: outerMargin - stageRect.left,
+      maxX: window.innerWidth - outerMargin - stageRect.left - panelWidth,
+      minY: protectedTop - stageRect.top,
+      maxY: window.innerHeight - outerMargin - stageRect.top - panelHeight,
     }
 
     panel.dataset.dvdBounds = [bounds.minX, bounds.maxX, bounds.minY, bounds.maxY]
       .map((value) => value.toFixed(2))
       .join(',')
     section.dataset.dvdTravel = `${rangeX().toFixed(2)},${rangeY().toFixed(2)}`
-    hasMeaningfulTravel = rangeX() >= MIN_TRAVEL_X && rangeY() >= MIN_TRAVEL_Y
+    hasMeaningfulTravel = bounds.maxX > bounds.minX
+      && bounds.maxY > bounds.minY
+      && rangeX() >= MIN_TRAVEL_X
+      && rangeY() >= MIN_TRAVEL_Y
+
     if (!hasMeaningfulTravel) {
       applyStaticState('travel-static')
       return
@@ -212,14 +201,14 @@ export function initEndPageDvdMotion(section, panel) {
 
     x = bounds.minX + clamp(normalizedX, 0, 1) * rangeX()
     y = bounds.minY + clamp(normalizedY, 0, 1) * rangeY()
-    const speed = getMotionSpeed()
-    const signX = velocityX < 0 ? -1 : 1
-    const signY = velocityY < 0 ? -1 : 1
-    velocityX = signX * speed * 0.82
-    velocityY = signY * speed * 0.57
-    panel.dataset.dvdSpeed = String(speed)
+    const normalizedMagnitude = Math.sqrt(1 + TRAJECTORY_RATIO ** 2)
+    const componentX = SPEED / normalizedMagnitude
+    const componentY = componentX * TRAJECTORY_RATIO
+    velocityX = velocityX === 0 ? -componentX : Math.sign(velocityX) * componentX
+    velocityY = velocityY === 0 ? -componentY : Math.sign(velocityY) * componentY
+    panel.dataset.dvdSpeed = String(SPEED)
     panel.dataset.dvdTrajectory = `${velocityX.toFixed(2)},${velocityY.toFixed(2)}`
-    section.dataset.dvdMode = window.innerWidth < 1600 ? 'compact-motion' : 'desktop-motion'
+    section.dataset.dvdMode = 'full-frame-motion'
     entryReady = hasEntered
     panel.dataset.dvdState = hasEntered ? 'revealed' : 'prepared'
     writeTransform()
@@ -242,19 +231,15 @@ export function initEndPageDvdMotion(section, panel) {
     }, ENTRY_DELAY)
   }
 
-  const onVisibilityChange = () => {
-    if (document.hidden) pause('hidden')
-    else resume('hidden', 0)
-  }
-
+  const onVisibilityChange = () => document.hidden ? pause('hidden') : resume('hidden', 0)
   const onPointerEnter = () => pause('pointer')
   const onPointerLeave = () => resume('pointer')
   const onPointerDown = () => pause('press')
   const onPointerUp = () => resume('press')
+  const onTouchStart = () => pause('touch')
+  const onTouchEnd = () => resume('touch')
   const onFocusIn = () => pause('focus')
-  const onFocusOut = (event) => {
-    if (!panel.contains(event.relatedTarget)) resume('focus')
-  }
+  const onFocusOut = (event) => { if (!panel.contains(event.relatedTarget)) resume('focus') }
   const onSelectStart = () => pause('selection')
   const onSelectionChange = () => {
     const selection = window.getSelection()
@@ -263,16 +248,12 @@ export function initEndPageDvdMotion(section, panel) {
   const onMediaChange = () => {
     if (!isViewportMotionEligible()) {
       applyStaticState(reducedMedia.matches ? 'reduced-static' : 'viewport-static')
-    }
-    else {
-      panel.dataset.dvdState = hasEntered ? 'revealed' : 'prepared'
-      if (hasEntered) {
-        entryReady = true
-        scheduleMeasure()
-      } else if (inViewport) {
-        scheduleMeasure()
-        beginEntry()
-      }
+    } else if (hasEntered) {
+      entryReady = true
+      scheduleMeasure()
+    } else if (inViewport) {
+      scheduleMeasure()
+      beginEntry()
     }
   }
 
@@ -283,6 +264,8 @@ export function initEndPageDvdMotion(section, panel) {
   panel.addEventListener('pointerdown', onPointerDown)
   window.addEventListener('pointerup', onPointerUp)
   window.addEventListener('pointercancel', onPointerUp)
+  panel.addEventListener('touchstart', onTouchStart, { passive: true })
+  panel.addEventListener('touchend', onTouchEnd, { passive: true })
   panel.addEventListener('focusin', onFocusIn)
   panel.addEventListener('focusout', onFocusOut)
   panel.addEventListener('selectstart', onSelectStart)
@@ -304,15 +287,12 @@ export function initEndPageDvdMotion(section, panel) {
       scheduleMeasure()
       beginEntry()
       requestRun()
-    } else {
-      pause('offscreen')
-    }
+    } else pause('offscreen')
   }, { threshold: [0, 0.04, 0.12] })
   intersectionObserver.observe(section)
 
-  if (!isViewportMotionEligible()) {
-    applyStaticState(reducedMedia.matches ? 'reduced-static' : 'viewport-static')
-  } else scheduleMeasure()
+  if (!isViewportMotionEligible()) applyStaticState(reducedMedia.matches ? 'reduced-static' : 'viewport-static')
+  else scheduleMeasure()
 
   const api = {
     getState: () => ({
@@ -322,6 +302,7 @@ export function initEndPageDvdMotion(section, panel) {
       collisions: collisionCount,
       position: { x, y },
       velocity: { x: velocityX, y: velocityY },
+      speed: SPEED,
       bounds: { ...bounds },
       travel: { x: rangeX(), y: rangeY() },
       thresholds: { x: MIN_TRAVEL_X, y: MIN_TRAVEL_Y },
@@ -343,6 +324,8 @@ export function initEndPageDvdMotion(section, panel) {
     panel.removeEventListener('pointerdown', onPointerDown)
     window.removeEventListener('pointerup', onPointerUp)
     window.removeEventListener('pointercancel', onPointerUp)
+    panel.removeEventListener('touchstart', onTouchStart)
+    panel.removeEventListener('touchend', onTouchEnd)
     panel.removeEventListener('focusin', onFocusIn)
     panel.removeEventListener('focusout', onFocusOut)
     panel.removeEventListener('selectstart', onSelectStart)
@@ -352,15 +335,8 @@ export function initEndPageDvdMotion(section, panel) {
     motionMedia.removeEventListener('change', onMediaChange)
     reducedMedia.removeEventListener('change', onMediaChange)
     panel.style.removeProperty('transform')
-    delete panel.dataset.dvdState
-    delete panel.dataset.dvdPause
-    delete panel.dataset.dvdBounds
-    delete panel.dataset.dvdSpeed
-    delete panel.dataset.dvdTrajectory
-    delete panel.dataset.dvdCollisions
-    delete section.dataset.dvdMode
-    delete section.dataset.dvdTravel
-    delete section.dataset.dvdRafActive
+    for (const key of ['dvdState', 'dvdPause', 'dvdBounds', 'dvdSpeed', 'dvdTrajectory', 'dvdCollisions']) delete panel.dataset[key]
+    for (const key of ['dvdMode', 'dvdTravel', 'dvdRafActive']) delete section.dataset[key]
     if (window.__END_PAGE_DVD_MOTION__ === api) delete window.__END_PAGE_DVD_MOTION__
   }
 }

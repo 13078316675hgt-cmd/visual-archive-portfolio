@@ -24,6 +24,7 @@ const approvedRoot = path.join(root, 'public', 'assets', 'approved')
 const requireDist = process.argv.includes('--dist')
 const reviewPendingRuntimeAssets = new Set([
   'public/assets/approved/directory-master-integrated-v3.png',
+  'public/assets/approved/directory-master-d04-locked.png',
   'public/assets/approved/end-page-master-integrated-v3.png',
 ])
 
