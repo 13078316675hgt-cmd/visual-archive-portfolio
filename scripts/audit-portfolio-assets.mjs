@@ -12,7 +12,6 @@ import {
   characterSheets,
   contentsChapters,
   costumeDetailAsset,
-  directoryMasterIntegrated,
   endPageIntegrated,
   portraitStudies,
   selectedWorks,
@@ -24,7 +23,6 @@ const approvedRoot = path.join(root, 'public', 'assets', 'approved')
 const requireDist = process.argv.includes('--dist')
 const reviewPendingRuntimeAssets = new Set([
   'public/assets/approved/directory-master-integrated-v3.png',
-  'public/assets/approved/directory-master-d04-locked.png',
   'public/assets/approved/end-page-master-integrated-v3.png',
 ])
 
@@ -64,7 +62,6 @@ function activeRoleEntries() {
     ['Artwork 01 / KEY VISUAL 01', artworkOne],
     ['Artwork 02 / KEY VISUAL 02', artworkTwo],
     ['Artwork 03 / KEY VISUAL 03', artworkThree],
-    ['D03.3 Directory Master', directoryMasterIntegrated],
     ['D03.3 End Page Master', endPageIntegrated],
     ...characterSheets.map((asset, index) => [`Character Sheet ${String(index + 1).padStart(2, '0')}`, asset]),
     ['Costume Detail', costumeDetailAsset],

@@ -91,7 +91,11 @@ const pageErrors = (page) => {
 }
 
 const waitForArchiveComplete = async (page) => {
-  await page.waitForFunction(() => document.querySelector('.archive-selection-scene')?.dataset.archivePhase === 'complete')
+  await page.waitForFunction(() => (
+    document.querySelector('.archive-selection-scene')?.dataset.archivePhase === 'complete'
+    || document.querySelector('[data-approved-motion="directory"]')?.dataset.motionState === 'complete'
+    || document.querySelector('.d0919-directory')?.dataset.directoryPhase === 'complete'
+  ))
 }
 
 const waitForAnchorSettled = async (page, hash) => {
@@ -129,8 +133,14 @@ const collectCounts = (logs) => ({
 })
 
 const clickChapter = async (page, chapter) => {
-  const locator = page.locator(`.archive-route-node[data-chapter="${chapter}"] .archive-route-anchor`)
-  if (await locator.count() !== 1) throw new Error(`Expected one clickable anchor marker for chapter ${chapter}`)
+  const node = page.locator([
+    `.approved-directory-route-node[data-chapter="${chapter}"]:visible`,
+    `.archive-route-node[data-chapter="${chapter}"]:visible`,
+  ].join(', '))
+  const locator = await node.evaluate((element) => element.matches('a'))
+    ? node
+    : node.locator('a[href^="#"]').first()
+  if (await locator.count() !== 1) throw new Error(`Expected one semantic chapter link for chapter ${chapter}`)
   await locator.click()
 }
 
@@ -272,7 +282,10 @@ const runKeyboardTest = async (browser) => {
   await page.goto(reviewUrl('end', '#contents'), { waitUntil: 'networkidle' })
   await waitForArchiveComplete(page)
   await resetInstrumentation(page)
-  const link = page.locator('.archive-route-node[data-chapter="04"]')
+  const link = page.locator([
+    '.approved-directory-route-node[data-chapter="04"]:visible',
+    '.archive-route-node[data-chapter="04"]:visible',
+  ].join(', '))
   if (await link.count() !== 1) throw new Error('Expected one chapter 04 link')
   await link.press('Enter')
   await page.waitForFunction(() => location.hash === '#character-sheets')
@@ -350,7 +363,11 @@ const runQuerySafetyTest = async (browser) => {
   await waitForAnchorSettled(page, '#key-visual-03')
   const instrumentation = await page.evaluate(() => window.__v520Navigation)
   const counts = collectCounts(instrumentation.logs)
-  const phase = await page.locator('.archive-selection-scene').getAttribute('data-archive-phase')
+  const phase = await page.evaluate(() => (
+    document.querySelector('.archive-selection-scene')?.dataset.archivePhase
+    || document.querySelector('.d0919-directory')?.dataset.directoryPhase
+    || ''
+  ))
   const result = {
     viewport: '1920x1080', destination: '?archiveMotion=replay#key-visual-03', navigationMethod: 'review query + pointer click',
     initialTargetScrollY: null, manualScrollTarget: null, scrollYAfter500ms: null, scrollYAfter2000ms: null,

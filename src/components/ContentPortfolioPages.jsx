@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useLayoutEffect, useRef } from 'react'
 import {
   additionalCharacterDesigns,
   characterSheets,
@@ -6,6 +6,13 @@ import {
   portraitStudies,
   selectedWorks,
 } from '../data/artworkManifest.js'
+import {
+  initD06Page04Motion,
+  initD06Page05Motion,
+  initD06Page06PrimaryMotion,
+  initD06Page06SecondaryMotion,
+  initD06Page07Motion,
+} from '../motion/innerPagesMotion.js'
 
 const CONTENT_ALT = Object.freeze({
   'sheet-01': '黑蓝配色短发角色正面、侧面、背面三视图设定',
@@ -47,6 +54,22 @@ function ContentPageMeta({ number, label }) {
   return <div className="page-meta content-page-meta"><span>{label}</span><b>{number}</b></div>
 }
 
+function D06AssetFigure({ asset, className, index, label = asset.label, critical = false, linkLabel = 'VIEW FULL SHEET' }) {
+  return <figure className={`d06-asset ${className}`.trim()}>
+    <img
+      {...imageAttrs(asset)}
+      alt={assetAlt(asset)}
+      loading="eager"
+      decoding="async"
+      className={critical ? 'd06-critical-art' : undefined}
+    />
+    <figcaption>
+      <span><b>{String(index).padStart(2, '0')}</b>{label}</span>
+      {linkLabel ? <a href={asset.src} target="_blank" rel="noreferrer">{linkLabel}</a> : null}
+    </figcaption>
+  </figure>
+}
+
 function FullSheetFigure({ asset, index, className = '', characterSheet = false, linkLabel = 'VIEW FULL SHEET', normalizedFrame = false, pairedFrame = false }) {
   const artwork = <img {...imageAttrs(asset)} alt={assetAlt(asset)} loading="lazy" decoding="async" />
   const frameClassName = [pairedFrame ? 'paired-spread-frame' : '', normalizedFrame ? 'additional-normalized-frame' : ''].filter(Boolean).join(' ')
@@ -62,8 +85,27 @@ function FullSheetFigure({ asset, index, className = '', characterSheet = false,
 
 export function CharacterSheets() {
   const [sheetOne, sheetTwo, sheetThree, sheetFour] = characterSheets
+  const sectionRef = useRef(null)
+  useLayoutEffect(() => initD06Page04Motion(sectionRef.current), [])
 
-  return <section id="character-sheets" className="content-portfolio-page content-sheets page" data-page-family="design-evidence">
+  return <section ref={sectionRef} id="character-sheets" className="content-portfolio-page content-sheets page d06-page04" data-page-family="design-evidence" data-d06-page="04">
+    <div className="d06-desktop-layout d06-sheet-canvas">
+      <header className="d06-sheet-heading">
+        <p><b>04</b><span>TECHNICAL ARCHIVE<br />DESIGN EVIDENCE</span></p>
+        <h2>CHARACTER <span>SHEETS</span></h2>
+        <i aria-hidden="true" />
+      </header>
+      <D06AssetFigure asset={sheetOne} index={1} className="d06-sheet-primary" critical />
+      <div className="d06-sheet-supports">
+        <D06AssetFigure asset={sheetTwo} index={2} className="d06-sheet-support d06-sheet-support-a" />
+        <D06AssetFigure asset={sheetThree} index={3} className="d06-sheet-support d06-sheet-support-b" />
+        <D06AssetFigure asset={sheetFour} index={4} className="d06-sheet-support d06-sheet-support-c" />
+      </div>
+      <p className="d06-sheet-order" aria-hidden="true"><span>FRONT</span><span>SIDE</span><span>BACK</span></p>
+      <i className="d06-sheet-axis" aria-hidden="true" />
+    </div>
+
+    <div className="d06-legacy-layout">
     <div className="content-shell">
       <header className="sheets-index" aria-labelledby="character-sheets-title">
         <div className="sheets-index-code">
@@ -98,11 +140,35 @@ export function CharacterSheets() {
       </div>
     </div>
     <ContentPageMeta number="04" label="CHARACTER SHEETS" />
+    </div>
   </section>
 }
 
 export function CostumeDetail() {
-  return <section id="costume-detail" className="content-portfolio-page content-costume page" data-page-family="detail-focus">
+  const sectionRef = useRef(null)
+  useLayoutEffect(() => initD06Page05Motion(sectionRef.current), [])
+
+  return <section ref={sectionRef} id="costume-detail" className="content-portfolio-page content-costume page d06-page05" data-page-family="detail-focus" data-d06-page="05">
+    <div className="d06-desktop-layout d06-costume-canvas">
+      <header className="d06-costume-heading">
+        <span>05 / DETAIL STUDY</span>
+        <h2>COSTUME<br /><b>CONSTRUCTION</b></h2>
+        <p>DETAIL / CONSTRUCTION STUDY</p>
+      </header>
+      <D06AssetFigure asset={costumeDetailAsset} index={1} className="d06-costume-sheet" critical label="COMPLETE SHEET / CONTEXT" linkLabel={null} />
+      <figure className="d06-costume-crop d06-costume-upper">
+        <div><img {...imageAttrs(costumeDetailAsset)} alt="" loading="eager" decoding="async" aria-hidden="true" /></div>
+        <figcaption><b>02</b>UPPER BODY / LAYERING</figcaption>
+      </figure>
+      <figure className="d06-costume-crop d06-costume-back">
+        <div><img {...imageAttrs(costumeDetailAsset)} alt="" loading="eager" decoding="async" aria-hidden="true" /></div>
+        <figcaption><b>03</b>BACK / SILHOUETTE</figcaption>
+      </figure>
+      <i className="d06-costume-marker d06-costume-marker-a" aria-hidden="true" />
+      <i className="d06-costume-marker d06-costume-marker-b" aria-hidden="true" />
+    </div>
+
+    <div className="d06-legacy-layout">
     <div className="content-shell">
       <header className="costume-index" aria-labelledby="costume-title">
         <span><b>05</b>DETAIL / CONSTRUCTION STUDY</span>
@@ -132,14 +198,43 @@ export function CostumeDetail() {
       </div>
     </div>
     <ContentPageMeta number="05" label="COSTUME DETAIL" />
+    </div>
   </section>
 }
 
 export function PortraitStudies() {
   const [darkPortrait, lightPortrait] = portraitStudies
   const [, redProfile, blueSky] = selectedWorks
+  const sectionRef = useRef(null)
+  useLayoutEffect(() => initD06Page06PrimaryMotion(sectionRef.current), [])
 
-  return <section id="portrait-studies" className="content-portfolio-page content-portraits page" data-page-family="hero-detail">
+  return <section ref={sectionRef} id="portrait-studies" className="content-portfolio-page content-portraits page d06-page06-primary" data-page-family="hero-detail" data-d06-page="06-primary">
+    <div className="d06-desktop-layout d06-identity-canvas">
+      <figure className="d06-identity-anchor">
+        <img {...imageAttrs(darkPortrait)} alt={assetAlt(darkPortrait)} loading="eager" decoding="async" className="d06-critical-art" />
+        <figcaption>PORTRAIT STUDY / 01</figcaption>
+      </figure>
+      <header className="d06-identity-heading">
+        <span>06 / PORTRAIT STUDIES</span>
+        <h2>IDENTITY<br /><b>&amp; EXPRESSION</b></h2>
+        <i aria-hidden="true" />
+      </header>
+      <figure className="d06-identity-light">
+        <img {...imageAttrs(lightPortrait)} alt={assetAlt(lightPortrait)} loading="eager" decoding="async" />
+        <figcaption>PORTRAIT STUDY / 02</figcaption>
+      </figure>
+      <figure className="d06-identity-strip d06-identity-red">
+        <img {...imageAttrs(redProfile)} alt={assetAlt(redProfile)} loading="eager" decoding="async" />
+        <figcaption>IMAGE STUDY / 03 / RED PROFILE</figcaption>
+      </figure>
+      <figure className="d06-identity-strip d06-identity-blue">
+        <img {...imageAttrs(blueSky)} alt={assetAlt(blueSky)} loading="eager" decoding="async" />
+        <figcaption>IMAGE STUDY / 04 / BLUE SKY</figcaption>
+      </figure>
+      <p className="d06-identity-vertical">FACE / IDENTITY / EXPRESSION</p>
+    </div>
+
+    <div className="d06-legacy-layout">
     <div className="portrait-dark-spread content-spread">
       <div className="portrait-dark-inner">
         <header className="portrait-dark-intro" aria-labelledby="portrait-title">
@@ -178,13 +273,32 @@ export function PortraitStudies() {
       </figure>
     </div>
     <ContentPageMeta number="06" label="PORTRAIT STUDIES" />
+    </div>
   </section>
 }
 
 export function SelectedWorks() {
   const [principal] = selectedWorks
+  const sectionRef = useRef(null)
+  useLayoutEffect(() => initD06Page06SecondaryMotion(sectionRef.current), [])
 
-  return <section id="selected-works" className="content-portfolio-page content-selected page" data-page-family="design-evidence-continuation">
+  return <section ref={sectionRef} id="selected-works" className="content-portfolio-page content-selected page d06-page06-secondary" data-page-family="design-evidence-continuation" data-d06-page="06-secondary">
+    <div className="d06-desktop-layout d06-presentation-canvas">
+      <p className="d06-presentation-ghost" aria-hidden="true">PRESENT</p>
+      <header className="d06-presentation-heading">
+        <span>06B / PRESENTATION STUDY</span>
+        <h2>CHARACTER<br /><b>PRESENTATION</b></h2>
+        <p>CHARACTER PRESENTATION</p>
+      </header>
+      <figure className="d06-presentation-art">
+        <img {...imageAttrs(principal)} alt={assetAlt(principal)} loading="eager" decoding="async" className="d06-critical-art" />
+        <figcaption>CHARACTER PRESENTATION</figcaption>
+      </figure>
+      <i className="d06-presentation-rule" aria-hidden="true" />
+      <span className="d06-presentation-index" aria-hidden="true">06</span>
+    </div>
+
+    <div className="d06-legacy-layout">
     <div className="content-shell selected-editorial content-spread">
       <header className="presentation-intro" aria-labelledby="presentation-title">
         <span>06B / PRESENTATION STUDY</span>
@@ -197,13 +311,31 @@ export function SelectedWorks() {
           <figcaption><span>CHARACTER PRESENTATION</span></figcaption>
         </figure>
     </div>
+    </div>
   </section>
 }
 
 export function AdditionalCharacterDesigns() {
   const [designOne, designTwo, designThree, designFour] = additionalCharacterDesigns
+  const sectionRef = useRef(null)
+  useLayoutEffect(() => initD06Page07Motion(sectionRef.current), [])
 
-  return <section id="additional-designs" className="content-portfolio-page content-additional page" data-page-family="design-evidence">
+  return <section ref={sectionRef} id="additional-designs" className="content-portfolio-page content-additional page d06-page07" data-page-family="design-evidence" data-d06-page="07">
+    <div className="d06-desktop-layout d06-archive-canvas">
+      <p className="d06-archive-ghost" aria-hidden="true">ARCHIVE</p>
+      <header className="d06-archive-heading">
+        <span>07 / FINAL DESIGN EVIDENCE</span>
+        <h2>CHARACTER DESIGN<br /><b>ARCHIVE</b></h2>
+      </header>
+      <D06AssetFigure asset={designFour} index={4} className="d06-archive-anchor" critical />
+      <D06AssetFigure asset={designOne} index={1} className="d06-archive-support d06-archive-support-a" />
+      <D06AssetFigure asset={designTwo} index={2} className="d06-archive-support d06-archive-support-b" />
+      <D06AssetFigure asset={designThree} index={3} className="d06-archive-support d06-archive-support-c" />
+      <p className="d06-archive-outro">END OF SELECTED WORKS</p>
+      <i className="d06-archive-axis" aria-hidden="true" />
+    </div>
+
+    <div className="d06-legacy-layout">
     <div className="content-shell">
       <header className="archive-close-head" aria-labelledby="archive-close-title">
         <div><b>07</b><span>ARCHIVE CLOSURE<br />FINAL DESIGN EVIDENCE</span></div>
@@ -228,5 +360,6 @@ export function AdditionalCharacterDesigns() {
       </footer>
     </div>
     <ContentPageMeta number="07" label="ADDITIONAL CHARACTER DESIGNS" />
+    </div>
   </section>
 }

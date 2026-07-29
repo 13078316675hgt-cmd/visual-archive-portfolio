@@ -1,6 +1,6 @@
 import { gsap } from 'gsap'
 
-const DESKTOP_DURATION = 1250
+const DESKTOP_DURATION = 2800
 const TABLET_DURATION = 1080
 const MOBILE_DURATION = 930
 const MEDIA_TIMEOUT = 1800
@@ -16,11 +16,23 @@ export function initArchiveMotion(scene, { reducedMotion = false } = {}) {
 
   const motionParent = scene.querySelector('.directory-motion-parent')
   const imageFrame = scene.querySelector('.directory-image-frame')
-  const image = scene.querySelector('.directory-master-image')
+  const desktopImage = scene.querySelector('.directory-d08-image-field img')
+  const image = desktopImage || scene.querySelector('.directory-master-image')
   const nodes = Array.from(scene.querySelectorAll('.archive-route-node'))
   const mobile = window.matchMedia('(max-width: 900px)').matches
-  const tablet = !mobile && window.matchMedia('(max-width: 1100px)').matches
-  const motionTarget = mobile || tablet ? imageFrame : motionParent
+  const tablet = !mobile && window.matchMedia('(max-width: 1024px)').matches
+  const desktop = !mobile && !tablet
+  const imageField = scene.querySelector('.directory-d08-image-field')
+  const reveals = Array.from(scene.querySelectorAll('.directory-d08-reveal'))
+  const axes = Array.from(scene.querySelectorAll('.directory-d08-axis'))
+  const caption = scene.querySelector('.directory-d08-caption')
+  const headingLabel = scene.querySelector('.directory-heading > span')
+  const headingWords = Array.from(scene.querySelectorAll('.directory-heading strong span'))
+  const headingSmall = scene.querySelector('.directory-heading small')
+  const index = scene.querySelector('.directory-d08-index')
+  const registration = Array.from(scene.querySelectorAll('.directory-d08-registration i'))
+  const desktopTargets = [imageField, ...reveals, ...axes, caption, headingLabel, ...headingWords, headingSmall, index, ...registration, ...nodes].filter(Boolean)
+  const motionTarget = mobile || tablet ? imageFrame : imageField
   const queryValue = new URLSearchParams(window.location.search).get('archiveMotion')
   const disposers = []
 
@@ -37,7 +49,7 @@ export function initArchiveMotion(scene, { reducedMotion = false } = {}) {
   let stableFrames = 0
 
   scene.dataset.archiveMotionReady = 'true'
-  scene.dataset.archiveMotionDirection = 'mother-image-pullback'
+  scene.dataset.archiveMotionDirection = desktop ? 'd08-local-editorial-assembly' : 'mother-image-pullback'
   scene.dataset.archivePhase = reducedMotion || queryValue === 'end' ? 'complete' : 'loading'
 
   const setActiveNode = (chapter) => {
@@ -47,31 +59,74 @@ export function initArchiveMotion(scene, { reducedMotion = false } = {}) {
 
   const setComplete = () => {
     timeline?.kill()
-    gsap.killTweensOf(motionTarget)
-    gsap.set(motionTarget, { clearProps: 'transform,transformOrigin,willChange' })
+    gsap.killTweensOf(desktop ? desktopTargets : motionTarget)
+    if (desktop) {
+      gsap.set([imageField, ...axes, caption, headingLabel, ...headingWords, headingSmall, index, ...registration, ...nodes].filter(Boolean), { clearProps: 'transform,transformOrigin,opacity,clipPath,filter,willChange' })
+      gsap.set(reveals, { clearProps: 'transform,transformOrigin,opacity,willChange' })
+    } else gsap.set(motionTarget, { clearProps: 'transform,transformOrigin,willChange' })
     scene.dataset.archivePhase = 'complete'
     scene.classList.add('is-archive-complete')
   }
 
   const prepare = () => {
     timeline?.kill()
-    gsap.killTweensOf(motionTarget)
+    gsap.killTweensOf(desktop ? desktopTargets : motionTarget)
     scene.classList.remove('is-archive-complete')
     scene.dataset.archivePhase = 'prepared'
 
-    gsap.set(motionTarget, {
-      scale: mobile ? 1.022 : (tablet ? 1.035 : 1.095),
-      x: mobile ? 2 : (tablet ? 4 : 8),
-      y: mobile ? 2 : (tablet ? 3 : 5),
-      transformOrigin: mobile || tablet ? '50% 50%' : '50% 53%',
-      force3D: true,
-      willChange: 'transform',
-    })
+    if (desktop) {
+      gsap.set(imageField, { opacity: 1, transform: 'none' })
+      gsap.set(reveals, { scaleX: 1, scaleY: 1, opacity: 1, willChange: 'transform,opacity' })
+      gsap.set(axes, { scaleX: 0, scaleY: 0, transformOrigin: 'left top' })
+      gsap.set(caption, { opacity: 0, y: 12, clipPath: 'inset(0 0 100% 0)' })
+      gsap.set(headingLabel, { opacity: 0, x: -12 })
+      gsap.set(headingWords, { opacity: 0, x: -28, clipPath: 'inset(0 100% 0 0)' })
+      gsap.set(headingSmall, { opacity: 0, y: 8 })
+      gsap.set(nodes, { opacity: 0, x: 14, willChange: 'transform,opacity' })
+      gsap.set(index, { opacity: 0, x: -12 })
+      gsap.set(registration, { scaleX: 0, transformOrigin: 'left center' })
+    } else {
+      gsap.set(motionTarget, {
+        scale: mobile ? 1.022 : 1.035,
+        x: mobile ? 2 : 4,
+        y: mobile ? 2 : 3,
+        transformOrigin: '50% 50%',
+        force3D: true,
+        willChange: 'transform',
+      })
+    }
   }
 
   const buildTimeline = () => {
-    const firstDuration = mobile ? 0.68 : (tablet ? 0.78 : 0.9)
-    const settleDuration = mobile ? 0.25 : (tablet ? 0.3 : 0.35)
+    if (desktop) {
+      const groupOne = nodes.slice(0, 4)
+      const groupTwo = nodes.slice(4)
+      timeline?.kill()
+      timeline = gsap.timeline({
+        paused: true,
+        defaults: { overwrite: 'auto' },
+        onStart: () => { scene.dataset.archivePhase = 'reveal' },
+        onComplete: setComplete,
+      })
+      timeline
+        .to(reveals[0], { scaleX: 0, duration: .55, ease: 'power3.inOut' }, .08)
+        .to(reveals[1], { scaleX: 0, duration: .66, ease: 'power3.inOut' }, .22)
+        .to(reveals[2], { scaleY: 0, duration: .64, ease: 'power3.inOut' }, .38)
+        .to(axes, { scaleX: 1, scaleY: 1, duration: .58, stagger: .08, ease: 'power3.out' }, .48)
+        .to(caption, { opacity: 1, y: 0, clipPath: 'inset(0 0 0% 0)', duration: .52, ease: 'power3.out' }, .58)
+        .to(headingLabel, { opacity: 1, x: 0, duration: .34, ease: 'power2.out' }, .84)
+        .to(headingWords, { opacity: 1, x: 0, clipPath: 'inset(0 0% 0 0)', duration: .52, stagger: .07, ease: 'power3.out' }, .9)
+        .to(headingSmall, { opacity: 1, y: 0, duration: .3, ease: 'power2.out' }, 1.12)
+        .to(groupOne, { opacity: 1, x: 0, duration: .4, stagger: .065, ease: 'power3.out' }, .9)
+        .to(groupTwo, { opacity: 1, x: 0, duration: .4, stagger: .065, ease: 'power3.out' }, 1.12)
+        .to(index, { opacity: 1, x: 0, duration: .28, ease: 'power2.out' }, 1.35)
+        .to(registration, { scaleX: 1, duration: .28, stagger: .05, ease: 'power3.out' }, 1.4)
+        .to({}, { duration: .9 }, 1.7)
+      return timeline
+    }
+
+    const firstDuration = mobile ? 0.68 : 0.78
+    const settleDuration = mobile ? 0.25 : (tablet ? 0.3 : 0.34)
     const firstScale = mobile ? 1.006 : (tablet ? 1.009 : 1.012)
     const firstX = mobile ? 0.5 : (tablet ? 0.8 : 1)
     const firstY = mobile ? 0.4 : (tablet ? 0.6 : 0.8)
@@ -203,7 +258,7 @@ export function initArchiveMotion(scene, { reducedMotion = false } = {}) {
     disposed = true
     observer?.disconnect()
     timeline?.kill()
-    gsap.killTweensOf(motionTarget)
+    gsap.killTweensOf(desktop ? desktopTargets : motionTarget)
     window.clearTimeout(readinessTimer)
     window.cancelAnimationFrame(settleFrame)
     disposers.forEach((dispose) => dispose())
@@ -215,7 +270,8 @@ export function initArchiveMotion(scene, { reducedMotion = false } = {}) {
     delete scene.dataset.archiveMotionDirection
     delete scene.dataset.archiveReduced
     delete scene.dataset.archivePhase
-    gsap.set(motionTarget, { clearProps: 'transform,transformOrigin,willChange' })
+    if (desktop) gsap.set(desktopTargets, { clearProps: 'transform,transformOrigin,opacity,clipPath,filter,willChange' })
+    else gsap.set(motionTarget, { clearProps: 'transform,transformOrigin,willChange' })
   }
 }
 

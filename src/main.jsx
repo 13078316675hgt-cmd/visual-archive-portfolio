@@ -8,13 +8,19 @@ import './d02-production-fix.css'
 import './d03-spread-edge-fix.css'
 import './d03-1-directory-motion.css'
 import './d03-3-static-integration-motion.css'
-import './d03-3-end-dvd-window.css'
+import './end-page-responsive.css'
 import './d04-motion-art-direction.css'
 import './d05-page02-poster.css'
+import './d06-inner-pages.css'
+import './d07-desktop-art-direction.css'
+import './d08-reference-rebuild.css'
+import './approved-motion.css'
+import './d09-17r-home-end-restoration.css'
+import './d09-19-locked-implementation.css'
+import './d09-20-home-static.css'
 import { initArchiveMotion } from './motion/archiveMotion.js'
-import { initEndPageDvdMotion } from './motion/endPageDvdMotion.js'
-import { initHomeMotion } from './motion/homeMotion.js'
 import { initPage02PosterMotion } from './motion/page02PosterMotion.js'
+import { initD06Page03Motion, initD07Page01Motion } from './motion/innerPagesMotion.js'
 import {
   AdditionalCharacterDesigns,
   CharacterSheets,
@@ -23,6 +29,12 @@ import {
   SelectedWorks,
 } from './components/ContentPortfolioPages.jsx'
 import {
+  ApprovedDirectoryMotion,
+  ApprovedEndMotion,
+  ApprovedPage03Motion,
+} from './components/ApprovedMotionPages.jsx'
+import { D0919Directory, D0919Page01 } from './components/D0919Pages.jsx'
+import {
   artworkManifest,
   artworkOne,
   artworkThree,
@@ -30,7 +42,6 @@ import {
   contentsChapters,
   directoryMasterIntegrated,
   endPageIntegrated,
-  homeV9Artwork,
 } from './data/artworkManifest.js'
 
 const PORTFOLIO_URL_ROUTES = Object.freeze([
@@ -109,8 +120,10 @@ function usePortfolioMotion() {
       navigateToAnchorOnce(requestedHash, requestedTarget)
     }
 
-    const cleanupArchiveMotion = initArchiveMotion(document.querySelector('.archive-selection-scene'), { reducedMotion: reduceMotion })
-    const cleanupHomeMotion = initHomeMotion(document.querySelector('.home-v9-preview'), { reducedMotion: reduceMotion })
+    const cleanupArchiveMotion = mobileMotion
+      ? initArchiveMotion(document.querySelector('.archive-selection-scene'), { reducedMotion: reduceMotion })
+      : () => {}
+    const cleanupHomeMotion = () => {}
 
     let routeSyncFrame = 0
     let routeSyncUnlockFrame = 0
@@ -533,46 +546,78 @@ function TitleSection() {
 }
 
 function HomeV9Preview() {
-  const { width, height } = getAssetDimensions(homeV9Artwork)
+  const base = import.meta.env.BASE_URL
+  const homeAsset = (filename) => `${base}assets/approved-motion/home/${filename}`
+  const layers = [
+    'home-background-neutralized.png',
+    'home-layer-statue-disc-v2.png',
+    'home-layer-rocks.png',
+    'home-layer-frame.png',
+    'home-layer-blue-accents.png',
+    'home-layer-birds.png',
+    'home-layer-fine-marks.png',
+  ]
 
-  const artworkPicture = (className, { decorative = false } = {}) => <picture className={className} aria-hidden={decorative || undefined}>
-    <source type="image/webp" srcSet={homeV9Artwork.srcSet} sizes={homeV9Artwork.sizes} />
-    <img
-      src={homeV9Artwork.src}
-      alt={decorative ? '' : homeV9Artwork.alt}
-      width={width}
-      height={height}
-      loading="eager"
-      decoding="async"
-      fetchPriority={decorative ? 'auto' : 'high'}
-    />
-  </picture>
-
-  return <section id="title" className="home-v9-preview" data-home-visual="v9master" data-home-motion="mother-image-pullback" tabIndex={-1}>
-    <Nav />
-    <div className="home-v9-artwork">
-      {artworkPicture('home-v9-mother home-v9-mother-base')}
-      <div className="home-v9-depth-layers" aria-hidden="true">
-        {artworkPicture('home-v9-mother home-v9-layer home-v9-layer-environment', { decorative: true })}
-        {artworkPicture('home-v9-mother home-v9-layer home-v9-layer-subject', { decorative: true })}
-        {artworkPicture('home-v9-mother home-v9-layer home-v9-layer-foreground', { decorative: true })}
+  return <section id="title" className="home-v9-preview d0920-home-static" data-home-visual="d09-20-locked-static" tabIndex={-1}>
+    <div className="d0920-home-canvas">
+      <div className="d0920-home-art" aria-hidden="true">
+        {layers.map((filename, index) => <img
+          key={filename}
+          src={homeAsset(filename)}
+          alt=""
+          width="2560"
+          height="1440"
+          loading="eager"
+          decoding="async"
+          fetchPriority={index < 2 ? 'high' : 'auto'}
+          draggable="false"
+        />)}
       </div>
-    </div>
-    <div className="home-v9-copy">
-      <p className="home-v9-eyebrow">SELECTED WORKS / 2026</p>
-      <h1 className="home-v9-title"><span>VISUAL</span><span>ARCHIVE</span></h1>
-      <p className="home-v9-subheading">CONCEPT ART PORTFOLIO</p>
-      <p className="home-v9-description">Character design, key visuals,<br />and visual development.</p>
-      <a className="home-v9-enter" href="#contents">
-        <span>ENTER ARCHIVE</span>
-        <svg viewBox="0 0 56 12" aria-hidden="true"><path d="M0 6h52M47 1l5 5-5 5" /></svg>
+
+      <a className="d0920-home-brand" href="#contents" aria-label="Open portfolio directory">
+        <svg viewBox="0 0 64 56" aria-hidden="true">
+          <g>
+            <rect x="28" y="0" width="8" height="8" />
+            <rect x="20" y="8" width="8" height="8" />
+            <rect x="36" y="8" width="8" height="8" />
+            <rect x="16" y="16" width="8" height="8" />
+            <rect x="40" y="16" width="8" height="8" />
+            <rect x="12" y="24" width="8" height="8" />
+            <rect x="44" y="24" width="8" height="8" />
+            <rect x="8" y="32" width="8" height="8" />
+            <rect x="48" y="32" width="8" height="8" />
+            <rect x="4" y="40" width="8" height="8" />
+            <rect x="52" y="40" width="8" height="8" />
+            <rect x="4" y="48" width="56" height="8" />
+            <rect x="28" y="18" width="8" height="18" />
+            <rect x="28" y="40" width="8" height="8" />
+          </g>
+        </svg>
+        <strong>ARCHIVE STUDIO</strong>
+        <span>VISUAL DESIGN &amp; ART DIRECTION</span>
       </a>
+
+      <header className="d0920-home-copy">
+        <h1 lang="zh-CN">个人作品集</h1>
+        <p>VISUAL DESIGN&nbsp;&nbsp;·&nbsp;&nbsp;ILLUSTRATION&nbsp;&nbsp;·&nbsp;&nbsp;ART DIRECTION</p>
+      </header>
+
+      <div className="d0920-home-projects">
+        <h2><span aria-hidden="true">+</span> SELECTED WORKS</h2>
+        <strong>SELECTED PROJECTS</strong>
+        <p>SELECTED WORKS FROM<br />VARIOUS PROJECTS.</p>
+      </div>
+
+      <a className="d0920-home-top-link" href="#contents">
+        <span>PORTFOLIO</span>
+        <strong>SELECTED WORKS</strong>
+        <i aria-hidden="true" />
+      </a>
+      <p className="d0920-home-discipline" aria-hidden="true">DESIGN&nbsp;&nbsp;/&nbsp;&nbsp;ILLUSTRATION&nbsp;&nbsp;/&nbsp;&nbsp;ART DIRECTION</p>
+      <a className="d0920-home-scroll" href="#contents"><span>SCROLL</span><i aria-hidden="true" /></a>
+      <p className="d0920-home-page-index"><b>01</b><i>/</i><span>PORTFOLIO</span></p>
+      <p className="d0920-home-total"><b>01</b><i>/ 12</i><span aria-hidden="true" /></p>
     </div>
-    <div className="home-v9-index" aria-hidden="true"><span>00</span><b>HOME / MASTER</b></div>
-    <p className="home-v9-coordinate" aria-hidden="true">ARCHIVE FIELD / X 35.8 / Y 06.2</p>
-    <i className="home-v9-rule home-v9-rule-a" aria-hidden="true" />
-    <i className="home-v9-rule home-v9-rule-b" aria-hidden="true" />
-    <a className="home-v9-scroll" href="#contents"><span>SCROLL</span><i aria-hidden="true" /></a>
   </section>
 }
 
@@ -620,17 +665,39 @@ function DirectoryCard({ card }) {
 
 function ContentsSection() {
   const { width, height } = getAssetDimensions(directoryMasterIntegrated)
+  const directoryImageProps = {
+    src: directoryMasterIntegrated.src,
+    width,
+    height,
+    loading: 'eager',
+    decoding: 'async',
+  }
 
   return <section
     id="contents"
     className="contents archive-route archive-selection-scene d01-directory page"
     data-contents-visual="d04-locked-mother-image"
-    data-directory-motion="mother-image-pullback"
+    data-directory-motion="d08-local-editorial-assembly"
     data-archive-motion-ready="true"
     data-archive-phase="initial"
   >
+    <ApprovedDirectoryMotion />
     <div className="directory-stage">
       <div className="directory-motion-parent">
+        <div className="directory-d08-visual" aria-hidden="true">
+          <figure className="directory-d08-image-field">
+            <img {...directoryImageProps} alt="" />
+            <span className="directory-d08-reveal directory-d08-reveal-cube" />
+            <span className="directory-d08-reveal directory-d08-reveal-membrane" />
+            <span className="directory-d08-reveal directory-d08-reveal-platform" />
+          </figure>
+          <i className="directory-d08-axis directory-d08-axis-x" />
+          <i className="directory-d08-axis directory-d08-axis-y" />
+          <div className="directory-d08-caption">
+            <span>ARCHIVE PLATE / 01—END</span>
+            <b>SELECTED<br />WORKS</b>
+          </div>
+        </div>
         <div className="directory-image-frame">
           <img
             className="directory-master-image"
@@ -649,9 +716,14 @@ function ContentsSection() {
       </div>
       <header className="directory-heading">
         <span>CONTENTS</span>
-        <strong>VISUAL ARCHIVE</strong>
+        <strong><span>VISUAL</span>{' '}<span>ARCHIVE</span></strong>
         <small>SELECT YOUR DESTINATION</small>
       </header>
+      <div className="directory-d08-index" aria-hidden="true">
+        <b>01—07</b>
+        <span>SELECTED WORKS / DIRECTORY</span>
+      </div>
+      <div className="directory-d08-registration" aria-hidden="true"><i /><i /><i /></div>
       <a className="directory-return" href="#title">RETURN / TITLE</a>
     </div>
   </section>
@@ -692,6 +764,92 @@ function KeyVisualPage({ id, number, title, asset, variant }) {
 function getAssetDimensions(asset) {
   const [width, height] = asset.resolution.split(/\s*[x脳]\s*/).map(Number)
   return { width, height }
+}
+
+function KeyVisualOne() {
+  const sectionRef = useRef(null)
+  useLayoutEffect(() => initD07Page01Motion(sectionRef.current), [])
+
+  return <section ref={sectionRef} id="key-visual-01" className="key-visual-page key-visual-one page d07-page01 d08-page01" data-d07-page="01" data-d08-page="01">
+    <div className="d08-page01-desktop">
+      <div className="d08-page01-color-plane" aria-hidden="true" />
+      <figure className="d08-page01-art">
+        <img {...imageAttrs(artworkOne)} alt={artworkOne.alt} loading="eager" decoding="async" fetchPriority="high" />
+        <span className="d08-page01-reveal d08-page01-reveal-upper" aria-hidden="true" />
+        <span className="d08-page01-reveal d08-page01-reveal-lower" aria-hidden="true" />
+      </figure>
+      <header className="d08-page01-heading">
+        <p>VISUAL ARCHIVE / OPENING PLATE</p>
+        <h2><span>KEY</span><span>VISUAL</span></h2>
+        <small>CHARACTER ILLUSTRATION / SINGLE WORK</small>
+      </header>
+      <div className="d08-page01-index" aria-label="01 / KEY VISUAL"><span>01</span><i /></div>
+      <p className="d08-page01-side-meta">DRAGON / ARCHITECTURE / CHARACTER</p>
+      <i className="d08-page01-cross-axis d08-page01-cross-axis-x" aria-hidden="true" />
+      <i className="d08-page01-cross-axis d08-page01-cross-axis-y" aria-hidden="true" />
+    </div>
+    <div className="d07-page01-legacy">
+      <div className="kv-meta kv-title-module">
+        <div className="kv-number-row"><b>01</b><i className="kv-title-rule" aria-hidden="true" /></div>
+        <div className="kv-title-copy"><h2>KEY VISUAL 01</h2><p>CHARACTER ILLUSTRATION</p></div>
+      </div>
+      <figure className="kv-main">
+        <img {...imageAttrs(artworkOne)} alt={artworkOne.alt} loading="eager" decoding="async" />
+        <span className="motion-curtain" aria-hidden="true" />
+      </figure>
+      <div className="kv-red-shape" aria-hidden="true" />
+      <div className="kv-local-plane" aria-hidden="true" />
+      <div className="kv-rule kv-rule-a" aria-hidden="true" />
+      <div className="kv-rule kv-rule-b" aria-hidden="true" />
+      <div className="kv-mark kv-mark-a" aria-hidden="true">+</div>
+      <div className="kv-mark kv-mark-b" aria-hidden="true">01</div>
+      <PageMeta number="01" label="KEY VISUAL 01" />
+    </div>
+  </section>
+}
+
+function KeyVisualThree() {
+  const sectionRef = useRef(null)
+  const asset = artworkThree
+
+  useLayoutEffect(() => initD06Page03Motion(sectionRef.current), [])
+
+  return <section ref={sectionRef} id="key-visual-03" className="key-visual-page key-visual-three page d06-page03 d08-page03" data-d06-page="03" data-d08-page="03">
+    <ApprovedPage03Motion />
+    <div className="d06-desktop-layout d08-page03-canvas">
+      <div className="d08-page03-green-field" aria-hidden="true" />
+      <div className="d08-page03-orbit d08-page03-orbit-a" aria-hidden="true" />
+      <div className="d08-page03-orbit d08-page03-orbit-b" aria-hidden="true" />
+      <figure className="d08-page03-art">
+        <img {...imageAttrs(asset)} alt={asset.alt} loading="eager" decoding="async" fetchPriority="high" className="d06-critical-art" />
+      </figure>
+      <div className="d08-page03-ribbon d08-page03-ribbon-a" aria-hidden="true" />
+      <div className="d08-page03-ribbon d08-page03-ribbon-b" aria-hidden="true" />
+      <div className="d08-page03-lower-wave" aria-hidden="true" />
+      <header className="d08-page03-copy">
+        <span>03 / CHARACTER ILLUSTRATION</span>
+        <h2><span>KEY</span><span>VISUAL</span></h2>
+        <p>GREEN DRAGON / CHARACTER STUDY</p>
+      </header>
+      <div className="d08-page03-index"><b>03</b><span>ARTWORK 03 / 1800 × 1996</span></div>
+      <p className="d08-page03-side">FORM / RIBBON / SILHOUETTE</p>
+    </div>
+
+    <div className="d06-mobile-legacy">
+      <div className="kv-meta kv-title-module">
+        <div className="kv-number-row"><b>03</b><i className="kv-title-rule" aria-hidden="true" /></div>
+        <div className="kv-title-copy"><h2>KEY VISUAL 03</h2><p>CHARACTER ILLUSTRATION</p></div>
+      </div>
+      <figure className="kv-main"><img {...imageAttrs(asset)} alt={asset.alt} loading="lazy" decoding="async" /></figure>
+      <div className="kv-red-shape" aria-hidden="true" />
+      <div className="kv-local-plane" aria-hidden="true" />
+      <div className="kv-rule kv-rule-a" aria-hidden="true" />
+      <div className="kv-rule kv-rule-b" aria-hidden="true" />
+      <div className="kv-mark kv-mark-a" aria-hidden="true">+</div>
+      <div className="kv-mark kv-mark-b" aria-hidden="true">03</div>
+      <PageMeta number="03" label="KEY VISUAL 03" />
+    </div>
+  </section>
 }
 
 function Page02Poster() {
@@ -788,14 +946,8 @@ const END_PAGE_HOTSPOTS = Object.freeze({
 
 function EndPageSection() {
   const { width, height } = getAssetDimensions(endPageIntegrated)
-  const sectionRef = useRef(null)
-  const panelRef = useRef(null)
 
-  useLayoutEffect(() => initEndPageDvdMotion(sectionRef.current, panelRef.current), [])
-
-  return <section ref={sectionRef} id="end" className="end-page page" aria-label="Portfolio ending">
-    <span id="resume-contact-resume" className="end-page-legacy-anchor" aria-hidden="true" />
-    <span id="resume-contact-contact" className="end-page-legacy-anchor" aria-hidden="true" />
+  return <section id="end" className="end-page page d08-end d09-17r-end-restored" aria-label="Portfolio ending">
     <link rel="prefetch" as="image" href={endPageIntegrated.src} />
 
     <div className="end-page-stage">
@@ -810,6 +962,26 @@ function EndPageSection() {
           decoding="async"
         />
 
+        <div className="d09-17r-end-visual-stage" aria-hidden="true" inert>
+          <ApprovedEndMotion />
+        </div>
+
+        <div className="end-d08-hand-motion" aria-hidden="true">
+          <span className="end-d08-hand-veil end-d08-hand-veil-upper" />
+          <span className="end-d08-hand-veil end-d08-hand-veil-lower" />
+          <span className="end-d08-hand-scan end-d08-hand-scan-upper" />
+          <span className="end-d08-hand-scan end-d08-hand-scan-lower" />
+          <i className="end-d08-signal-bridge" />
+          <i className="end-d08-signal-core" />
+        </div>
+
+        <div className="end-d08-cleanup" aria-hidden="true">
+          <i className="end-d08-clean end-d08-clean-e" />
+          <i className="end-d08-clean end-d08-clean-n" />
+          <i className="end-d08-clean end-d08-clean-t" />
+          <i className="end-d08-clean end-d08-clean-d" />
+        </div>
+
         <span className="end-page-hotspot-anchor end-page-return-anchor" style={END_PAGE_HOTSPOTS.returnToBeginning}>
           <a className="end-page-hotspot end-page-return-hotspot" href="#title" aria-label="Return to beginning">
             <span>RETURN TO BEGINNING</span>
@@ -817,8 +989,42 @@ function EndPageSection() {
         </span>
       </div>
 
-      <aside ref={panelRef} className="end-page-system-log" aria-labelledby="end-page-system-log-title">
-        <header><span><i aria-hidden="true" />SYSTEM PROFILE</span></header>
+      <div className="d09-17r-end-content">
+        <div className="d09-17r-final-chapter-label" aria-label="Final chapter">
+          <span>09 / FINAL CONTACT</span>
+          <span>RESUME + CONTACT</span>
+        </div>
+
+        <div className="d09-17r-final-identity">
+          <h2>HUANG GUO TAI</h2>
+          <p>CHARACTER CONCEPT ARTIST</p>
+        </div>
+
+        <div id="resume-contact-resume" className="d09-17r-resume resume-anchor">
+          <p className="d09-17r-resume-profile">中国广东，角色原画师 / 角色概念设计。动漫制作技术专业背景，曾负责手游角色设定设计，并参与素材建模与贴图绘制。</p>
+          <div className="d09-17r-resume-facts">
+            <p><span>LOCATION</span>中国广东</p>
+            <p><span>EDUCATION</span>广东文理职业学院 / 动漫制作技术</p>
+            <p><span>INTENTION</span>角色原画师 / 角色概念设计</p>
+          </div>
+          <div className="d09-17r-resume-experience">
+            <h3>EXPERIENCE</h3>
+            <article>
+              <time>2021.11 – 2024.11</time>
+              <h4>深圳市知返科技有限公司</h4>
+              <p>手游角色设定设计；根据世界观与策划文案完成角色概念、造型、服饰与道具设计。</p>
+            </article>
+            <article>
+              <time>2021.01 – 2021.06</time>
+              <h4>茂名风采品牌策划有限公司 / 美术实习生</h4>
+              <p>参与素材建模与贴图绘制，根据反馈协作迭代设计，并将成果应用于项目终版。</p>
+            </article>
+          </div>
+        </div>
+      </div>
+
+      <aside id="resume-contact-contact" className="end-page-system-log contact-anchor" aria-labelledby="end-page-system-log-title">
+        <header><span><i aria-hidden="true" />THE END / PROFILE</span></header>
         <div className="end-page-system-log-body">
           <h2 id="end-page-system-log-title">{`\u9EC4\u56FD\u6CF0`}</h2>
           <p>CONCEPT ARTIST / CHARACTER DESIGNER</p>
@@ -828,7 +1034,11 @@ function EndPageSection() {
             <div><dt>WECHAT</dt><dd>Veiko_9029</dd></div>
           </dl>
         </div>
-        <footer><span>// SYSTEM LOG / ACTIVE</span><i aria-hidden="true" /></footer>
+        <footer>
+          <span>// CONNECTION / COMPLETE</span>
+          <a href="#title">BACK TO TOP</a>
+          <i aria-hidden="true" />
+        </footer>
       </aside>
     </div>
 
@@ -842,10 +1052,10 @@ function App() {
 
   return <main className={[directContentsCapture ? 'contents-capture-direct' : '', 'home-v9-preview-mode'].filter(Boolean).join(' ') || undefined}>
     <HomeV9Preview />
-    <ContentsSection />
-    <KeyVisualPage id="key-visual-01" number="01" title="KEY VISUAL 01" asset={artworkOne} variant="one" />
+    <D0919Directory />
+    <D0919Page01 />
     <Page02Poster />
-    <KeyVisualPage id="key-visual-03" number="03" title="KEY VISUAL 03" asset={artworkThree} variant="three" />
+    <KeyVisualThree />
     <CharacterSheets />
     <CostumeDetail />
     <PortraitStudies />

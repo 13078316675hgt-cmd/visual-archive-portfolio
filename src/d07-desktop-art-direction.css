@@ -1,0 +1,503 @@
+/* D07 desktop continuation. Page 02 and <=1024px layouts are intentionally outside this file. */
+
+.d07-page01-desktop { display: none; }
+
+@media (min-width: 1025px) {
+  .d07-page01 {
+    position: relative;
+    min-height: max(760px, 100svh);
+    padding: 0;
+    overflow: hidden;
+    isolation: isolate;
+    background: #edf0f2;
+    color: #18232d;
+  }
+
+  .d07-page01-desktop { display: block; position: absolute; inset: 0; }
+  .d07-page01-legacy { display: none !important; }
+
+  .d07-page01-desktop::before {
+    content: '';
+    position: absolute;
+    left: 67.2%;
+    top: 10.5%;
+    width: 1px;
+    height: 62%;
+    background: linear-gradient(to bottom, transparent, rgba(181, 59, 50, .7) 28%, rgba(181, 59, 50, .7) 72%, transparent);
+    z-index: -1;
+  }
+
+  .d07-page01-desktop::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 8.8%;
+    height: 1px;
+    background: linear-gradient(to right, transparent 0 4%, rgba(24, 35, 45, .16) 4% 72%, transparent 72%);
+    z-index: 1;
+  }
+
+  .d07-page01-art { margin: 0; overflow: hidden; }
+  .d07-page01-art-main {
+    position: absolute;
+    left: 15.5%;
+    top: -12%;
+    width: 65%;
+    height: 122%;
+    overflow: visible;
+    z-index: 3;
+  }
+  .d07-page01-art-main img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: 50% 50%;
+  }
+
+  .d07-page01-detail {
+    position: absolute;
+    left: -7.5%;
+    top: -9%;
+    width: 57%;
+    height: 69%;
+    margin: 0;
+    overflow: hidden;
+    opacity: .19;
+    -webkit-mask-image: linear-gradient(105deg, #000 0 48%, transparent 86%);
+    mask-image: linear-gradient(105deg, #000 0 48%, transparent 86%);
+    z-index: 1;
+  }
+  .d07-page01-detail img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 24%;
+    transform: scale(1.18);
+    transform-origin: 52% 24%;
+  }
+
+  .d07-page01-heading {
+    position: absolute;
+    left: -1.8%;
+    top: 10.2%;
+    width: 58%;
+    z-index: 2;
+  }
+  .d07-page01-heading small {
+    position: absolute;
+    left: 12.3%;
+    top: calc(100% + 20px);
+    margin: 0;
+    color: rgba(24, 35, 45, .68);
+    font-size: clamp(8px, .54vw, 10px);
+    font-weight: 700;
+    letter-spacing: .24em;
+  }
+  .d07-page01-heading h2 {
+    display: block;
+    margin: 0;
+    font-family: 'IBM Plex Sans Condensed', Inter, 'Noto Sans SC', sans-serif;
+    font-size: clamp(112px, 11.2vw, 215px);
+    font-weight: 700;
+    letter-spacing: -.085em;
+    line-height: .69;
+    color: #17232d;
+  }
+  .d07-page01-heading h2 span { display: block; }
+
+  .d07-page01-index {
+    position: absolute;
+    right: 3.8%;
+    bottom: 5.9%;
+    display: flex;
+    align-items: end;
+    gap: 15px;
+    color: var(--red);
+    z-index: 2;
+  }
+  .d07-page01-index span {
+    font-family: 'IBM Plex Sans Condensed', Inter, sans-serif;
+    font-size: clamp(110px, 14vw, 268px);
+    font-weight: 700;
+    letter-spacing: -.08em;
+    line-height: .66;
+    opacity: .9;
+  }
+  .d07-page01-index i { width: clamp(54px, 5vw, 96px); height: 2px; margin-bottom: 5px; background: #17232d; }
+
+  .d07-page01-rule { position: absolute; z-index: 4; }
+  .d07-page01-rule-a { left: 67.2%; top: 20%; width: 2px; height: 34%; background: rgba(181, 59, 50, .8); }
+  .d07-page01-rule-b { right: 4%; bottom: 28.5%; width: 13%; height: 1px; background: rgba(24, 35, 45, .48); }
+
+  /* D07.1 directory: one asymmetrical editorial poster made from safe crops of the
+     locked gray-white mother image. The flattened card zones are never rendered. */
+  #contents.d01-directory[data-directory-motion="editorial-poster-assembly"] {
+    min-height: max(720px, 100svh);
+    overflow: hidden;
+    background: #f3f4f2 !important;
+  }
+  #contents.d01-directory[data-directory-motion="editorial-poster-assembly"] .directory-stage,
+  #contents.d01-directory[data-directory-motion="editorial-poster-assembly"] .directory-motion-parent {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    margin: 0;
+    overflow: hidden;
+    background: transparent;
+  }
+  #contents.d01-directory[data-directory-motion="editorial-poster-assembly"] .directory-image-frame { display: none; }
+
+  .directory-d071-visual {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .directory-d071-fragment {
+    position: absolute;
+    margin: 0;
+    overflow: hidden;
+    background: #f3f4f2;
+    isolation: isolate;
+  }
+  .directory-d071-fragment img {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    user-select: none;
+    backface-visibility: hidden;
+  }
+  .directory-d071-atmosphere {
+    left: 14%;
+    top: 3.5%;
+    width: 48%;
+    height: 35%;
+    opacity: .42;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 12%, #000 82%, transparent 100%), linear-gradient(#000 0 76%, transparent 100%);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(90deg, transparent 0, #000 12%, #000 82%, transparent 100%), linear-gradient(#000 0 76%, transparent 100%);
+    mask-composite: intersect;
+  }
+  .directory-d071-atmosphere img {
+    transform: scale(2.48);
+    transform-origin: 50% 28%;
+    filter: contrast(.92);
+  }
+  .directory-d071-apparatus {
+    left: 6.2%;
+    top: 27%;
+    width: 63.5%;
+    height: 61%;
+    background: transparent;
+  }
+  .directory-d071-apparatus img {
+    transform: scale(2.02);
+    transform-origin: 50% 59%;
+    filter: contrast(1.02);
+  }
+  .directory-d071-apparatus::before,
+  .directory-d071-apparatus::after {
+    content: '';
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    bottom: 0;
+    width: 24%;
+    background: linear-gradient(90deg, #f3f4f2 0 58%, rgba(243, 244, 242, .92) 74%, transparent);
+    pointer-events: none;
+  }
+  .directory-d071-apparatus::before { left: 0; }
+  .directory-d071-apparatus::after { right: 0; transform: scaleX(-1); }
+  .directory-d071-cube-echo {
+    left: 43.2%;
+    top: 24.5%;
+    z-index: 3;
+    width: 10.4%;
+    height: 21%;
+    opacity: 0;
+    background: transparent;
+    clip-path: inset(11% 18% 11% 18%);
+  }
+  .directory-d071-cube-echo img {
+    transform: scale(8.1);
+    transform-origin: 50% 34%;
+  }
+  .directory-d071-orbit {
+    position: absolute;
+    left: 11.2%;
+    top: 64.5%;
+    width: 61%;
+    height: 24%;
+    border: 1px solid rgba(47, 53, 57, .32);
+    border-radius: 50%;
+    transform: rotate(-1.2deg);
+    transform-origin: center;
+  }
+
+  #contents.d01-directory .directory-heading {
+    left: -1.1%;
+    top: 5.8%;
+    z-index: 5;
+    width: 54%;
+    color: #22292d;
+    pointer-events: none;
+  }
+  #contents.d01-directory .directory-heading > span {
+    display: block;
+    margin-left: 8.4%;
+    color: var(--directory-red);
+    font-size: clamp(8px, .56vw, 11px);
+    letter-spacing: .24em;
+  }
+  #contents.d01-directory .directory-heading strong {
+    display: block;
+    margin-top: clamp(8px, 1.1vh, 13px);
+    font-family: 'IBM Plex Sans Condensed', Inter, sans-serif;
+    font-size: clamp(70px, 7.35vw, 142px);
+    font-weight: 700;
+    letter-spacing: -.073em;
+    line-height: .72;
+  }
+  #contents.d01-directory .directory-heading strong span {
+    display: block;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    line-height: inherit;
+  }
+  #contents.d01-directory .directory-heading small {
+    display: block;
+    margin: 18px 0 0 8.4%;
+    color: #69747a;
+    font-size: clamp(7px, .46vw, 9px);
+    letter-spacing: .2em;
+  }
+  .directory-d071-index {
+    display: flex;
+    position: absolute;
+    left: 3.5%;
+    bottom: 5.2%;
+    z-index: 6;
+    align-items: baseline;
+    gap: 16px;
+    color: #20272b;
+  }
+  .directory-d071-index b {
+    color: var(--directory-red);
+    font-family: 'IBM Plex Sans Condensed', Inter, sans-serif;
+    font-size: clamp(27px, 2.25vw, 44px);
+    line-height: 1;
+  }
+  .directory-d071-index span { font-size: 7px; font-weight: 700; letter-spacing: .2em; }
+  .directory-d071-registration {
+    display: flex;
+    position: absolute;
+    right: 3.3%;
+    bottom: 4.4%;
+    z-index: 6;
+    gap: 8px;
+  }
+  .directory-d071-registration i { display: block; width: 22px; height: 1px; background: #4e575c; }
+  .directory-d071-registration i:nth-child(2) { width: 5px; background: var(--directory-red); }
+
+  #contents.d01-directory .directory-return {
+    right: 3.2%;
+    top: 4.2%;
+    z-index: 8;
+    padding: 0 0 6px;
+    background: none;
+    font-size: 8px;
+    letter-spacing: .19em;
+  }
+  #contents.d01-directory .directory-card-layer { position: absolute; inset: 0; z-index: 7; }
+  #contents.d01-directory .directory-card,
+  #contents.d01-directory .directory-card-dual {
+    display: block;
+    min-height: 0;
+    height: auto;
+    padding: 0 0 10px;
+    overflow: visible;
+    color: #252c30;
+    background: none !important;
+    border: 0 !important;
+    border-bottom: 1px solid rgba(44, 52, 57, .34) !important;
+    box-shadow: none !important;
+    transition: color 150ms var(--ease-controlled), border-color 150ms var(--ease-controlled) !important;
+  }
+  #contents.d01-directory .directory-card::before,
+  #contents.d01-directory .directory-card::after,
+  #contents.d01-directory .directory-card-primary::after { content: none !important; }
+  #contents.d01-directory .directory-card-content {
+    display: grid !important;
+    grid-template-columns: clamp(30px, 2.6vw, 50px) minmax(0, 1fr) 16px;
+    align-items: end;
+    gap: 8px;
+    min-height: 33px;
+  }
+  #contents.d01-directory .directory-card-number,
+  #contents.d01-directory .directory-card strong,
+  #contents.d01-directory .directory-card-arrow {
+    position: static;
+    inset: auto;
+    transform: none;
+  }
+  #contents.d01-directory .directory-card-number {
+    align-self: start;
+    color: var(--directory-red);
+    font-family: 'IBM Plex Sans Condensed', Inter, sans-serif;
+    font-size: clamp(16px, 1.18vw, 23px);
+    font-weight: 600;
+    line-height: 1;
+  }
+  #contents.d01-directory .directory-card strong {
+    display: block;
+    align-self: end;
+    padding-bottom: 1px;
+    font-size: clamp(8px, .58vw, 11px);
+    font-weight: 650;
+    letter-spacing: .115em;
+    line-height: 1.25;
+  }
+  #contents.d01-directory .directory-card-arrow {
+    justify-self: end;
+    color: #515c62;
+    font-size: 13px;
+  }
+  #contents.d01-directory :is(.directory-card-marks, .directory-card-corner, .directory-card-confirm-rule, .directory-card-hit) { display: none !important; }
+  #contents.d01-directory .directory-card-primary {
+    position: relative;
+    inset: auto;
+    display: block;
+    width: auto;
+    height: auto;
+    padding: 0;
+    color: inherit;
+  }
+  #contents.d01-directory .directory-card-secondary {
+    position: static;
+    display: block;
+    min-height: 0;
+    margin: 8px 24px 0 clamp(38px, 3.1vw, 58px);
+    padding: 0;
+    color: #667177;
+    font-size: clamp(7px, .48vw, 9px);
+    letter-spacing: .08em;
+    line-height: 1.4;
+  }
+  #contents.d01-directory .directory-card-dual { padding-bottom: 12px; }
+  #contents.d01-directory .directory-card:hover,
+  #contents.d01-directory .directory-card:focus-visible,
+  #contents.d01-directory .directory-card:focus-within {
+    color: var(--directory-red);
+    border-bottom-color: var(--directory-red) !important;
+    background: none !important;
+    transform: none !important;
+  }
+  #contents.d01-directory .directory-card:focus-visible,
+  #contents.d01-directory .directory-card-primary:focus-visible,
+  #contents.d01-directory .directory-card-secondary:focus-visible { outline-offset: 5px; }
+
+  #contents.d01-directory .directory-card-left-01 { left: 71%; top: 14%; width: 24%; }
+  #contents.d01-directory .directory-card-left-02 { left: 78%; top: 27.5%; width: 17%; }
+  #contents.d01-directory .directory-card-left-03 { left: 67%; top: 39.5%; width: 28%; }
+  #contents.d01-directory .directory-card-left-04 { left: 4.6%; top: 73.5%; width: 18%; }
+  #contents.d01-directory .directory-card-right-05 { left: 26%; top: 81.5%; width: 21%; }
+  #contents.d01-directory .directory-card-right-06 { left: 64.5%; top: 60%; width: 30.5%; }
+  #contents.d01-directory .directory-card-right-07 { left: 71.5%; top: 77%; width: 23.5%; }
+  #contents.d01-directory .directory-card-right-end { left: 84.5%; top: 89.5%; width: 10.5%; }
+  #contents.d01-directory .directory-card-right-end .directory-card-content { grid-template-columns: 31px 1fr 12px; }
+  #contents.d01-directory .directory-card-right-end .directory-card-number { font-size: 9px; }
+  #contents.d01-directory .directory-card-right-end strong { font-size: 7px; letter-spacing: .08em; }
+
+  /* D07.1 END: the approved base pose remains exact; low-opacity source-aligned
+     hand echoes provide the transient X-ray movement and disappear by 1.3s. */
+  .end-page[data-end-motion="hand-led-projection"] .end-page-stage,
+  .end-page[data-end-motion="hand-led-projection"] .end-page-artwork-field,
+  .end-page[data-end-motion="hand-led-projection"] .end-page-image { backface-visibility: hidden; }
+  html.motion-enabled .end-page[data-end-motion="hand-led-projection"] .end-page-image {
+    opacity: 1 !important;
+    filter: none !important;
+    transition: none !important;
+  }
+  .end-hand-echo-field { display: block; position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
+  .end-hand-echo { position: absolute; inset: 0; display: block; opacity: 0; overflow: hidden; will-change: transform, opacity, filter; }
+  .end-hand-echo img { display: block; width: 100%; height: 100%; object-fit: contain; object-position: center; }
+  .end-hand-echo-upper { clip-path: polygon(4% 6%, 24% 9%, 46% 31%, 44% 53%, 31% 49%, 17% 34%, 6% 27%); }
+  .end-hand-echo-upper-detail { clip-path: polygon(20% 14%, 35% 20%, 46% 34%, 43% 53%, 33% 47%, 25% 31%); }
+  .end-hand-echo-lower { clip-path: polygon(53% 49%, 69% 53%, 95% 76%, 99% 93%, 82% 87%, 64% 75%, 55% 65%); }
+  .end-hand-echo-lower-detail { clip-path: polygon(57% 54%, 71% 59%, 89% 74%, 93% 87%, 78% 82%, 64% 72%); }
+  .end-hand-signal {
+    position: absolute;
+    left: 48.6%;
+    top: 48.8%;
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(38, 95, 221, .54);
+    border-radius: 50%;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(.7);
+  }
+  .end-page[data-end-motion="hand-led-projection"] .end-page-system-log {
+    left: 40.2%;
+    top: 66.2%;
+    bottom: auto;
+    width: clamp(350px, 18.4vw, 382px);
+    transform: none;
+    translate: none;
+    border: 1px solid rgba(77, 105, 132, .44);
+    background: rgba(246, 249, 251, .9);
+    box-shadow: 0 12px 34px rgba(77, 104, 129, .07);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    opacity: 1;
+    animation: none !important;
+    will-change: transform, clip-path, opacity;
+    contain: layout paint style;
+  }
+  .end-page[data-end-motion="hand-led-projection"] .end-page-system-log::before {
+    content: '';
+    position: absolute;
+    right: -92px;
+    top: -19px;
+    width: 105px;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(38, 95, 221, .48), transparent);
+    transform: rotate(-9deg);
+    transform-origin: left center;
+    pointer-events: none;
+  }
+  .end-page[data-end-motion="hand-led-projection"] .end-page-system-log-body { padding: 17px 20px 14px; background: rgba(247, 248, 248, .08); }
+  .end-page[data-end-motion="hand-led-projection"] .end-page-system-log h2 { font-size: clamp(28px, 1.65vw, 33px); }
+  .end-page[data-end-motion="hand-led-projection"] .end-page-system-log dl div { grid-template-columns: 72px 1fr; padding: 6px 0; }
+}
+
+@media (max-width: 1024px) {
+  .d07-page01-desktop { display: none !important; }
+  .d07-page01-legacy { display: contents; }
+  .directory-d071-visual,
+  .directory-d071-index,
+  .directory-d071-registration,
+  .end-hand-echo-field { display: none !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .d07-page01-desktop *,
+  #contents.d01-directory .directory-card,
+  .end-page[data-end-motion="hand-led-projection"] .end-page-stage,
+  .end-page[data-end-motion="hand-led-projection"] .end-page-system-log,
+  .end-page[data-end-motion="hand-led-projection"] .end-hand-echo,
+  .end-page[data-end-motion="hand-led-projection"] .end-hand-signal {
+    animation: none !important;
+    transition: none !important;
+  }
+}

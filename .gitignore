@@ -30,6 +30,10 @@ coverage/
 # Temporary and review files
 tmp/
 review/
+review_input/
+review_package/
+temporary_preview/
+AGENTS.md
 
 # Original source archives and old portfolio iterations
 source-assets/

@@ -1,0 +1,46 @@
+/* Static END-page structure shared by the approved desktop composition and the
+   locked tablet/mobile flow. Motion is owned exclusively by endPageMotion.js. */
+.end-page-artwork-field { position: absolute; inset: 0; }
+
+@media (max-width: 1024px) {
+  .end-page { min-height: auto !important; overflow: clip; display: block; }
+  .end-page .end-page-stage {
+    width: 100%;
+    height: auto;
+    max-width: none;
+    aspect-ratio: auto;
+    display: flow-root;
+  }
+  .end-page .end-page-artwork-field {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+  }
+  .end-page .end-page-image {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: contain;
+  }
+  .end-page .end-page-system-log {
+    position: relative;
+    left: auto;
+    right: auto;
+    top: auto;
+    bottom: auto;
+    width: min(480px, calc(100% - 36px));
+    max-width: none;
+    margin: 18px auto 32px;
+    translate: none;
+    transform: none !important;
+    border: .5px solid rgba(120, 148, 173, .5);
+    background: rgba(247, 248, 248, .84);
+    box-shadow: none;
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    animation: none !important;
+    opacity: 1 !important;
+    will-change: auto;
+  }
+}

@@ -1,0 +1,330 @@
+@property --edge {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+@property --radius {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+.approved-motion-desktop {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  isolation: isolate;
+  z-index: 6;
+  background: #f7f8f7;
+}
+
+.approved-motion-canvas {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  transform: translate(-50%, -50%);
+  transform-origin: 50% 50%;
+  background: #f7f8f7;
+  isolation: isolate;
+}
+
+.am-layer,
+.am-page03-ui {
+  position: absolute;
+  inset: 0;
+}
+
+.am-layer > img,
+.am-page03-ui > img,
+.am-page03-gold,
+.am-page03-part > img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  user-select: none;
+  pointer-events: none;
+}
+
+.am-home-focus {
+  -webkit-mask-image: radial-gradient(circle at 62% 39%, #000 0%, #000 calc(var(--radius) - 8%), transparent var(--radius));
+  mask-image: radial-gradient(circle at 62% 39%, #000 0%, #000 calc(var(--radius) - 8%), transparent var(--radius));
+}
+
+.am-reveal-right {
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 var(--edge), transparent calc(var(--edge) + 8%), transparent 100%);
+  mask-image: linear-gradient(90deg, #000 0%, #000 var(--edge), transparent calc(var(--edge) + 8%), transparent 100%);
+}
+
+.am-reveal-diagonal {
+  -webkit-mask-image: linear-gradient(135deg, #000 0%, #000 var(--edge), transparent calc(var(--edge) + 8%), transparent 100%);
+  mask-image: linear-gradient(135deg, #000 0%, #000 var(--edge), transparent calc(var(--edge) + 8%), transparent 100%);
+}
+
+.am-reveal-up {
+  -webkit-mask-image: linear-gradient(0deg, #000 0%, #000 var(--edge), transparent calc(var(--edge) + 8%), transparent 100%);
+  mask-image: linear-gradient(0deg, #000 0%, #000 var(--edge), transparent calc(var(--edge) + 8%), transparent 100%);
+}
+
+.am-directory-registered {
+  position: absolute;
+  left: 0.5100708px;
+  top: 0;
+  width: 1918.979858px;
+  height: 1080px;
+}
+
+.am-directory-title {
+  position: absolute;
+  left: 63.124336px;
+  top: 48.204037px;
+  width: 344.314545px;
+  height: 87.226357px;
+}
+
+.am-directory-route {
+  position: absolute;
+  left: 43.613178px;
+  top: 387.927734px;
+  width: 1641px;
+  height: 331px;
+  overflow: visible;
+}
+
+.am-directory-route path {
+  fill: none;
+  stroke: #16191d;
+  stroke-width: 2.52497;
+  stroke-linecap: square;
+}
+
+.am-directory-nodes {
+  position: absolute;
+  left: 30.628262px;
+  top: 374.94281px;
+  width: 1665px;
+  height: 354px;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.am-directory-nodes path {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.am-directory-label {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  overflow: hidden;
+  color: #15191e;
+  pointer-events: none;
+}
+
+.am-directory-number {
+  position: absolute;
+  color: #1488ff;
+  font-family: "Times New Roman", serif;
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.am-directory-number.is-end {
+  font-size: 23px;
+}
+
+.am-directory-tag {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  padding: 0 7px;
+  color: #f6f6f3;
+  background: #1a1c1e;
+  box-shadow: 7px 7px 12px rgb(19 22 24 / 18%);
+  font-family: "OCR A Extended", "IBM Plex Mono", monospace;
+  font-size: 10px;
+  line-height: 13px;
+  letter-spacing: 0.15px;
+  white-space: nowrap;
+}
+
+.am-directory-tag.is-multiline {
+  align-content: center;
+  flex-wrap: wrap;
+}
+
+.am-directory-tag.is-multiline span {
+  width: 100%;
+}
+
+.am-directory-secondary {
+  position: absolute;
+  width: 190px;
+  color: #858b92;
+  font-family: "OCR A Extended", "IBM Plex Mono", monospace;
+  font-size: 7px;
+  line-height: 15px;
+  letter-spacing: 0.25px;
+  white-space: nowrap;
+}
+
+.am-directory-secondary span {
+  display: block;
+}
+
+.am-directory-label-hit,
+.am-directory-secondary-hit,
+.am-directory-node-hit {
+  position: absolute;
+  z-index: 30;
+  display: block;
+  pointer-events: auto;
+  background: transparent;
+}
+
+.am-directory-node-hit {
+  width: 28px;
+  height: 28px;
+}
+
+.am-directory-label-hit:focus-visible,
+.am-directory-secondary-hit:focus-visible,
+.am-directory-node-hit:focus-visible,
+.am-end-return:focus-visible {
+  outline: 2px solid #1488ff;
+  outline-offset: 3px;
+}
+
+.am-page03-registered {
+  position: absolute;
+  left: 0.5100708px;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  transform: scaleX(0.999468676);
+  transform-origin: 0 0;
+}
+
+.am-page03-art-parent {
+  position: absolute;
+  left: 730.242615px;
+  top: 0;
+  width: 964.636963px;
+  height: 1069.670532px;
+}
+
+.am-page03-part {
+  position: absolute;
+  inset: 0;
+}
+
+.am-page03-gold {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.am-soft-115 {
+  -webkit-mask-image: linear-gradient(115deg, #000 0%, #000 var(--edge), transparent calc(var(--edge) + 9%), transparent 100%);
+  mask-image: linear-gradient(115deg, #000 0%, #000 var(--edge), transparent calc(var(--edge) + 9%), transparent 100%);
+}
+
+.am-soft-right {
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 var(--edge), transparent calc(var(--edge) + 8%), transparent 100%);
+  mask-image: linear-gradient(90deg, #000 0%, #000 var(--edge), transparent calc(var(--edge) + 8%), transparent 100%);
+}
+
+.am-soft-left {
+  -webkit-mask-image: linear-gradient(270deg, #000 0%, #000 var(--edge), transparent calc(var(--edge) + 8%), transparent 100%);
+  mask-image: linear-gradient(270deg, #000 0%, #000 var(--edge), transparent calc(var(--edge) + 8%), transparent 100%);
+}
+
+.am-end-upper {
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 calc(var(--edge) - 5%), rgb(0 0 0 / 68%) calc(var(--edge) - 2%), transparent calc(var(--edge) + 3%), transparent 100%);
+  mask-image: linear-gradient(90deg, #000 0%, #000 calc(var(--edge) - 5%), rgb(0 0 0 / 68%) calc(var(--edge) - 2%), transparent calc(var(--edge) + 3%), transparent 100%);
+}
+
+.am-end-lower {
+  -webkit-mask-image: linear-gradient(270deg, #000 0%, #000 calc(var(--edge) - 5%), rgb(0 0 0 / 68%) calc(var(--edge) - 2%), transparent calc(var(--edge) + 3%), transparent 100%);
+  mask-image: linear-gradient(270deg, #000 0%, #000 calc(var(--edge) - 5%), rgb(0 0 0 / 68%) calc(var(--edge) - 2%), transparent calc(var(--edge) + 3%), transparent 100%);
+}
+
+.am-end-title-fragment {
+  position: absolute;
+  overflow: hidden;
+}
+
+.am-end-title-fragment img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.am-end-return {
+  position: absolute;
+  z-index: 40;
+  right: 54px;
+  bottom: 42px;
+  width: 94px;
+  height: 52px;
+  background: transparent;
+}
+
+.approved-motion-mobile-fallback {
+  display: none;
+}
+
+#title,
+#contents,
+#key-visual-03,
+#end {
+  position: relative;
+}
+
+#contents,
+#key-visual-03,
+#end {
+  min-height: 100vh;
+}
+
+@media (min-width: 901px) {
+  #title > :not(.approved-motion-desktop),
+  #contents > :not(.approved-motion-desktop):not(.end-page-legacy-anchor),
+  #key-visual-03 > :not(.approved-motion-desktop),
+  #end > :not(.approved-motion-desktop):not(.end-page-legacy-anchor) {
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .approved-motion-desktop {
+    display: none;
+  }
+
+  .approved-motion-mobile-fallback {
+    display: contents;
+  }
+
+  #end.end-page {
+    min-height: 100svh !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .approved-motion-desktop * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

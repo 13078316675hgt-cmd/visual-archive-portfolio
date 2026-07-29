@@ -1,6 +1,6 @@
 import { gsap } from 'gsap'
 
-const HOME_COMPLETE_TIME = 1.32
+const HOME_COMPLETE_TIME = 1.66
 const MEDIA_TIMEOUT = 1800
 
 const isVisible = (node) => {
@@ -50,8 +50,8 @@ export function initHomeMotion(section, { reducedMotion = false } = {}) {
     section.dataset.homeMotionState = 'prepared'
 
     gsap.set(base, {
-      scale: mobile ? 1.028 : (tablet ? 1.04 : 1.055),
-      x: mobile ? 4 : (tablet ? 6 : 10),
+      scale: mobile ? 1.028 : (tablet ? 1.04 : 1.072),
+      x: mobile ? 4 : (tablet ? 6 : 13),
       y: mobile ? 2 : (tablet ? 3 : 4),
       transformOrigin: mobile ? '58% 52%' : '72% 52%',
       force3D: true,
@@ -61,26 +61,26 @@ export function initHomeMotion(section, { reducedMotion = false } = {}) {
       gsap.set(layers, { opacity: 0 })
     } else {
       gsap.set(environment, {
-        scale: tablet ? 1.025 : 1.045,
-        x: tablet ? -7 : -14,
-        y: tablet ? -4 : -7,
-        opacity: tablet ? 0.34 : 0.5,
+        scale: tablet ? 1.025 : 1.038,
+        x: tablet ? -7 : -11,
+        y: tablet ? -4 : -5,
+        opacity: tablet ? 0.34 : 0.24,
         transformOrigin: '68% 48%',
         force3D: true,
       })
       gsap.set(subject, {
-        scale: tablet ? 1.038 : 1.07,
-        x: tablet ? 12 : 24,
-        y: tablet ? 2 : 3,
-        opacity: tablet ? 0.52 : 0.82,
+        scale: tablet ? 1.038 : 1.058,
+        x: tablet ? 12 : 18,
+        y: tablet ? 2 : 2,
+        opacity: tablet ? 0.52 : 0.36,
         transformOrigin: '70% 48%',
         force3D: true,
       })
       gsap.set(foreground, {
-        scale: tablet ? 1.04 : 1.075,
-        x: tablet ? -10 : -20,
-        y: tablet ? 6 : 12,
-        opacity: tablet ? 0.45 : 0.76,
+        scale: tablet ? 1.04 : 1.06,
+        x: tablet ? -10 : -16,
+        y: tablet ? 6 : 9,
+        opacity: tablet ? 0.45 : 0.3,
         transformOrigin: '66% 68%',
         force3D: true,
       })
@@ -113,20 +113,20 @@ export function initHomeMotion(section, { reducedMotion = false } = {}) {
       scale: 1,
       x: 0,
       y: 0,
-      duration: mobile ? 0.82 : 1.07,
-      ease: 'power3.out',
+      duration: mobile ? 0.82 : (tablet ? 1.07 : 1.24),
+      ease: mobile || tablet ? 'power3.out' : 'power3.inOut',
     }, mobile ? 0 : 0.08)
 
     if (!mobile) {
       timeline
-        .to(environment, { scale: 1, x: 0, y: 0, opacity: 0, duration: tablet ? 0.78 : 0.92, ease: 'power3.out' }, 0.15)
-        .to(subject, { scale: 1, x: 0, y: 0, opacity: 0, duration: tablet ? 0.82 : 0.96, ease: 'power3.out' }, 0.24)
-        .to(foreground, { scale: 1, x: 0, y: 0, opacity: 0, duration: tablet ? 0.74 : 0.88, ease: 'power3.out' }, 0.37)
+        .to(environment, { scale: 1, x: 0, y: 0, opacity: 0, duration: tablet ? 0.78 : 1.08, ease: 'power3.out' }, 0.12)
+        .to(subject, { scale: 1, x: 0, y: 0, opacity: 0, duration: tablet ? 0.82 : 1.12, ease: 'power3.out' }, 0.18)
+        .to(foreground, { scale: 1, x: 0, y: 0, opacity: 0, duration: tablet ? 0.74 : 1.02, ease: 'power3.out' }, 0.28)
     }
 
-    const copyStart = mobile ? 0.28 : 0.78
+    const copyStart = mobile ? 0.28 : (tablet ? 0.78 : 0.86)
     timeline
-      .to(nav, { opacity: 1, y: 0, duration: mobile ? 0.34 : 0.48, ease: 'power2.out' }, mobile ? 0.2 : 0.74)
+      .to(nav, { opacity: 1, y: 0, duration: mobile ? 0.34 : 0.48, ease: 'power2.out' }, mobile ? 0.2 : (tablet ? 0.74 : 0.8))
       .to(copy, {
         opacity: 1,
         x: 0,
@@ -135,15 +135,17 @@ export function initHomeMotion(section, { reducedMotion = false } = {}) {
         duration: mobile ? 0.46 : 0.52,
         ease: 'power3.out',
       }, copyStart)
-      .to(rules[0], { scaleX: 1, duration: mobile ? 0.32 : 0.42, ease: 'power3.out' }, mobile ? 0.48 : 0.88)
-      .to(rules[1], { scaleX: 1, duration: mobile ? 0.3 : 0.38, ease: 'power3.out' }, mobile ? 0.52 : 0.94)
+      .to(rules[0], { scaleX: 1, duration: mobile ? 0.32 : 0.42, ease: 'power3.out' }, mobile ? 0.48 : (tablet ? 0.88 : 1.02))
+      .to(rules[1], { scaleX: 1, duration: mobile ? 0.3 : 0.38, ease: 'power3.out' }, mobile ? 0.52 : (tablet ? 0.94 : 1.08))
       .to(utility, {
         opacity: 1,
         y: 0,
         duration: mobile ? 0.3 : 0.38,
         stagger: mobile ? 0.025 : 0.04,
         ease: 'power2.out',
-      }, mobile ? 0.5 : 0.9)
+      }, mobile ? 0.5 : (tablet ? 0.9 : 1.08))
+
+    if (!mobile && !tablet) timeline.to({}, { duration: .18 }, 1.48)
 
     return timeline
   }
