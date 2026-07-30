@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "build:pages": "vite build --base=/visual-archive-portfolio/",
+    "export:portfolio-pdf": "pnpm run build && node scripts/export-portfolio-pdf.mjs",
+    "export:portfolio-pdf:final": "pnpm run build && node scripts/export-portfolio-pdf-final.mjs",
     "preview": "vite preview",
     "review:assets": "node scripts/audit-portfolio-assets.mjs",
     "review:assets:dist": "node scripts/audit-portfolio-assets.mjs --dist",

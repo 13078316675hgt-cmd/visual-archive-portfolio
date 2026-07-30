@@ -296,7 +296,8 @@
     #f1f2f2;
 }
 
-.d0919-directory-preview > img {
+.d0919-directory-preview > img,
+.d0919-directory-preview > picture > img {
   display: block;
   width: 100%;
   height: 100%;
@@ -396,8 +397,11 @@
 }
 
 .d0919-directory-node:hover .d0919-directory-preview > img,
+.d0919-directory-node:hover .d0919-directory-preview > picture > img,
 .d0919-directory-node:focus-visible .d0919-directory-preview > img,
-.d0919-directory-node:focus-within .d0919-directory-preview > img {
+.d0919-directory-node:focus-visible .d0919-directory-preview > picture > img,
+.d0919-directory-node:focus-within .d0919-directory-preview > img,
+.d0919-directory-node:focus-within .d0919-directory-preview > picture > img {
   transform: scale(1.018);
 }
 
@@ -423,7 +427,8 @@
   transition: transform 160ms cubic-bezier(.16, 1, .3, 1), color 160ms ease;
 }
 
-.d0919-directory-end > img {
+.d0919-directory-end > img,
+.d0919-directory-end > picture > img {
   position: absolute;
   inset: 0;
   display: block;
@@ -1099,6 +1104,7 @@
   .d0919-directory-node,
   .d0919-directory-window,
   .d0919-directory-preview > img,
+  .d0919-directory-preview > picture > img,
   .d0919-directory-end {
     transition: none;
   }

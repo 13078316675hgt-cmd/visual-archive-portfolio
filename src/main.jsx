@@ -1,6 +1,7 @@
 ﻿import React from 'react'
 import { createRoot } from 'react-dom/client'
-import { useEffect, useLayoutEffect, useRef } from 'react'
+import { flushSync } from 'react-dom'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import './styles.css'
 import './gallery.css'
 import './content-layout.css'
@@ -18,6 +19,8 @@ import './approved-motion.css'
 import './d09-17r-home-end-restoration.css'
 import './d09-19-locked-implementation.css'
 import './d09-20-home-static.css'
+import './portfolio-pdf.css'
+import './performance-loading.css'
 import { initArchiveMotion } from './motion/archiveMotion.js'
 import { initPage02PosterMotion } from './motion/page02PosterMotion.js'
 import { initD06Page03Motion, initD07Page01Motion } from './motion/innerPagesMotion.js'
@@ -35,6 +38,10 @@ import {
 } from './components/ApprovedMotionPages.jsx'
 import { D0919Directory, D0919Page01 } from './components/D0919Pages.jsx'
 import {
+  PerformancePicture,
+  performanceImageAttrs,
+} from './components/PerformancePicture.jsx'
+import {
   artworkManifest,
   artworkOne,
   artworkThree,
@@ -43,6 +50,7 @@ import {
   directoryMasterIntegrated,
   endPageIntegrated,
 } from './data/artworkManifest.js'
+import resumeContent from './data/resumeContent.js'
 
 const PORTFOLIO_URL_ROUTES = Object.freeze([
   { id: 'title', hash: '', aliases: ['#title'] },
@@ -128,17 +136,14 @@ function usePortfolioMotion() {
     let routeSyncFrame = 0
     let routeSyncUnlockFrame = 0
     let routeSyncSuspended = Boolean(requestedHash && requestedRoute && requestedTarget)
-    const routeElements = PORTFOLIO_URL_ROUTES.map((route) => ({
-      route,
-      element: document.getElementById(route.id),
-    })).filter(({ element }) => Boolean(element))
-
     const findViewportRoute = () => {
       const probeY = Math.min(window.innerHeight * 0.38, 360)
-      return routeElements.find(({ element }) => {
+      return PORTFOLIO_URL_ROUTES.find((route) => {
+        const element = document.getElementById(route.id)
+        if (!element) return false
         const rect = element.getBoundingClientRect()
         return rect.top <= probeY && rect.bottom > probeY
-      })?.route || null
+      }) || null
     }
 
     const syncViewportRouteToUrl = () => {
@@ -257,6 +262,8 @@ function usePortfolioMotion() {
       if (!anchor || anchor.hasAttribute('download') || (anchor.target && anchor.target !== '_self')) return
 
       const hash = anchor.getAttribute('href')
+      const route = getPortfolioRouteForHash(hash)
+      if (route && route.id !== 'title') window.__portfolioEnsureSection?.(route.id)
       const target = resolveAnchorTarget(hash)
       if (!hash || !target) return
 
@@ -288,6 +295,8 @@ function usePortfolioMotion() {
       historyNavigationFrame = window.requestAnimationFrame(() => {
         historyNavigationFrame = 0
         if (window.location.hash) {
+          const route = getPortfolioRouteForHash(window.location.hash)
+          if (route && route.id !== 'title') window.__portfolioEnsureSection?.(route.id)
           if (window.location.hash === '#contents') {
             window.dispatchEvent(new CustomEvent('portfolio:directory-history-enter'))
           }
@@ -338,24 +347,25 @@ function usePortfolioMotion() {
     const touchedNodes = new Set()
     const scenes = []
     const completionTimers = new Set()
+    let sceneObserver = null
 
     const touch = (node) => {
       if (node) touchedNodes.add(node)
       return node
     }
 
-    const scene = (selector, name, pattern, duration) => {
-      const node = document.querySelector(selector)
+    const scene = (target, name, pattern, duration) => {
+      const node = typeof target === 'string' ? document.querySelector(target) : target
       if (!node) return null
       node.setAttribute('data-motion-scene', name)
       node.setAttribute('data-motion-pattern', pattern)
       node.style.setProperty('--scene-duration', `var(${duration})`)
-      scenes.push(node)
+      if (!scenes.includes(node)) scenes.push(node)
       return touch(node)
     }
 
-    const setMotion = (selector, type, options = {}) => {
-      const nodes = Array.from(document.querySelectorAll(selector))
+    const setMotion = (selector, type, options = {}, scope = document) => {
+      const nodes = Array.from(scope.querySelectorAll(selector))
       nodes.forEach((node, index) => {
         node.setAttribute('data-motion', type)
         if (options.variant) node.setAttribute('data-motion-variant', options.variant)
@@ -424,7 +434,7 @@ function usePortfolioMotion() {
       completionTimers.add(timer)
     }
 
-    const sceneObserver = new IntersectionObserver((entries) => {
+    sceneObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return
         activateScene(entry.target)
@@ -432,17 +442,118 @@ function usePortfolioMotion() {
       })
     }, { threshold: 0.16, rootMargin: '0px 0px -8% 0px' })
 
+    const armScene = (node) => {
+      if (!node || node.classList.contains('is-inview')) return
+      sceneObserver.observe(node)
+      const rect = node.getBoundingClientRect()
+      if (rect.top < window.innerHeight * 0.92 && rect.bottom > 0) {
+        activateScene(node)
+        sceneObserver.unobserve(node)
+      }
+    }
+
     scenes.forEach((node) => sceneObserver.observe(node))
 
     requestAnimationFrame(() => {
       scenes.forEach((node) => {
-        const rect = node.getBoundingClientRect()
-        if (rect.top < window.innerHeight * 0.92 && rect.bottom > 0) {
-          activateScene(node)
-          sceneObserver.unobserve(node)
-        }
+        armScene(node)
       })
     })
+
+    const registerMountedSectionMotion = (section) => {
+      if (!(section instanceof HTMLElement)) return
+      const id = section.id
+      let mountedScene = null
+
+      if (id === 'key-visual-01') {
+        mountedScene = scene(section, 'kv01', 'artwork-sequence', '--motion-section')
+        setMotion('.kv-number-row', 'section-title', {}, section)
+        setMotion('.kv-title-rule', 'registration-rule', { delay: 40 }, section)
+        setMotion('.kv-title-copy', 'section-copy', { delay: 80 }, section)
+        setMotion('.kv-main', 'artwork-primary', { variant: 'diagonal', delay: 40 }, section)
+        setMotion('.kv-red-shape, .kv-local-plane, .kv-rule, .kv-mark', 'registration-detail', {
+          delay: 160,
+          stagger: 40,
+          maxDelay: 240,
+        }, section)
+      } else if (id === 'key-visual-03') {
+        mountedScene = scene(section, 'kv03', 'artwork-static-first', '--motion-standard')
+        setMotion('.kv-number-row', 'section-title', {}, section)
+        setMotion('.kv-title-rule', 'registration-rule', { delay: 40 }, section)
+        setMotion('.kv-title-copy', 'section-copy', { delay: 80 }, section)
+        setMotion('.kv-red-shape, .kv-local-plane, .kv-rule, .kv-mark', 'registration-detail', {
+          delay: 80,
+          stagger: 40,
+          maxDelay: 140,
+        }, section)
+      } else if (id === 'character-sheets') {
+        mountedScene = scene(section, 'sheets', 'artwork-sequence', '--motion-section')
+        setMotion('.editorial-head span, .editorial-head h2', 'section-title', { stagger: 40, maxDelay: 80 }, section)
+        setMotion('.editorial-head p', 'section-copy', { delay: 80 }, section)
+        setMotion('.sheet-main', 'artwork-primary', { delay: 40 }, section)
+        setMotion('.sheet-support', 'artwork-support', { delay: 100, stagger: 40, maxDelay: 220 }, section)
+      } else if (id === 'costume-detail') {
+        mountedScene = scene(section, 'detail', 'artwork-sequence', '--motion-section')
+        setMotion('.editorial-head span, .editorial-head h2', 'section-title', { stagger: 40, maxDelay: 80 }, section)
+        setMotion('.editorial-head p', 'section-copy', { delay: 80 }, section)
+        setMotion('.costume-primary', 'artwork-primary', { delay: 40 }, section)
+        setMotion('.detail-crop', 'artwork-support', { delay: 120, stagger: 50, maxDelay: 220 }, section)
+      } else if (id === 'portrait-studies') {
+        mountedScene = scene(section, 'portraits', 'artwork-sequence', '--motion-section')
+        setMotion('.editorial-head span, .editorial-head h2', 'section-title', { stagger: 40, maxDelay: 80 }, section)
+        setMotion('.editorial-head p', 'section-copy', { delay: 80 }, section)
+        setMotion('.portrait-item', 'artwork-support', { delay: 40, stagger: 70, maxDelay: 120 }, section)
+      } else if (id === 'selected-works') {
+        mountedScene = scene(section, 'selected', 'artwork-sequence', '--motion-section')
+        setMotion('.editorial-head span, .editorial-head h2', 'section-title', { stagger: 40, maxDelay: 80 }, section)
+        setMotion('.editorial-head p', 'section-copy', { delay: 80 }, section)
+        setMotion('.selected-primary img', 'artwork-primary', { delay: 80, mobileDelay: 40 }, section)
+        setMotion('.selected-primary figcaption', 'section-copy', { delay: 160, mobileDelay: 100 }, section)
+        setMotion('.selected-support img', 'artwork-support', {
+          delay: 240,
+          stagger: 80,
+          maxDelay: 320,
+          mobileDelay: 160,
+          mobileStagger: 60,
+          mobileMaxDelay: 220,
+        }, section)
+        setMotion('.selected-support figcaption', 'section-copy', {
+          delay: 340,
+          stagger: 60,
+          maxDelay: 400,
+          mobileDelay: 200,
+          mobileStagger: 40,
+          mobileMaxDelay: 240,
+        }, section)
+      } else if (id === 'additional-designs') {
+        mountedScene = scene(section, 'additional', 'section-intro', '--motion-section')
+        setMotion('.editorial-head span, .editorial-head h2', 'section-title', { stagger: 40, maxDelay: 80 }, section)
+        setMotion('.editorial-head p', 'section-copy', { delay: 80 }, section)
+        setMotion('.additional-item', 'artwork-support', { delay: 60, stagger: 40, maxDelay: 220 }, section)
+      } else if (id === 'end') {
+        mountedScene = scene(section, 'final', 'contact-ending', '--motion-slow')
+        setMotion('.end-page-image', 'end-page-field', {}, section)
+        setMotion('.end-page-hotspot-anchor', 'end-page-control', {
+          delay: 680,
+          stagger: 90,
+          maxDelay: 770,
+          mobileDelay: 520,
+          mobileStagger: 70,
+          mobileMaxDelay: 590,
+        }, section)
+      }
+
+      setMotion('.page-meta', 'micro-copy', { delay: 160 }, section)
+      if (mountedScene) armScene(mountedScene)
+    }
+
+    const handleDeferredSectionMounted = (event) => {
+      const section = event.detail?.section || document.getElementById(event.detail?.id)
+      registerMountedSectionMotion(section)
+    }
+
+    window.__portfolioRegisterMountedSection = registerMountedSectionMotion
+    window.addEventListener('portfolio:section-mounted', handleDeferredSectionMounted)
 
     const navLinks = Array.from(document.querySelectorAll('.top-nav a[href^="#"]'))
     const navMap = new Map(navLinks.map((link) => [link.getAttribute('href'), link]))
@@ -488,6 +599,10 @@ function usePortfolioMotion() {
       window.removeEventListener('popstate', handleHistoryNavigation)
       window.removeEventListener('scroll', scheduleViewportRouteSync)
       window.removeEventListener('resize', scheduleViewportRouteSync)
+      window.removeEventListener('portfolio:section-mounted', handleDeferredSectionMounted)
+      if (window.__portfolioRegisterMountedSection === registerMountedSectionMotion) {
+        delete window.__portfolioRegisterMountedSection
+      }
       window.history.scrollRestoration = previousScrollRestoration
       sceneObserver.disconnect()
       navObserver.disconnect()
@@ -548,6 +663,7 @@ function TitleSection() {
 function HomeV9Preview() {
   const base = import.meta.env.BASE_URL
   const homeAsset = (filename) => `${base}assets/approved-motion/home/${filename}`
+  const pdfMode = document.documentElement.classList.contains('portfolio-pdf-mode')
   const layers = [
     'home-background-neutralized.png',
     'home-layer-statue-disc-v2.png',
@@ -561,17 +677,32 @@ function HomeV9Preview() {
   return <section id="title" className="home-v9-preview d0920-home-static" data-home-visual="d09-20-locked-static" tabIndex={-1}>
     <div className="d0920-home-canvas">
       <div className="d0920-home-art" aria-hidden="true">
-        {layers.map((filename, index) => <img
-          key={filename}
-          src={homeAsset(filename)}
-          alt=""
-          width="2560"
-          height="1440"
-          loading="eager"
-          decoding="async"
-          fetchPriority={index < 2 ? 'high' : 'auto'}
-          draggable="false"
-        />)}
+        {pdfMode
+          ? layers.map((filename, index) => <img
+              key={filename}
+              src={homeAsset(filename)}
+              alt=""
+              width="2560"
+              height="1440"
+              loading="eager"
+              decoding="async"
+              fetchPriority={index < 2 ? 'high' : 'auto'}
+              draggable="false"
+            />)
+          : <PerformancePicture
+              sourceKey="home-clean"
+              widths={[960, 1800, 2560]}
+              fallback={`${base}assets/performance-v1-source/home-approved-composite-2560x1440.png`}
+              sizes="100vw"
+              className="d0920-home-flat-image"
+              alt=""
+              width="2560"
+              height="1440"
+              loading="eager"
+              decoding="async"
+              fetchPriority="high"
+              draggable="false"
+            />}
       </div>
 
       <a className="d0920-home-brand" href="#contents" aria-label="Open portfolio directory">
@@ -821,7 +952,7 @@ function KeyVisualThree() {
       <div className="d08-page03-orbit d08-page03-orbit-a" aria-hidden="true" />
       <div className="d08-page03-orbit d08-page03-orbit-b" aria-hidden="true" />
       <figure className="d08-page03-art">
-        <img {...imageAttrs(asset)} alt={asset.alt} loading="eager" decoding="async" fetchPriority="high" className="d06-critical-art" />
+        <img {...imageAttrs(asset)} alt={asset.alt} loading="eager" decoding="async" className="d06-critical-art" />
       </figure>
       <div className="d08-page03-ribbon d08-page03-ribbon-a" aria-hidden="true" />
       <div className="d08-page03-ribbon d08-page03-ribbon-b" aria-hidden="true" />
@@ -860,7 +991,6 @@ function Page02Poster() {
 
   return <section ref={sectionRef} id="key-visual-02" className="key-visual-page key-visual-two kv02-poster page">
     <span id="page-02" className="page-deep-link-alias" aria-hidden="true" />
-    <link rel="preload" as="image" href={asset.src} />
 
     <div className="kv02-poster-canvas">
       <div className="kv02-blue-field" aria-hidden="true" />
@@ -877,7 +1007,6 @@ function Page02Poster() {
           alt={asset.alt}
           loading="eager"
           decoding="async"
-          fetchPriority="high"
         />
         <div className="kv02-art-mask kv02-mask-upper" aria-hidden="true">
           <img className="kv02-art" {...imageAttrs(asset)} alt="" loading="eager" decoding="async" />
@@ -932,9 +1061,9 @@ function Page02Poster() {
 function imageAttrs(asset) {
   const { width, height } = getAssetDimensions(asset)
   return {
-    src: asset.src,
-    srcSet: asset.srcSet,
-    sizes: asset.sizes,
+    ...performanceImageAttrs(asset, {
+      disabled: document.documentElement.classList.contains('portfolio-pdf-mode'),
+    }),
     width,
     height,
   }
@@ -946,19 +1075,22 @@ const END_PAGE_HOTSPOTS = Object.freeze({
 
 function EndPageSection() {
   const { width, height } = getAssetDimensions(endPageIntegrated)
+  const { contact, identity, website } = resumeContent
 
   return <section id="end" className="end-page page d08-end d09-17r-end-restored" aria-label="Portfolio ending">
-    <link rel="prefetch" as="image" href={endPageIntegrated.src} />
-
     <div className="end-page-stage">
       <div className="end-page-artwork-field">
-        <img
+        <PerformancePicture
+          sourceKey="end-page-integrated"
+          widths={[960, 1600, 2560]}
+          fallback={endPageIntegrated.src}
+          sizes="100vw"
+          disabled={document.documentElement.classList.contains('portfolio-pdf-mode')}
           className="end-page-image"
-          src={endPageIntegrated.src}
           alt={endPageIntegrated.alt}
           width={width}
           height={height}
-          loading="lazy"
+          loading="eager"
           decoding="async"
         />
 
@@ -996,29 +1128,24 @@ function EndPageSection() {
         </div>
 
         <div className="d09-17r-final-identity">
-          <h2>HUANG GUO TAI</h2>
-          <p>CHARACTER CONCEPT ARTIST</p>
+          <h2>{identity.name}</h2>
+          <p>{identity.title}</p>
         </div>
 
         <div id="resume-contact-resume" className="d09-17r-resume resume-anchor">
-          <p className="d09-17r-resume-profile">中国广东，角色原画师 / 角色概念设计。动漫制作技术专业背景，曾负责手游角色设定设计，并参与素材建模与贴图绘制。</p>
+          <p className="d09-17r-resume-profile">{website.profile}</p>
           <div className="d09-17r-resume-facts">
-            <p><span>LOCATION</span>中国广东</p>
-            <p><span>EDUCATION</span>广东文理职业学院 / 动漫制作技术</p>
-            <p><span>INTENTION</span>角色原画师 / 角色概念设计</p>
+            <p><span>LOCATION</span>{website.facts.location}</p>
+            <p><span>EDUCATION</span>{website.facts.education.school}<br />{website.facts.education.major}</p>
+            <p><span>FOCUS</span>{website.facts.focus}</p>
           </div>
           <div className="d09-17r-resume-experience">
             <h3>EXPERIENCE</h3>
-            <article>
-              <time>2021.11 – 2024.11</time>
-              <h4>深圳市知返科技有限公司</h4>
-              <p>手游角色设定设计；根据世界观与策划文案完成角色概念、造型、服饰与道具设计。</p>
-            </article>
-            <article>
-              <time>2021.01 – 2021.06</time>
-              <h4>茂名风采品牌策划有限公司 / 美术实习生</h4>
-              <p>参与素材建模与贴图绘制，根据反馈协作迭代设计，并将成果应用于项目终版。</p>
-            </article>
+            {website.experience.map((item) => <article key={`${item.company}-${item.period}`}>
+              <time>{item.period}</time>
+              <h4>{item.company}<br />{item.role}</h4>
+              <p>{item.summary}</p>
+            </article>)}
           </div>
         </div>
       </div>
@@ -1026,12 +1153,12 @@ function EndPageSection() {
       <aside id="resume-contact-contact" className="end-page-system-log contact-anchor" aria-labelledby="end-page-system-log-title">
         <header><span><i aria-hidden="true" />THE END / PROFILE</span></header>
         <div className="end-page-system-log-body">
-          <h2 id="end-page-system-log-title">{`\u9EC4\u56FD\u6CF0`}</h2>
-          <p>CONCEPT ARTIST / CHARACTER DESIGNER</p>
+          <h2 id="end-page-system-log-title">{identity.name}</h2>
+          <p>{identity.title}</p>
           <dl>
-            <div><dt>EMAIL</dt><dd><a href="mailto:2488731102@qq.com">2488731102@qq.com</a></dd></div>
-            <div><dt>PORTFOLIO</dt><dd><a href="https://www.marlsa.cc.cd/" target="_blank" rel="noreferrer">www.marlsa.cc.cd</a></dd></div>
-            <div><dt>WECHAT</dt><dd>Veiko_9029</dd></div>
+            <div><dt>EMAIL</dt><dd><a href={`mailto:${contact.email}`}>{contact.email}</a></dd></div>
+            <div><dt>PORTFOLIO</dt><dd><a href={contact.portfolioUrl} target="_blank" rel="noreferrer">{contact.portfolio}</a></dd></div>
+            <div><dt>WECHAT</dt><dd>{contact.wechat}</dd></div>
           </dl>
         </div>
         <footer>
@@ -1045,12 +1172,260 @@ function EndPageSection() {
   </section>
 }
 
-function App() {
-  usePortfolioMotion()
-  const query = new URLSearchParams(window.location.search)
-  const directContentsCapture = query.get('contentsCapture') === '1'
+function PortfolioResumeDetails() {
+  const {
+    contact,
+    coreCapabilities,
+    identity,
+    profile,
+    software,
+    strengths,
+    workflow,
+  } = resumeContent
 
-  return <main className={[directContentsCapture ? 'contents-capture-direct' : '', 'home-v9-preview-mode'].filter(Boolean).join(' ') || undefined}>
+  return <section
+    id="pdf-resume-details"
+    className="pdf-resume-details page"
+    aria-labelledby="pdf-resume-details-title"
+  >
+    <div className="pdf-resume-atmosphere" aria-hidden="true">
+      <i className="pdf-resume-axis pdf-resume-axis-x" />
+      <i className="pdf-resume-axis pdf-resume-axis-y" />
+      <i className="pdf-resume-corner pdf-resume-corner-a" />
+      <i className="pdf-resume-corner pdf-resume-corner-b" />
+      <i className="pdf-resume-register pdf-resume-register-a" />
+      <i className="pdf-resume-register pdf-resume-register-b" />
+    </div>
+
+    <header className="pdf-resume-header">
+      <div className="pdf-resume-index">
+        <span>11 / FULL RESUME DETAILS</span>
+        <span>VISUAL ARCHIVE / PROFESSIONAL PROFILE</span>
+      </div>
+      <div className="pdf-resume-title">
+        <p>CHARACTER CONCEPT ARTIST</p>
+        <h2 id="pdf-resume-details-title">PROFESSIONAL<br />PROFILE</h2>
+      </div>
+      <div className="pdf-resume-identity">
+        <strong>{identity.name}</strong>
+        <span>{identity.title}</span>
+      </div>
+    </header>
+
+    <div className="pdf-resume-columns">
+      <div className="pdf-resume-column pdf-resume-profile-column">
+        <section className="pdf-resume-block">
+          <h3><span>01</span>PROFILE</h3>
+          <div className="pdf-resume-profile-copy">
+            {profile.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+          </div>
+        </section>
+
+        <section className="pdf-resume-block pdf-resume-software">
+          <h3><span aria-hidden="true"></span>SOFTWARE / TOOLS</h3>
+          <div className="pdf-resume-software-list">
+            {software.map((item) => <article key={item.name}>
+              <h4>{item.name}</h4>
+              <p>{item.usage}</p>
+            </article>)}
+          </div>
+        </section>
+      </div>
+
+      <section className="pdf-resume-column pdf-resume-block pdf-resume-capabilities">
+        <h3><span>02</span>CORE CAPABILITIES</h3>
+        <div className="pdf-resume-capability-list">
+          {coreCapabilities.map((item, index) => <article key={item.title}>
+            <b>{String(index + 1).padStart(2, '0')}</b>
+            <div>
+              <h4>{item.title}</h4>
+              <p>{item.description}</p>
+            </div>
+          </article>)}
+        </div>
+      </section>
+
+      <section className="pdf-resume-column pdf-resume-block pdf-resume-workflow">
+        <h3><span>03</span>DESIGN WORKFLOW</h3>
+        <ol>
+          {workflow.map((item) => <li key={item.number}>
+            <b>{item.number}</b>
+            <div>
+              <h4>{item.title}</h4>
+              <p>{item.description}</p>
+            </div>
+          </li>)}
+        </ol>
+      </section>
+    </div>
+
+    <section className="pdf-resume-strengths pdf-resume-block">
+      <h3><span>04</span>PROFESSIONAL STRENGTHS</h3>
+      <ul>
+        {strengths.map((item) => <li key={item}>{item}</li>)}
+      </ul>
+    </section>
+
+    <footer className="pdf-resume-footer">
+      <span>PROFILE RECORD / 11 OF 12</span>
+      <span>{identity.name} / {identity.title}</span>
+      <span>WECHAT / {contact.wechat}</span>
+    </footer>
+  </section>
+}
+
+const WEBSITE_DEFERRED_SECTIONS = Object.freeze([
+  { id: 'contents', Component: D0919Directory, aliases: [] },
+  { id: 'key-visual-01', Component: D0919Page01, aliases: [] },
+  { id: 'key-visual-02', Component: Page02Poster, aliases: ['page-02'] },
+  { id: 'key-visual-03', Component: KeyVisualThree, aliases: [] },
+  { id: 'character-sheets', Component: CharacterSheets, aliases: [] },
+  { id: 'costume-detail', Component: CostumeDetail, aliases: [] },
+  { id: 'portrait-studies', Component: PortraitStudies, aliases: [] },
+  { id: 'selected-works', Component: SelectedWorks, aliases: [] },
+  { id: 'additional-designs', Component: AdditionalCharacterDesigns, aliases: [] },
+  {
+    id: 'end',
+    Component: EndPageSection,
+    aliases: ['resume-contact-resume', 'resume-contact-contact'],
+  },
+])
+
+function DeferredPortfolioSection({ definition, enabled, mounted, ensureMounted }) {
+  const placeholderRef = useRef(null)
+
+  useEffect(() => {
+    if (!mounted) return undefined
+    let frame = 0
+    let disposed = false
+    let attempts = 0
+    const register = () => {
+      if (disposed) return
+      const section = document.getElementById(definition.id)
+      if (!section || section.classList.contains('performance-section-placeholder')) return
+      if (typeof window.__portfolioRegisterMountedSection === 'function') {
+        window.__portfolioRegisterMountedSection(section)
+        return
+      }
+      attempts += 1
+      if (attempts < 4) {
+        frame = window.requestAnimationFrame(register)
+        return
+      }
+      window.dispatchEvent(new CustomEvent('portfolio:section-mounted', {
+        detail: { id: definition.id, section },
+      }))
+    }
+    frame = window.requestAnimationFrame(register)
+    return () => {
+      disposed = true
+      window.cancelAnimationFrame(frame)
+    }
+  }, [definition.id, mounted])
+
+  useEffect(() => {
+    if (!enabled || mounted) return undefined
+    const placeholder = placeholderRef.current
+    if (!placeholder) return undefined
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return
+      ensureMounted(definition.id)
+      observer.disconnect()
+    }, {
+      threshold: 0,
+      rootMargin: `${Math.round(window.innerHeight * 0.9)}px 0px ${Math.round(window.innerHeight * 0.9)}px 0px`,
+    })
+    observer.observe(placeholder)
+    return () => observer.disconnect()
+  }, [definition.id, enabled, ensureMounted, mounted])
+
+  if (mounted) return <definition.Component />
+
+  return <section
+    ref={placeholderRef}
+    id={definition.id}
+    className="performance-section-placeholder page"
+    data-performance-placeholder={definition.id}
+    aria-label={`${definition.id} loading boundary`}
+    tabIndex={-1}
+  >
+    {definition.aliases.map((alias) =>
+      <span id={alias} className="page-deep-link-alias" aria-hidden="true" key={alias} />,
+    )}
+    <span className="performance-section-placeholder-mark" aria-hidden="true" />
+  </section>
+}
+
+function WebsitePortfolioPageSequence({ className, forceContents = false }) {
+  const initialRoute = getPortfolioRouteForHash(window.location.hash)
+  const initialMounted = initialRoute && initialRoute.id !== 'title'
+    ? [initialRoute.id]
+    : (forceContents ? ['contents'] : [])
+  const [mountedSections, setMountedSections] = useState(() => new Set(initialMounted))
+  const [observerEnabled, setObserverEnabled] = useState(Boolean(initialMounted.length))
+
+  const ensureMounted = useCallback((id) => {
+    setMountedSections((current) => {
+      if (current.has(id)) return current
+      const next = new Set(current)
+      next.add(id)
+      return next
+    })
+  }, [])
+
+  useLayoutEffect(() => {
+    const ensureSection = (value) => {
+      const normalized = String(value || '')
+      const hash = normalized.startsWith('#') ? normalized : `#${normalized}`
+      const route = getPortfolioRouteForHash(hash)
+        || PORTFOLIO_URL_ROUTES.find((candidate) => candidate.id === normalized)
+      if (!route || route.id === 'title') return document.getElementById('title')
+      flushSync(() => {
+        setObserverEnabled(true)
+        ensureMounted(route.id)
+      })
+      return document.getElementById(route.id)
+    }
+    window.__portfolioEnsureSection = ensureSection
+    return () => {
+      if (window.__portfolioEnsureSection === ensureSection) {
+        delete window.__portfolioEnsureSection
+      }
+    }
+  }, [ensureMounted])
+
+  useEffect(() => {
+    if (observerEnabled) return undefined
+    const enable = () => setObserverEnabled(true)
+    const enableFromKeyboard = (event) => {
+      if (['ArrowDown', 'PageDown', 'End', ' ', 'Space'].includes(event.key)) enable()
+    }
+    window.addEventListener('wheel', enable, { passive: true, once: true })
+    window.addEventListener('touchmove', enable, { passive: true, once: true })
+    window.addEventListener('keydown', enableFromKeyboard)
+    return () => {
+      window.removeEventListener('wheel', enable)
+      window.removeEventListener('touchmove', enable)
+      window.removeEventListener('keydown', enableFromKeyboard)
+    }
+  }, [observerEnabled])
+
+  return <main className={className}>
+    <HomeV9Preview />
+    {WEBSITE_DEFERRED_SECTIONS.map((definition) =>
+      <DeferredPortfolioSection
+        definition={definition}
+        enabled={observerEnabled}
+        ensureMounted={ensureMounted}
+        mounted={mountedSections.has(definition.id)}
+        key={definition.id}
+      />,
+    )}
+  </main>
+}
+
+function PortfolioPageSequence({ className, includeResumeDetails = false }) {
+  return <main className={className}>
     <HomeV9Preview />
     <D0919Directory />
     <D0919Page01 />
@@ -1061,8 +1436,34 @@ function App() {
     <PortraitStudies />
     <SelectedWorks />
     <AdditionalCharacterDesigns />
+    {includeResumeDetails ? <PortfolioResumeDetails /> : null}
     <EndPageSection />
   </main>
 }
 
-createRoot(document.getElementById('root')).render(<App />)
+function App() {
+  usePortfolioMotion()
+  const query = new URLSearchParams(window.location.search)
+  const directContentsCapture = query.get('contentsCapture') === '1'
+
+  return <WebsitePortfolioPageSequence
+    className={[directContentsCapture ? 'contents-capture-direct' : '', 'home-v9-preview-mode'].filter(Boolean).join(' ') || undefined}
+    forceContents={directContentsCapture}
+  />
+}
+
+function PortfolioPdfApp() {
+  usePortfolioMotion()
+  return <PortfolioPageSequence
+    className="home-v9-preview-mode portfolio-pdf-root"
+    includeResumeDetails
+  />
+}
+
+const portfolioPdfRoute = /\/portfolio-pdf\/?$/.test(window.location.pathname)
+
+if (portfolioPdfRoute) {
+  document.documentElement.classList.add('portfolio-pdf-mode', 'motion-reduced')
+}
+
+createRoot(document.getElementById('root')).render(portfolioPdfRoute ? <PortfolioPdfApp /> : <App />)

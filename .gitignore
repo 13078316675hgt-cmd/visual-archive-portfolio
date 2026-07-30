@@ -13,6 +13,8 @@ review-temp/
 Thumbs.db
 .cache/
 coverage/
+__pycache__/
+*.pyc
 
 # Local environment values; keep only the documented placeholder.
 .env
@@ -33,6 +35,9 @@ review/
 review_input/
 review_package/
 temporary_preview/
+output/
+*.har
+browser-profile*/
 AGENTS.md
 
 # Original source archives and old portfolio iterations

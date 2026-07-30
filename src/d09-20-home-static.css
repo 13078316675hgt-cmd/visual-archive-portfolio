@@ -66,6 +66,12 @@
   transform-origin: 50% 50%;
 }
 
+.d0920-home-art img.d0920-home-flat-image {
+  opacity: 1;
+  filter: none;
+  transform: none;
+}
+
 .d0920-home-brand,
 .d0920-home-top-link,
 .d0920-home-scroll {

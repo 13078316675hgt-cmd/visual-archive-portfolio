@@ -92,7 +92,8 @@ const pageErrors = (page) => {
 
 const waitForArchiveComplete = async (page) => {
   await page.waitForFunction(() => (
-    document.querySelector('.archive-selection-scene')?.dataset.archivePhase === 'complete'
+    document.querySelector('#contents.performance-section-placeholder')
+    || document.querySelector('.archive-selection-scene')?.dataset.archivePhase === 'complete'
     || document.querySelector('[data-approved-motion="directory"]')?.dataset.motionState === 'complete'
     || document.querySelector('.d0919-directory')?.dataset.directoryPhase === 'complete'
   ))

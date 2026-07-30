@@ -1,5 +1,6 @@
 import React, { useLayoutEffect, useRef } from 'react'
 import { initD0919DirectoryMotion, initD0919Page01Motion } from '../motion/d0919Motion.js'
+import { PerformancePicture } from './PerformancePicture.jsx'
 
 const base = import.meta.env.BASE_URL
 const directoryAsset = (filename) => `${base}assets/d09-19-directory/${filename}`
@@ -128,14 +129,21 @@ function PixelWarningMark() {
 
 function PreviewWindow({ item }) {
   const [width, height] = item.imageSize
+  const sourceKey = item.source.replace(/\.[^.]+$/, '')
+  const fallback = directoryAsset(item.source)
+  const pdfMode = document.documentElement.classList.contains('portfolio-pdf-mode')
   return <span className="d0919-directory-window" data-d0919-frame>
     <span className="d0919-directory-window-title" aria-hidden="true">
       <small>Frame.Com_{item.number}</small>
       <i /><i /><b />
     </span>
     <span className="d0919-directory-preview directory-asset-preview">
-      <img
-        src={directoryAsset(item.source)}
+      <PerformancePicture
+        sourceKey={sourceKey}
+        widths={[360, 720, 900]}
+        fallback={fallback}
+        sizes="(max-width: 900px) 40vw, 12vw"
+        disabled={pdfMode}
         alt={item.alt}
         width={width}
         height={height}
@@ -243,9 +251,14 @@ function DirectoryRoutes() {
 }
 
 function DirectoryEndNode() {
+  const pdfMode = document.documentElement.classList.contains('portfolio-pdf-mode')
   return <a className="d0919-directory-end" href="#end" data-d0919-node="END" aria-label="END 关于 联系 ABOUT CONTACT">
-    <img
-      src={directoryAsset('directory-end-source.png')}
+    <PerformancePicture
+      sourceKey="directory-end"
+      widths={[480, 960, 1672]}
+      fallback={directoryAsset('directory-end-source.png')}
+      sizes="(max-width: 900px) 45vw, 11vw"
+      disabled={pdfMode}
       alt=""
       width="1672"
       height="941"
@@ -263,6 +276,7 @@ function DirectoryEndNode() {
 
 export function D0919Directory() {
   const sectionRef = useRef(null)
+  const pdfMode = document.documentElement.classList.contains('portfolio-pdf-mode')
   useLayoutEffect(() => initD0919DirectoryMotion(sectionRef.current), [])
 
   return <section
@@ -274,8 +288,32 @@ export function D0919Directory() {
   >
     <div className="d0919-directory-canvas">
       <div className="d0919-directory-atmosphere" aria-hidden="true">
-        <img className="d0919-directory-ghost d0919-directory-ghost-left" src={directoryAsset('directory-thumb-01.webp')} alt="" />
-        <img className="d0919-directory-ghost d0919-directory-ghost-right" src={directoryAsset('directory-thumb-07.webp')} alt="" />
+        <PerformancePicture
+          sourceKey="directory-thumb-01"
+          widths={[360, 720, 900]}
+          fallback={directoryAsset('directory-thumb-01.webp')}
+          sizes="20vw"
+          disabled={pdfMode}
+          className="d0919-directory-ghost d0919-directory-ghost-left"
+          alt=""
+          width="900"
+          height="1163"
+          loading="lazy"
+          decoding="async"
+        />
+        <PerformancePicture
+          sourceKey="directory-thumb-07"
+          widths={[360, 720, 900]}
+          fallback={directoryAsset('directory-thumb-07.webp')}
+          sizes="20vw"
+          disabled={pdfMode}
+          className="d0919-directory-ghost d0919-directory-ghost-right"
+          alt=""
+          width="900"
+          height="600"
+          loading="lazy"
+          decoding="async"
+        />
       </div>
       <header className="d0919-directory-header" data-d0919-header>
         <PixelWarningMark />
@@ -316,6 +354,7 @@ function Page01Brand() {
 
 export function D0919Page01() {
   const sectionRef = useRef(null)
+  const pdfMode = document.documentElement.classList.contains('portfolio-pdf-mode')
   useLayoutEffect(() => initD0919Page01Motion(sectionRef.current), [])
 
   return <section
@@ -335,8 +374,12 @@ export function D0919Page01() {
       </nav>
 
       <figure className="d0919-page01-art" data-d0919-page01-art>
-        <img
-          src={page01Asset}
+        <PerformancePicture
+          sourceKey="page01-original-art"
+          widths={[720, 1280, 1515]}
+          fallback={page01Asset}
+          sizes="(max-width: 900px) 92vw, 67vw"
+          disabled={pdfMode}
           alt="蓝色东方幻想建筑、黑龙与黑衣角色构成的关键视觉插画"
           width="1515"
           height="1780"

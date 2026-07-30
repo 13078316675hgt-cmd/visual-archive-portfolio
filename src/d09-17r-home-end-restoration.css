@@ -252,6 +252,50 @@
   transform: none !important;
 }
 
+.end-page.d08-end.d09-17r-end-restored .end-page-system-log {
+  border: 0 !important;
+  border-top: 1px solid rgba(38, 95, 221, .52) !important;
+  border-bottom: 1px solid rgba(38, 95, 221, .2) !important;
+  clip-path: none !important;
+  background: rgba(247, 250, 252, .88) !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(8px) saturate(.92) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(.92) !important;
+}
+
+.end-page.d08-end.d09-17r-end-restored .end-page-system-log::before,
+.end-page.d08-end.d09-17r-end-restored .end-page-system-log::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  display: block !important;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+}
+
+.end-page.d08-end.d09-17r-end-restored .end-page-system-log::before {
+  left: -1px;
+  top: -1px;
+  border-left: 1px solid rgba(38, 95, 221, .52);
+  border-top: 1px solid rgba(38, 95, 221, .52);
+}
+
+.end-page.d08-end.d09-17r-end-restored .end-page-system-log::after {
+  right: -1px;
+  bottom: -1px;
+  border-right: 1px solid rgba(38, 95, 221, .36);
+  border-bottom: 1px solid rgba(38, 95, 221, .36);
+}
+
+.end-page.d08-end.d09-17r-end-restored .end-page-system-log header {
+  border-bottom-color: rgba(38, 95, 221, .13);
+}
+
+.end-page.d08-end.d09-17r-end-restored .end-page-system-log footer {
+  border-top-color: rgba(38, 95, 221, .14);
+}
+
 .d09-17r-end-restored .end-page-system-log header span,
 .d09-17r-end-restored .end-page-system-log-body,
 .d09-17r-end-restored .end-page-system-log footer {

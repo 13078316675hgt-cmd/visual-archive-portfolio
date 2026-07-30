@@ -13,6 +13,7 @@ import {
   initD06Page06SecondaryMotion,
   initD06Page07Motion,
 } from '../motion/innerPagesMotion.js'
+import { performanceImageAttrs } from './PerformancePicture.jsx'
 
 const CONTENT_ALT = Object.freeze({
   'sheet-01': '黑蓝配色短发角色正面、侧面、背面三视图设定',
@@ -38,9 +39,9 @@ function getAssetDimensions(asset) {
 function imageAttrs(asset) {
   const { width, height } = getAssetDimensions(asset)
   return {
-    src: asset.src,
-    srcSet: asset.srcSet,
-    sizes: asset.sizes,
+    ...performanceImageAttrs(asset, {
+      disabled: document.documentElement.classList.contains('portfolio-pdf-mode'),
+    }),
     width,
     height,
   }
