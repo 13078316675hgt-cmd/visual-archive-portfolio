@@ -1,472 +1,275 @@
 import { chromium } from 'playwright'
-import { mkdir, rename, rm, writeFile } from 'node:fs/promises'
+import { mkdir, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
 const root = process.cwd()
 const baseUrl = process.env.REVIEW_BASE_URL || 'http://127.0.0.1:4173'
-const contentsVisual = process.env.CONTENTS_VISUAL || ''
-const visualQuery = contentsVisual ? `contentsVisual=${encodeURIComponent(contentsVisual)}&` : ''
-const reviewDir = path.join(root, 'review', 'navigation')
-const videoDir = path.join(reviewDir, '.video-temp')
-const recordingPath = path.join(reviewDir, process.env.NAVIGATION_RECORDING_FILE || 'v5-20-anchor-scroll-stability-1920.webm')
-const validationPath = path.join(reviewDir, process.env.NAVIGATION_VALIDATION_FILE || 'v5-20-anchor-scroll-validation.json')
-const commandLogPath = path.join(reviewDir, process.env.NAVIGATION_LOG_FILE || 'v5-20-scroll-command-log.json')
-const skipRecording = process.env.SKIP_NAVIGATION_RECORDING === '1'
+const reviewDir = path.join(root, 'review', 'd10-01')
+const validationPath = path.join(reviewDir, 'navigation-validation.json')
 
-const reviewUrl = (motion, hash) => `${baseUrl}/?${visualQuery}archiveMotion=${motion}${hash}`
+const routes = [
+  ['#contents', 'contents'],
+  ['#key-visual-01', 'key-visual-01'],
+  ['#key-visual-02', 'key-visual-02'],
+  ['#page-02', 'key-visual-02'],
+  ['#key-visual-03', 'key-visual-03'],
+  ['#character-sheets', 'character-sheets'],
+  ['#costume-detail', 'costume-detail'],
+  ['#portrait-studies', 'portrait-studies'],
+  ['#selected-works', 'selected-works'],
+  ['#additional-designs', 'additional-designs'],
+  ['#professional-profile', 'professional-profile'],
+  ['#resume-contact-resume', 'professional-profile'],
+  ['#about-the-creator', 'about-the-creator'],
+  ['#end', 'about-the-creator'],
+  ['#resume-contact-contact', 'about-the-creator'],
+]
+
+const directoryDestinations = [
+  '#key-visual-01',
+  '#key-visual-02',
+  '#key-visual-03',
+  '#costume-detail',
+  '#character-sheets',
+  '#professional-profile',
+  '#about-the-creator',
+]
+
+const canonicalIdentity = Object.freeze({
+  name: '黄国泰',
+  role: '角色概念设计师',
+  location: '中国：广东',
+  email: '2488731102@qq.com',
+  wechat: 'Veiko_9029',
+  software: ['Adobe Photoshop', 'Clip Studio Paint'],
+})
 
 await mkdir(reviewDir, { recursive: true })
 
-const installInstrumentation = () => {
-  const state = {
-    logs: [],
-    manualStarted: false,
-    animationPhases: [],
-  }
-  window.__v520Navigation = state
+const results = []
+const record = (name, pass, detail = {}) => results.push({ name, pass, ...detail })
 
-  const identify = (element) => {
-    if (!element) return null
-    return element.id || element.getAttribute?.('href') || element.getAttribute?.('data-chapter') || element.tagName || null
-  }
-  const record = (method, target, extra = {}) => {
-    state.logs.push({
-      timestamp: performance.now(),
-      method,
-      target: identify(target),
-      afterManualScroll: state.manualStarted,
-      ...extra,
-    })
-  }
-
-  const originalScrollIntoView = Element.prototype.scrollIntoView
-  Element.prototype.scrollIntoView = function (...args) {
-    record('scrollIntoView', this, { args, stack: new Error().stack?.split('\n').slice(1, 6).join('\n') })
-    return originalScrollIntoView.apply(this, args)
-  }
-
-  const originalScrollTo = window.scrollTo.bind(window)
-  window.scrollTo = (...args) => {
-    record('window.scrollTo', document.scrollingElement, { args, stack: new Error().stack?.split('\n').slice(1, 6).join('\n') })
-    return originalScrollTo(...args)
-  }
-
-  const originalFocus = HTMLElement.prototype.focus
-  HTMLElement.prototype.focus = function (...args) {
-    record('focus', this, { args })
-    return originalFocus.apply(this, args)
-  }
-
-  window.addEventListener('hashchange', () => record('hashchange', document.getElementById(location.hash.slice(1))))
-  window.addEventListener('popstate', () => record('popstate', document.getElementById(location.hash.slice(1))))
-
-  const watchScene = () => {
-    const scene = document.querySelector('.archive-selection-scene')
-    if (!scene) return
-    const capture = () => {
-      const phase = scene.dataset.archivePhase || ''
-      if (state.animationPhases.at(-1) !== phase) state.animationPhases.push(phase)
-    }
-    capture()
-    new MutationObserver(capture).observe(scene, { attributes: true, attributeFilter: ['data-archive-phase'] })
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', watchScene, { once: true })
-  else watchScene()
+async function waitForRoute(page, canonicalId) {
+  await page.waitForFunction((id) => {
+    const section = document.getElementById(id)
+    return section && !section.classList.contains('performance-section-placeholder')
+  }, canonicalId)
+  await page.waitForTimeout(180)
 }
 
-const instrumentContext = async (browser, options) => {
-  const context = await browser.newContext(options)
-  await context.addInitScript(installInstrumentation)
-  return context
-}
-
-const pageErrors = (page) => {
-  const errors = []
-  page.on('console', (message) => {
-    if (message.type() === 'error') errors.push(`console: ${message.text()}`)
-  })
-  page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`))
-  page.on('requestfailed', (request) => errors.push(`requestfailed: ${request.url()} ${request.failure()?.errorText || ''}`))
-  return errors
-}
-
-const waitForArchiveComplete = async (page) => {
-  await page.waitForFunction(() => (
-    document.querySelector('#contents.performance-section-placeholder')
-    || document.querySelector('.archive-selection-scene')?.dataset.archivePhase === 'complete'
-    || document.querySelector('[data-approved-motion="directory"]')?.dataset.motionState === 'complete'
-    || document.querySelector('.d0919-directory')?.dataset.directoryPhase === 'complete'
-  ))
-}
-
-const waitForAnchorSettled = async (page, hash) => {
-  await page.waitForFunction((targetHash) => {
-    const target = document.getElementById(targetHash.slice(1))
-    const scrollCalls = window.__v520Navigation?.logs.filter((entry) => entry.method === 'scrollIntoView').length || 0
-    return scrollCalls >= 1 && target && Math.abs(target.getBoundingClientRect().top) < 180
-  }, hash, { timeout: 15000 })
-  await page.waitForTimeout(250)
-}
-
-const resetInstrumentation = async (page) => page.evaluate(() => {
-  window.__v520Navigation.logs = []
-  window.__v520Navigation.manualStarted = false
-  window.__v520Navigation.animationPhases = [document.querySelector('.archive-selection-scene')?.dataset.archivePhase || '']
-})
-
-const getScrollState = async (page, hash) => page.evaluate((targetHash) => {
-  const target = document.getElementById(targetHash.slice(1))
-  return {
-    scrollY: window.scrollY,
-    maxScroll: document.documentElement.scrollHeight - window.innerHeight,
-    targetViewportTop: target?.getBoundingClientRect().top ?? null,
-    phase: document.querySelector('.archive-selection-scene')?.dataset.archivePhase || '',
-  }
-}, hash)
-
-const collectCounts = (logs) => ({
-  scrollIntoView: logs.filter((entry) => entry.method === 'scrollIntoView').length,
-  scrollTo: logs.filter((entry) => entry.method === 'window.scrollTo').length,
-  hashchange: logs.filter((entry) => entry.method === 'hashchange').length,
-  popstate: logs.filter((entry) => entry.method === 'popstate').length,
-  focus: logs.filter((entry) => entry.method === 'focus').length,
-  forcedAfterManual: logs.filter((entry) => entry.afterManualScroll && ['scrollIntoView', 'window.scrollTo'].includes(entry.method)).length,
-})
-
-const clickChapter = async (page, chapter) => {
-  const node = page.locator([
-    `.approved-directory-route-node[data-chapter="${chapter}"]:visible`,
-    `.archive-route-node[data-chapter="${chapter}"]:visible`,
-  ].join(', '))
-  const locator = await node.evaluate((element) => element.matches('a'))
-    ? node
-    : node.locator('a[href^="#"]').first()
-  if (await locator.count() !== 1) throw new Error(`Expected one semantic chapter link for chapter ${chapter}`)
-  await locator.click()
-}
-
-const runDestinationTest = async (browser, destination) => {
-  const context = await instrumentContext(browser, { viewport: { width: 1920, height: 1080 } })
-  const page = await context.newPage()
-  const errors = pageErrors(page)
-  await page.goto(reviewUrl('end', '#contents'), { waitUntil: 'networkidle' })
-  await waitForArchiveComplete(page)
-  await resetInstrumentation(page)
-
-  await clickChapter(page, destination.chapter)
-  await page.waitForFunction((hash) => location.hash === hash, destination.hash)
-  await waitForAnchorSettled(page, destination.hash)
-  const initial = await getScrollState(page, destination.hash)
-
-  await page.evaluate(() => { window.__v520Navigation.manualStarted = true })
-  const firstDelta = Math.min(900, Math.max(0, initial.maxScroll - initial.scrollY - 20))
-  await page.mouse.wheel(0, firstDelta)
-  const manualTarget = Math.min(initial.maxScroll, initial.scrollY + firstDelta)
-  await page.waitForTimeout(500)
-  const after500 = await getScrollState(page, destination.hash)
-  await page.waitForTimeout(1500)
-  const after2000 = await getScrollState(page, destination.hash)
-
-  const secondDelta = Math.min(700, Math.max(0, after2000.maxScroll - after2000.scrollY - 20))
-  await page.mouse.wheel(0, secondDelta)
-  await page.waitForTimeout(2100)
-  const afterSecondDown = await getScrollState(page, destination.hash)
-  await page.mouse.wheel(0, -500)
-  await page.waitForTimeout(900)
-  const afterUp = await getScrollState(page, destination.hash)
-
-  const instrumentation = await page.evaluate(() => window.__v520Navigation)
-  const counts = collectCounts(instrumentation.logs)
-  const movedDown = after2000.scrollY > initial.scrollY + Math.min(300, firstDelta * .55)
-  const stayedDown = Math.abs(after2000.scrollY - manualTarget) < 180
-  const movedDownAgain = secondDelta < 50 || afterSecondDown.scrollY > after2000.scrollY + Math.min(240, secondDelta * .5)
-  const movedUp = afterUp.scrollY < afterSecondDown.scrollY - 250
-  const snapback = !movedDown || !stayedDown || counts.forcedAfterManual > 0
-  const animationReplay = instrumentation.animationPhases.some((phase, index) => index > 0 && phase !== 'complete')
-
-  const result = {
-    viewport: '1920x1080',
-    destination: destination.hash,
-    navigationMethod: 'pointer click',
-    initialTargetScrollY: initial.scrollY,
-    manualScrollTarget: manualTarget,
-    scrollYAfter500ms: after500.scrollY,
-    scrollYAfter2000ms: after2000.scrollY,
-    scrollYAfterSecondDown: afterSecondDown.scrollY,
-    scrollYAfterUp: afterUp.scrollY,
-    snapbackDetected: snapback,
-    scrollIntoViewCallCount: counts.scrollIntoView,
-    windowScrollToCallCount: counts.scrollTo,
-    hashchangeCount: counts.hashchange,
-    popstateCount: counts.popstate,
-    focusCallCount: counts.focus,
-    forcedScrollCallsAfterManualScroll: counts.forcedAfterManual,
-    animationReplayDetected: animationReplay,
-    consoleErrors: errors,
-    pass: !snapback && movedDownAgain && movedUp && !animationReplay && counts.scrollIntoView === 1 && counts.scrollTo === 0 && errors.length === 0,
-  }
-  const logs = instrumentation.logs.map((entry) => ({ test: destination.hash, viewport: '1920x1080', ...entry }))
-  await context.close()
-  return { result, logs }
-}
-
-const runDirectHashTest = async (browser) => {
-  const context = await instrumentContext(browser, { viewport: { width: 1920, height: 1080 } })
-  const page = await context.newPage()
-  const errors = pageErrors(page)
-  const hash = '#costume-detail'
-  await page.goto(reviewUrl('end', hash), { waitUntil: 'networkidle' })
-  await waitForArchiveComplete(page)
-  await waitForAnchorSettled(page, hash)
-  const initial = await getScrollState(page, hash)
-  await page.evaluate(() => { window.__v520Navigation.manualStarted = true })
-  await page.mouse.wheel(0, 850)
-  await page.waitForTimeout(2100)
-  const after = await getScrollState(page, hash)
-  const instrumentation = await page.evaluate(() => window.__v520Navigation)
-  const counts = collectCounts(instrumentation.logs)
-  const result = {
-    viewport: '1920x1080', destination: hash, navigationMethod: 'direct URL hash',
-    initialTargetScrollY: initial.scrollY, manualScrollTarget: Math.min(initial.maxScroll, initial.scrollY + 850),
-    initialTargetViewportTop: initial.targetViewportTop,
-    scrollYAfter500ms: null, scrollYAfter2000ms: after.scrollY,
-    snapbackDetected: after.scrollY < initial.scrollY + 400,
-    scrollIntoViewCallCount: counts.scrollIntoView, windowScrollToCallCount: counts.scrollTo,
-    hashchangeCount: counts.hashchange, popstateCount: counts.popstate, focusCallCount: counts.focus,
-    forcedScrollCallsAfterManualScroll: counts.forcedAfterManual,
-    animationReplayDetected: false, consoleErrors: errors,
-    pass: Math.abs(initial.targetViewportTop) < 160 && after.scrollY > initial.scrollY + 400 && counts.scrollIntoView === 1 && counts.forcedAfterManual === 0 && errors.length === 0,
-  }
-  const logs = instrumentation.logs.map((entry) => ({ test: 'direct-hash', viewport: '1920x1080', ...entry }))
-  await context.close()
-  return { result, logs }
-}
-
-const runHistoryTest = async (browser) => {
-  const context = await instrumentContext(browser, { viewport: { width: 1920, height: 1080 } })
-  const page = await context.newPage()
-  const errors = pageErrors(page)
-  await page.goto(reviewUrl('end', '#contents'), { waitUntil: 'networkidle' })
-  await waitForArchiveComplete(page)
-  await resetInstrumentation(page)
-  await clickChapter(page, '01')
-  await page.waitForFunction(() => location.hash === '#key-visual-01')
-  await waitForAnchorSettled(page, '#key-visual-01')
-  await page.goBack({ waitUntil: 'commit' })
-  await page.waitForFunction(() => location.hash === '#contents')
-  await page.waitForTimeout(700)
-  const back = await getScrollState(page, '#contents')
-  await page.goForward({ waitUntil: 'commit' })
-  await page.waitForFunction(() => location.hash === '#key-visual-01')
-  await page.waitForTimeout(700)
-  const forward = await getScrollState(page, '#key-visual-01')
-  const instrumentation = await page.evaluate(() => window.__v520Navigation)
-  const counts = collectCounts(instrumentation.logs)
-  const result = {
-    viewport: '1920x1080', destination: '#contents ⇄ #key-visual-01', navigationMethod: 'Back / Forward',
-    initialTargetScrollY: back.scrollY, manualScrollTarget: null, scrollYAfter500ms: forward.scrollY, scrollYAfter2000ms: forward.scrollY,
-    snapbackDetected: false, scrollIntoViewCallCount: counts.scrollIntoView, windowScrollToCallCount: counts.scrollTo,
-    hashchangeCount: counts.hashchange, popstateCount: counts.popstate, focusCallCount: counts.focus,
-    forcedScrollCallsAfterManualScroll: counts.forcedAfterManual, animationReplayDetected: false, consoleErrors: errors,
-    backHash: '#contents', forwardHash: '#key-visual-01', backTargetViewportTop: back.targetViewportTop, forwardTargetViewportTop: forward.targetViewportTop,
-    pass: Math.abs(back.targetViewportTop) < 180 && Math.abs(forward.targetViewportTop) < 180 && counts.popstate === 2 && errors.length === 0,
-  }
-  const logs = instrumentation.logs.map((entry) => ({ test: 'back-forward', viewport: '1920x1080', ...entry }))
-  await context.close()
-  return { result, logs }
-}
-
-const runKeyboardTest = async (browser) => {
-  const context = await instrumentContext(browser, { viewport: { width: 1920, height: 1080 } })
-  const page = await context.newPage()
-  const errors = pageErrors(page)
-  await page.goto(reviewUrl('end', '#contents'), { waitUntil: 'networkidle' })
-  await waitForArchiveComplete(page)
-  await resetInstrumentation(page)
-  const link = page.locator([
-    '.approved-directory-route-node[data-chapter="04"]:visible',
-    '.archive-route-node[data-chapter="04"]:visible',
-  ].join(', '))
-  if (await link.count() !== 1) throw new Error('Expected one chapter 04 link')
-  await link.press('Enter')
-  await page.waitForFunction(() => location.hash === '#character-sheets')
-  await waitForAnchorSettled(page, '#character-sheets')
-  const target = await getScrollState(page, '#character-sheets')
-  const instrumentation = await page.evaluate(() => window.__v520Navigation)
-  const counts = collectCounts(instrumentation.logs)
-  const result = {
-    viewport: '1920x1080', destination: '#character-sheets', navigationMethod: 'keyboard Enter',
-    initialTargetScrollY: target.scrollY, manualScrollTarget: null, scrollYAfter500ms: target.scrollY, scrollYAfter2000ms: target.scrollY,
-    initialTargetViewportTop: target.targetViewportTop,
-    snapbackDetected: false, scrollIntoViewCallCount: counts.scrollIntoView, windowScrollToCallCount: counts.scrollTo,
-    hashchangeCount: counts.hashchange, popstateCount: counts.popstate, focusCallCount: counts.focus,
-    forcedScrollCallsAfterManualScroll: counts.forcedAfterManual, animationReplayDetected: false, consoleErrors: errors,
-    pass: Math.abs(target.targetViewportTop) < 180 && counts.scrollIntoView === 1 && errors.length === 0,
-  }
-  const logs = instrumentation.logs.map((entry) => ({ test: 'keyboard', viewport: '1920x1080', ...entry }))
-  await context.close()
-  return { result, logs }
-}
-
-const runReducedOrMobileTest = async (browser, { mobile = false, reduced = false }) => {
-  const viewport = mobile ? { width: 390, height: 844 } : { width: 1920, height: 1080 }
-  const context = await instrumentContext(browser, { viewport, reducedMotion: reduced ? 'reduce' : 'no-preference' })
-  const page = await context.newPage()
-  const errors = pageErrors(page)
-  await page.goto(reviewUrl('end', '#contents'), { waitUntil: 'networkidle' })
-  await waitForArchiveComplete(page)
-  await resetInstrumentation(page)
-  await clickChapter(page, '05')
-  await page.waitForFunction(() => location.hash === '#costume-detail')
-  await waitForAnchorSettled(page, '#costume-detail')
-  const initial = await getScrollState(page, '#costume-detail')
-  await page.evaluate(() => { window.__v520Navigation.manualStarted = true })
-  await page.mouse.wheel(0, 800)
-  await page.waitForTimeout(2100)
-  const after = await getScrollState(page, '#costume-detail')
-  const instrumentation = await page.evaluate(() => {
-    const core = document.querySelector('.archive-selection-core')
+async function inspectRoute(page, hash, canonicalId) {
+  await page.goto(`${baseUrl}/${hash}`, { waitUntil: 'networkidle' })
+  await waitForRoute(page, canonicalId)
+  return page.evaluate(({ hashValue, id }) => {
+    const section = document.getElementById(id)
+    const rect = section.getBoundingClientRect()
+    const page02 = document.getElementById('key-visual-02')?.getBoundingClientRect()
     return {
-      ...window.__v520Navigation,
-      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-      coreDisplay: core ? getComputedStyle(core).display : 'none',
+      hash: location.hash,
+      canonicalId: id,
+      className: section.className,
+      top: rect.top,
+      height: rect.height,
+      textLength: section.textContent.trim().length,
+      page02AtTop: id !== 'key-visual-02' && page02 ? Math.abs(page02.top) < 3 : false,
+      placeholder: section.classList.contains('performance-section-placeholder'),
+      requestedHashPresent: Boolean(document.getElementById(hashValue.slice(1))),
     }
-  })
-  const counts = collectCounts(instrumentation.logs)
-  const result = {
-    viewport: `${viewport.width}x${viewport.height}`, destination: '#costume-detail',
-    navigationMethod: reduced ? 'reduced-motion pointer click' : 'mobile pointer click',
-    initialTargetScrollY: initial.scrollY, manualScrollTarget: Math.min(initial.maxScroll, initial.scrollY + 800),
-    scrollYAfter500ms: null, scrollYAfter2000ms: after.scrollY,
-    snapbackDetected: after.scrollY < initial.scrollY + 350,
-    scrollIntoViewCallCount: counts.scrollIntoView, windowScrollToCallCount: counts.scrollTo,
-    hashchangeCount: counts.hashchange, popstateCount: counts.popstate, focusCallCount: counts.focus,
-    forcedScrollCallsAfterManualScroll: counts.forcedAfterManual,
-    animationReplayDetected: instrumentation.animationPhases.some((phase, index) => index > 0 && phase !== 'complete'),
-    consoleErrors: errors, horizontalOverflow: instrumentation.overflow,
-    desktopCoreDisplay: instrumentation.coreDisplay,
-    pass: after.scrollY > initial.scrollY + 350 && counts.scrollIntoView === 1 && counts.forcedAfterManual === 0 && instrumentation.overflow <= 1 && (!mobile || instrumentation.coreDisplay === 'none') && errors.length === 0,
-  }
-  const logs = instrumentation.logs.map((entry) => ({ test: reduced ? 'reduced-motion' : 'mobile', viewport: result.viewport, ...entry }))
-  await context.close()
-  return { result, logs }
-}
-
-const runQuerySafetyTest = async (browser) => {
-  const context = await instrumentContext(browser, { viewport: { width: 1920, height: 1080 } })
-  const page = await context.newPage()
-  const errors = pageErrors(page)
-  await page.goto(reviewUrl('replay', '#contents'), { waitUntil: 'networkidle' })
-  await waitForArchiveComplete(page)
-  await resetInstrumentation(page)
-  await clickChapter(page, '03')
-  await page.waitForFunction(() => location.hash === '#key-visual-03')
-  await waitForAnchorSettled(page, '#key-visual-03')
-  const instrumentation = await page.evaluate(() => window.__v520Navigation)
-  const counts = collectCounts(instrumentation.logs)
-  const phase = await page.evaluate(() => (
-    document.querySelector('.archive-selection-scene')?.dataset.archivePhase
-    || document.querySelector('.d0919-directory')?.dataset.directoryPhase
-    || ''
-  ))
-  const result = {
-    viewport: '1920x1080', destination: '?archiveMotion=replay#key-visual-03', navigationMethod: 'review query + pointer click',
-    initialTargetScrollY: null, manualScrollTarget: null, scrollYAfter500ms: null, scrollYAfter2000ms: null,
-    snapbackDetected: false, scrollIntoViewCallCount: counts.scrollIntoView, windowScrollToCallCount: counts.scrollTo,
-    hashchangeCount: counts.hashchange, popstateCount: counts.popstate, focusCallCount: counts.focus,
-    forcedScrollCallsAfterManualScroll: counts.forcedAfterManual,
-    animationReplayDetected: instrumentation.animationPhases.some((value, index) => index > 0 && value !== 'complete'),
-    consoleErrors: errors, finalPhase: phase,
-    pass: phase === 'complete' && counts.scrollIntoView === 1 && errors.length === 0,
-  }
-  const logs = instrumentation.logs.map((entry) => ({ test: 'review-query-safety', viewport: '1920x1080', ...entry }))
-  await context.close()
-  return { result, logs }
-}
-
-const recordStability = async (browser) => {
-  await rm(videoDir, { recursive: true, force: true })
-  await mkdir(videoDir, { recursive: true })
-  const context = await browser.newContext({ viewport: { width: 1920, height: 1080 }, recordVideo: { dir: videoDir, size: { width: 1920, height: 1080 } } })
-  const page = await context.newPage()
-  await page.goto(reviewUrl('end', '#contents'), { waitUntil: 'networkidle' })
-  await waitForArchiveComplete(page)
-  await page.waitForTimeout(700)
-  await clickChapter(page, '05')
-  await page.waitForFunction(() => location.hash === '#costume-detail')
-  await page.waitForFunction(() => {
-    const target = document.getElementById('costume-detail')
-    return target && Math.abs(target.getBoundingClientRect().top) < 180
-  }, null, { timeout: 15000 })
-  await page.waitForTimeout(250)
-  await page.mouse.wheel(0, 900)
-  await page.waitForTimeout(2100)
-  await page.mouse.wheel(0, 700)
-  await page.waitForTimeout(2100)
-  await page.mouse.wheel(0, -550)
-  await page.waitForTimeout(1500)
-  const video = page.video()
-  await page.close()
-  const temporaryPath = await video.path()
-  await context.close()
-  await rm(recordingPath, { force: true })
-  await rename(temporaryPath, recordingPath)
-  await rm(videoDir, { recursive: true, force: true })
+  }, { hashValue: hash, id: canonicalId })
 }
 
 const browser = await chromium.launch({ headless: true })
-const validations = []
-const commandLog = []
 try {
-  for (const destination of [
-    { chapter: '01', hash: '#key-visual-01' },
-    { chapter: '05', hash: '#costume-detail' },
-    { chapter: '07', hash: '#additional-designs' },
+  const context = await browser.newContext({ viewport: { width: 1440, height: 900 } })
+  const page = await context.newPage()
+  for (const [hash, canonicalId] of routes) {
+    const state = await inspectRoute(page, hash, canonicalId)
+    const pass = state.hash === hash
+      && state.requestedHashPresent
+      && !state.placeholder
+      && Math.abs(state.top) < 3
+      && state.height >= 700
+      && state.textLength > 20
+      && !state.page02AtTop
+    record(`direct refresh ${hash}`, pass, state)
+  }
+  await context.close()
+
+  const directoryContext = await browser.newContext({ viewport: { width: 1672, height: 941 } })
+  const directoryPage = await directoryContext.newPage()
+  await directoryPage.goto(`${baseUrl}/#contents`, { waitUntil: 'networkidle' })
+  await waitForRoute(directoryPage, 'contents')
+  const hrefs = await directoryPage.locator('.d1001-directory-card').evaluateAll((links) => links.map((link) => link.getAttribute('href')))
+  record('directory card destinations', JSON.stringify(hrefs) === JSON.stringify(directoryDestinations), { hrefs })
+
+  for (let index = 0; index < directoryDestinations.length; index += 1) {
+    await directoryPage.goto(`${baseUrl}/#contents`, { waitUntil: 'networkidle' })
+    await waitForRoute(directoryPage, 'contents')
+    await directoryPage.locator('.d1001-directory-card').nth(index).click()
+    const destination = directoryDestinations[index]
+    const canonicalId = routes.find(([hash]) => hash === destination)?.[1]
+    await waitForRoute(directoryPage, canonicalId)
+    const top = await directoryPage.locator(`#${canonicalId}`).evaluate((node) => node.getBoundingClientRect().top)
+    record(`directory click ${destination}`, directoryPage.url().endsWith(destination) && Math.abs(top) < 3, { top })
+  }
+
+  for (const [navSelector, expected, canonicalId] of [
+    ['.d1001-nav-resume', '#professional-profile', 'professional-profile'],
+    ['.d1001-nav-contact', '#about-the-creator', 'about-the-creator'],
   ]) {
-    const test = await runDestinationTest(browser, destination)
-    validations.push(test.result)
-    commandLog.push(...test.logs)
+    await directoryPage.goto(`${baseUrl}/#contents`, { waitUntil: 'networkidle' })
+    await waitForRoute(directoryPage, 'contents')
+    await directoryPage.locator('.d1001-directory-top details').evaluate((details) => { details.open = true })
+    await directoryPage.locator(navSelector).click()
+    await waitForRoute(directoryPage, canonicalId)
+    record(`${expected.slice(1).toUpperCase()} top navigation`, directoryPage.url().endsWith(expected))
   }
 
-  for (const runner of [
-    runDirectHashTest,
-    runHistoryTest,
-    runKeyboardTest,
-  ]) {
-    const test = await runner(browser)
-    validations.push(test.result)
-    commandLog.push(...test.logs)
-  }
+  await directoryPage.goto(`${baseUrl}/#contents`, { waitUntil: 'networkidle' })
+  await waitForRoute(directoryPage, 'contents')
+  await directoryPage.locator('.d1001-directory-card').first().click()
+  await waitForRoute(directoryPage, 'key-visual-01')
+  await directoryPage.goBack({ waitUntil: 'networkidle' })
+  await waitForRoute(directoryPage, 'contents')
+  const backHash = await directoryPage.evaluate(() => location.hash)
+  await directoryPage.goForward({ waitUntil: 'networkidle' })
+  await waitForRoute(directoryPage, 'key-visual-01')
+  const forwardHash = await directoryPage.evaluate(() => location.hash)
+  record('browser back and forward', backHash === '#contents' && forwardHash === '#key-visual-01', { backHash, forwardHash })
+  await directoryContext.close()
 
-  for (const options of [{ reduced: true }, { mobile: true }]) {
-    const test = await runReducedOrMobileTest(browser, options)
-    validations.push(test.result)
-    commandLog.push(...test.logs)
+  const reducedContext = await browser.newContext({ viewport: { width: 1672, height: 941 }, reducedMotion: 'reduce' })
+  const reducedPage = await reducedContext.newPage()
+  for (const [hash, canonicalId] of routes.filter(([, id], index, all) => all.findIndex((entry) => entry[1] === id) === index)) {
+    const state = await inspectRoute(reducedPage, hash, canonicalId)
+    const visible = await reducedPage.locator(`#${canonicalId}`).evaluate((section) => {
+      const important = [...section.querySelectorAll('h1,h2,h3,figure,img,a')].filter((node) => !node.classList.contains('page-deep-link-alias'))
+      return important.length > 0 && important.some((node) => {
+        const style = getComputedStyle(node)
+        return style.display !== 'none' && style.visibility !== 'hidden' && Number.parseFloat(style.opacity || '1') > 0
+      })
+    })
+    record(`reduced motion ${hash}`, visible && state.textLength > 20, { visible, textLength: state.textLength })
   }
+  await reducedContext.close()
 
-  const querySafety = await runQuerySafetyTest(browser)
-  validations.push(querySafety.result)
-  commandLog.push(...querySafety.logs)
-  if (!skipRecording) await recordStability(browser)
+  const screenshotContext = await browser.newContext({ viewport: { width: 1672, height: 941 }, deviceScaleFactor: 1 })
+  const screenshotPage = await screenshotContext.newPage()
+  await screenshotPage.goto(`${baseUrl}/#contents`, { waitUntil: 'networkidle' })
+  await waitForRoute(screenshotPage, 'contents')
+  const png = await screenshotPage.screenshot({ animations: 'disabled' })
+  record('desktop screenshot dimensions 1672x941', png.readUInt32BE(16) === 1672 && png.readUInt32BE(20) === 941)
+  await screenshotContext.close()
+
+  const profileContext = await browser.newContext({ viewport: { width: 1586, height: 992 }, deviceScaleFactor: 1 })
+  const profilePage = await profileContext.newPage()
+  await profilePage.goto(`${baseUrl}/#professional-profile`, { waitUntil: 'networkidle' })
+  await waitForRoute(profilePage, 'professional-profile')
+  const profilePng = await profilePage.screenshot({ animations: 'disabled' })
+  record('profile screenshot dimensions 1586x992', profilePng.readUInt32BE(16) === 1586 && profilePng.readUInt32BE(20) === 992)
+  await profileContext.close()
+
+  const mobileContext = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, reducedMotion: 'reduce' })
+  const mobilePage = await mobileContext.newPage()
+  for (const [hash, canonicalId] of routes.filter(([, id], index, all) => all.findIndex((entry) => entry[1] === id) === index)) {
+    await mobilePage.goto(`${baseUrl}/${hash}`, { waitUntil: 'networkidle' })
+    await waitForRoute(mobilePage, canonicalId)
+    const state = await mobilePage.evaluate((id) => ({
+      innerWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+      textLength: document.getElementById(id)?.innerText.trim().length || 0,
+      placeholder: document.getElementById(id)?.classList.contains('performance-section-placeholder'),
+    }), canonicalId)
+    record(`mobile overflow ${hash}`, !state.placeholder && state.textLength > 20 && state.scrollWidth <= state.innerWidth + 1, state)
+  }
+  await mobileContext.close()
+
+  const identityContext = await browser.newContext({ viewport: { width: 1440, height: 900 } })
+  const identityPage = await identityContext.newPage()
+  await identityPage.goto(`${baseUrl}/#professional-profile`, { waitUntil: 'networkidle' })
+  await waitForRoute(identityPage, 'professional-profile')
+  await identityPage.evaluate(() => window.__portfolioEnsureSection?.('about-the-creator'))
+  await waitForRoute(identityPage, 'about-the-creator')
+
+  const identityState = await identityPage.evaluate((canonical) => {
+    const profile = document.getElementById('professional-profile')
+    const about = document.getElementById('about-the-creator')
+    const definitionList = (container) => Object.fromEntries([...container.querySelectorAll('dl > div')].map((row) => [
+      row.querySelector('dt')?.textContent.trim() || '',
+      row.querySelector('dd')?.textContent.trim() || '',
+    ]))
+    const profileFields = definitionList(profile.querySelector('.d1001-profile-identity'))
+    const aboutFields = definitionList(about.querySelector('.d1001-about-window'))
+    const identityNames = [
+      profile.querySelector('.d1001-profile-identity h3')?.textContent.trim() || '',
+      about.querySelector('.d1001-about-window h3')?.textContent.trim() || '',
+    ]
+    const identityRoles = [
+      profile.querySelector('.d1001-profile-identity > p')?.textContent.trim() || '',
+      about.querySelector('.d1001-about-window h3 + p')?.textContent.trim() || '',
+    ]
+    const contactSections = [profile, about]
+    const renderedEmails = contactSections.flatMap((section) => [...section.querySelectorAll('a[href^="mailto:"]')].map((link) => ({
+      text: link.textContent.trim(),
+      href: link.getAttribute('href')?.slice('mailto:'.length) || '',
+    })))
+    const extractedEmails = contactSections.flatMap((section) => section.innerText.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi) || [])
+    const telephoneLinks = contactSections.flatMap((section) => [...section.querySelectorAll('a[href^="tel:"]')].map((link) => link.getAttribute('href')))
+    const contactText = contactSections.map((section) => section.innerText).join('\n')
+    const telephoneLabels = contactText.match(/电话|手机|联系电话|telephone|phone|mobile/gi) || []
+    const mainlandTelephoneValues = contactText.match(/(?:\+?86[-\s]?)?1[3-9]\d{9}/g) || []
+    const software = [...profile.querySelectorAll('.d1001-profile-tools article strong')].map((node) => node.textContent.trim())
+
+    return {
+      identityNames,
+      identityRoles,
+      profileFields,
+      aboutFields,
+      renderedEmails,
+      extractedEmails,
+      telephoneLinks,
+      telephoneLabels,
+      mainlandTelephoneValues,
+      software,
+      checks: {
+        exactNames: identityNames.length === 2 && identityNames.every((value) => value === canonical.name),
+        exactRoles: identityRoles.length === 2 && identityRoles.every((value) => value === canonical.role),
+        exactLocation: profileFields['所在地'] === canonical.location,
+        exactEmails: renderedEmails.length === 2
+          && renderedEmails.every(({ text, href }) => text === canonical.email && href === canonical.email)
+          && extractedEmails.length === 2
+          && extractedEmails.every((value) => value === canonical.email),
+        exactWechat: profileFields['微信'] === canonical.wechat && aboutFields['微信'] === canonical.wechat,
+        noTelephone: telephoneLinks.length === 0 && telephoneLabels.length === 0 && mainlandTelephoneValues.length === 0,
+        exactSoftware: JSON.stringify(software) === JSON.stringify(canonical.software),
+        noAdditionalIdentityFields: JSON.stringify(Object.keys(profileFields)) === JSON.stringify(['所在地', '邮箱', '微信', '可合作时间'])
+          && JSON.stringify(Object.keys(aboutFields)) === JSON.stringify(['擅长方向', '邮箱', '微信']),
+      },
+    }
+  }, canonicalIdentity)
+
+  for (const [name, pass] of Object.entries(identityState.checks)) record(`canonical profile allowlist: ${name}`, pass, identityState)
+  await identityContext.close()
+
+  const lazyContext = await browser.newContext({ viewport: { width: 1440, height: 900 } })
+  const lazyPage = await lazyContext.newPage()
+  await lazyPage.goto(`${baseUrl}/`, { waitUntil: 'networkidle' })
+  await lazyPage.evaluate(() => window.__portfolioEnsureSection?.('additional-designs'))
+  await waitForRoute(lazyPage, 'additional-designs')
+  record('lazy-mounted section becomes visible', await lazyPage.locator('#additional-designs').evaluate((node) => !node.classList.contains('performance-section-placeholder')))
+  await lazyContext.close()
 } finally {
   await browser.close()
 }
 
-const validationOutput = {
+const output = {
   generatedAt: new Date().toISOString(),
+  suite: 'D10.01 R2 route, navigation, reduced-motion, responsive, and identity validation',
   baseUrl,
-  suite: 'V5.2 desktop anchor navigation scroll stability',
-  pass: validations.every((test) => test.pass),
-  tests: validations,
+  pass: results.every((result) => result.pass),
+  tests: results,
 }
 
-await writeFile(validationPath, `${JSON.stringify(validationOutput, null, 2)}\n`, 'utf8')
-await writeFile(commandLogPath, `${JSON.stringify({ generatedAt: validationOutput.generatedAt, contentsVisual, entries: commandLog }, null, 2)}\n`, 'utf8')
-
-console.log(JSON.stringify({
-  pass: validationOutput.pass,
-  tests: validations.map(({ destination, navigationMethod, pass, snapbackDetected, scrollIntoViewCallCount, forcedScrollCallsAfterManualScroll }) => ({ destination, navigationMethod, pass, snapbackDetected, scrollIntoViewCallCount, forcedScrollCallsAfterManualScroll })),
-  recording: skipRecording ? null : path.relative(root, recordingPath).replaceAll(path.sep, '/'),
-}, null, 2))
-
-if (!validationOutput.pass) process.exitCode = 1
+await writeFile(validationPath, `${JSON.stringify(output, null, 2)}\n`, 'utf8')
+console.log(JSON.stringify({ pass: output.pass, tests: results.map(({ name, pass }) => ({ name, pass })) }, null, 2))
+if (!output.pass) process.exitCode = 1

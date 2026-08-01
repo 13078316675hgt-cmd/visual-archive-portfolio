@@ -23,6 +23,15 @@ VITE_PUBLIC_SITE_URL=https://www.marlsa.cc.cd/
 
 `pnpm run build:pages` 只保留为 `/visual-archive-portfolio/` 仓库路径 fallback，不用于自定义域名生产部署。
 
+## 两种构建模式
+
+| 模式 | 命令 | Vite base | 用途 |
+|---|---|---|---|
+| 自定义域名生产构建 | `pnpm run build` | `/` | `https://www.marlsa.cc.cd/` 根路径 |
+| GitHub Pages 仓库路径 fallback | `pnpm run build:pages` | `/visual-archive-portfolio/` | 无自定义域名时的仓库子路径 |
+
+两种构建必须分别验证；不能用仓库子路径构建覆盖自定义域名生产规则，也不能把根路径构建当作仓库路径 fallback。`.github/workflows/deploy-pages.yml` 的自定义域名生产流程保持不变。
+
 ## GitHub Pages
 
 1. 获得授权后，把远程仓库重命名为 `visual-archive-portfolio` 并更新本地 origin。

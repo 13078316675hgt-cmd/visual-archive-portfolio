@@ -1,18 +1,15 @@
 import { access, readFile, readdir, stat } from 'node:fs/promises'
+import { existsSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import {
   additionalCharacterDesigns,
-  artworkManifest,
-  artworkOne,
   artworkThree,
   artworkTwo,
   characterSheets,
-  contentsChapters,
   costumeDetailAsset,
-  endPageIntegrated,
   portraitStudies,
   selectedWorks,
 } from '../src/data/artworkManifest.js'
@@ -21,10 +18,18 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const publicRoot = path.join(root, 'public')
 const approvedRoot = path.join(root, 'public', 'assets', 'approved')
 const requireDist = process.argv.includes('--dist')
+const gitMetadataAvailable = existsSync(path.join(root, '.git'))
+let detectedDistBase = null
 const reviewPendingRuntimeAssets = new Set([
-  'public/assets/approved/directory-master-integrated-v3.png',
-  'public/assets/approved/end-page-master-integrated-v3.png',
+  'public/assets/d10-01/about-hand-locked-r2.png',
 ])
+const directRuntimeAssets = [
+  ['HOME approved composite fallback', 'assets/performance-v1-source/home-approved-composite-2560x1440.png'],
+  ...[960, 1800, 2560].flatMap((width) => ['avif', 'webp'].map((extension) => [`HOME performance ${width}.${extension}`, `assets/performance-v1/home-clean/home-clean-${width}.${extension}`])),
+  ['PAGE 01 original artwork fallback', 'assets/d09-19-page01/page01-original-art-crop-1515x1780.png'],
+  ...[720, 1280, 1515].flatMap((width) => ['avif', 'webp'].map((extension) => [`PAGE 01 performance ${width}.${extension}`, `assets/performance-v1/page01-original-art/page01-original-art-${width}.${extension}`])),
+  ['ABOUT approved hand isolation', 'assets/d10-01/about-hand-locked-r2.png'],
+]
 
 const srcSetCandidates = (srcSet = '') => srcSet
   .split(',')
@@ -53,22 +58,14 @@ function isTracked(repoRelative) {
 const sha256 = (buffer) => createHash('sha256').update(buffer).digest('hex')
 
 function activeRoleEntries() {
-  const contentsImageRoles = contentsChapters
-    .filter((chapter) => chapter.type === 'image')
-    .map((chapter) => [`Contents ${chapter.number} / ${chapter.title}`, chapter.asset])
-
   const roles = [
-    ['titleBackground', artworkManifest.titleBackground],
-    ['Artwork 01 / KEY VISUAL 01', artworkOne],
     ['Artwork 02 / KEY VISUAL 02', artworkTwo],
     ['Artwork 03 / KEY VISUAL 03', artworkThree],
-    ['D03.3 End Page Master', endPageIntegrated],
     ...characterSheets.map((asset, index) => [`Character Sheet ${String(index + 1).padStart(2, '0')}`, asset]),
     ['Costume Detail', costumeDetailAsset],
     ...portraitStudies.map((asset, index) => [`Portrait Study ${String(index + 1).padStart(2, '0')}`, asset]),
     ...selectedWorks.map((asset, index) => [`Selected Work ${String(index + 1).padStart(2, '0')}`, asset]),
     ...additionalCharacterDesigns.map((asset, index) => [`Additional Character Design ${String(index + 1).padStart(2, '0')}`, asset]),
-    ...contentsImageRoles,
   ]
   return roles.map(([role, asset]) => ({ role, asset }))
 }
@@ -133,7 +130,7 @@ export async function auditPortfolioAssets() {
       if (sourceBuffer.subarray(0, 160).toString('utf8').includes('git-lfs')) errors.push(`${roles.join(' / ')}: Git LFS pointer found instead of binary (${candidate})`)
       if (path.extname(source).toLowerCase() === '.webp' && !(sourceBuffer.subarray(0, 4).toString('ascii') === 'RIFF' && sourceBuffer.subarray(8, 12).toString('ascii') === 'WEBP')) errors.push(`${roles.join(' / ')}: invalid WebP binary (${candidate})`)
       const repoRelative = path.relative(root, source)
-      if (!isTracked(repoRelative) && !reviewPendingRuntimeAssets.has(repoRelative.replaceAll(path.sep, '/'))) {
+      if (gitMetadataAvailable && !isTracked(repoRelative) && !reviewPendingRuntimeAssets.has(repoRelative.replaceAll(path.sep, '/'))) {
         errors.push(`${roles.join(' / ')}: runtime candidate is not tracked by Git (${candidate})`)
       }
 
@@ -155,12 +152,39 @@ export async function auditPortfolioAssets() {
     }
   }
 
+  for (const [role, publicRelative] of directRuntimeAssets) {
+    const source = path.resolve(publicRoot, publicRelative)
+    if (!source.startsWith(`${publicRoot}${path.sep}`)) {
+      errors.push(`${role}: runtime path escapes public directory (${publicRelative})`)
+      continue
+    }
+    try {
+      if (!await hasExactCase(publicRoot, publicRelative)) errors.push(`${role}: filename case mismatch (${publicRelative})`)
+      const sourceStat = await stat(source)
+      if (!sourceStat.isFile() || sourceStat.size === 0) errors.push(`${role}: runtime asset is empty (${publicRelative})`)
+      const sourceBuffer = await readFile(source)
+      if (path.extname(source).toLowerCase() === '.png' && sourceBuffer.subarray(1, 4).toString('ascii') !== 'PNG') errors.push(`${role}: invalid PNG binary (${publicRelative})`)
+      if (requireDist) {
+        const built = path.resolve(root, 'dist', publicRelative)
+        const builtBuffer = await readFile(built)
+        if (builtBuffer.length !== sourceBuffer.length || sha256(builtBuffer) !== sha256(sourceBuffer)) errors.push(`${role}: built asset differs from public source (${publicRelative})`)
+      }
+    } catch {
+      errors.push(`${role}: runtime asset missing from ${requireDist ? 'public or dist' : 'public'} (${publicRelative})`)
+    }
+  }
+
   if (requireDist) {
     try {
       const distRoot = path.join(root, 'dist')
       const bundleFiles = (await readdir(path.join(distRoot, 'assets'))).filter((file) => /\.(js|css)$/i.test(file))
-      const generated = [await readFile(path.join(distRoot, 'index.html'), 'utf8'), ...await Promise.all(bundleFiles.map((file) => readFile(path.join(distRoot, 'assets', file), 'utf8')))].join('\n')
-      if (/huang-guotai|huangguotai|\/visual-archive-portfolio\//i.test(generated)) errors.push('dist: generated runtime URL contains an incorrect deployment base or personal-name slug')
+      const distIndex = await readFile(path.join(distRoot, 'index.html'), 'utf8')
+      const generated = [distIndex, ...await Promise.all(bundleFiles.map((file) => readFile(path.join(distRoot, 'assets', file), 'utf8')))].join('\n')
+      const usesRootBase = /(?:src|href)=["']\/assets\//.test(distIndex)
+      const usesPagesFallback = /(?:src|href)=["']\/visual-archive-portfolio\/assets\//.test(distIndex)
+      if (usesRootBase === usesPagesFallback) errors.push('dist: unable to identify exactly one approved deployment base')
+      else detectedDistBase = usesPagesFallback ? '/visual-archive-portfolio/' : '/'
+      if (/huang-guotai|huangguotai/i.test(generated)) errors.push('dist: generated runtime URL contains a personal-name slug')
       for (const candidate of candidates.keys()) if (!generated.includes(path.basename(candidate))) errors.push(`dist: generated runtime bundle does not reference candidate ${candidate}`)
     } catch (error) {
       errors.push(`dist: unable to inspect generated runtime URLs (${error.message})`)
@@ -183,7 +207,10 @@ export async function auditPortfolioAssets() {
     activeUniqueAssets: grouped.size,
     activeRoleReferences: entries.length,
     runtimeCandidates: candidates.size,
+    directRuntimeAssets: directRuntimeAssets.length,
     distValidated: requireDist,
+    detectedDistBase,
+    gitTrackingValidated: gitMetadataAvailable,
     intentionallyUnused: [
       'hero-blue-dragon.png',
       'character-illustration-green.png',
@@ -199,6 +226,9 @@ export async function auditPortfolioAssets() {
   }
   console.log(`Asset audit passed: ${summary.activeUniqueAssets} active files / ${summary.activeRoleReferences} role references.`)
   console.log(`- runtime src/srcSet candidates: ${summary.runtimeCandidates}${requireDist ? ' (public + dist)' : ' (public source)'}`)
+  console.log(`- D10.01 direct runtime assets: ${summary.directRuntimeAssets}${requireDist ? ' (public + dist)' : ' (public source)'}`)
+  console.log(`- Git tracking: ${gitMetadataAvailable ? 'validated' : 'not available; D10.01 baseline inventory is the rollback authority'}`)
+  if (requireDist) console.log(`- detected deployment base: ${summary.detectedDistBase}`)
   for (const [src, roles] of grouped) console.log(`- ${src}: ${roles.join(' / ')}`)
   console.log(`- intentionally unused: ${summary.intentionallyUnused.join(', ')}`)
   return summary

@@ -21,6 +21,7 @@ import './d09-19-locked-implementation.css'
 import './d09-20-home-static.css'
 import './portfolio-pdf.css'
 import './performance-loading.css'
+import './d10-01-r2-master-integration.css'
 import { initArchiveMotion } from './motion/archiveMotion.js'
 import { initPage02PosterMotion } from './motion/page02PosterMotion.js'
 import { initD06Page03Motion, initD07Page01Motion } from './motion/innerPagesMotion.js'
@@ -36,7 +37,12 @@ import {
   ApprovedEndMotion,
   ApprovedPage03Motion,
 } from './components/ApprovedMotionPages.jsx'
-import { D0919Directory, D0919Page01 } from './components/D0919Pages.jsx'
+import { D0919Page01 } from './components/D0919Pages.jsx'
+import {
+  D1001AboutCreator,
+  D1001Directory,
+  D1001ProfessionalProfile,
+} from './components/D1001LockedMasterPages.jsx'
 import {
   PerformancePicture,
   performanceImageAttrs,
@@ -63,7 +69,8 @@ const PORTFOLIO_URL_ROUTES = Object.freeze([
   { id: 'portrait-studies', hash: '#portrait-studies', aliases: [] },
   { id: 'selected-works', hash: '#selected-works', aliases: [] },
   { id: 'additional-designs', hash: '#additional-designs', aliases: [] },
-  { id: 'end', hash: '#end', aliases: ['#resume-contact-resume', '#resume-contact-contact'] },
+  { id: 'professional-profile', hash: '#professional-profile', aliases: ['#resume-contact-resume'] },
+  { id: 'about-the-creator', hash: '#about-the-creator', aliases: ['#end', '#resume-contact-contact'] },
 ])
 
 const getPortfolioRouteForHash = (hash) => PORTFOLIO_URL_ROUTES.find((route) => (
@@ -80,8 +87,8 @@ function Nav() {
     <div className="nav-links">
       <a href="#contents">CONTENTS</a>
       <a href="#character-sheets">CHARACTER DESIGN</a>
-      <a href="#resume-contact-resume">RESUME</a>
-      <a href="#resume-contact-contact">CONTACT</a>
+      <a href="#professional-profile">RESUME</a>
+      <a href="#about-the-creator">CONTACT</a>
     </div>
   </nav>
 }
@@ -391,7 +398,7 @@ function usePortfolioMotion() {
     scene('#portrait-studies', 'portraits', 'artwork-sequence', '--motion-section')
     scene('#selected-works', 'selected', 'artwork-sequence', '--motion-section')
     scene('#additional-designs', 'additional', 'section-intro', '--motion-section')
-    scene('#end', 'final', 'contact-ending', '--motion-slow')
+    scene('#about-the-creator', 'final', 'contact-ending', '--motion-standard')
 
     setMotion('.title-rule-a, .title-rule-b', 'registration-rule', { stagger: 40, maxDelay: 80 })
     setMotion('.title-lockup h1 span', 'intro-title', { delay: 80, stagger: 60, maxDelay: 200 })
@@ -530,17 +537,10 @@ function usePortfolioMotion() {
         setMotion('.editorial-head span, .editorial-head h2', 'section-title', { stagger: 40, maxDelay: 80 }, section)
         setMotion('.editorial-head p', 'section-copy', { delay: 80 }, section)
         setMotion('.additional-item', 'artwork-support', { delay: 60, stagger: 40, maxDelay: 220 }, section)
-      } else if (id === 'end') {
-        mountedScene = scene(section, 'final', 'contact-ending', '--motion-slow')
-        setMotion('.end-page-image', 'end-page-field', {}, section)
-        setMotion('.end-page-hotspot-anchor', 'end-page-control', {
-          delay: 680,
-          stagger: 90,
-          maxDelay: 770,
-          mobileDelay: 520,
-          mobileStagger: 70,
-          mobileMaxDelay: 590,
-        }, section)
+      } else if (id === 'professional-profile') {
+        mountedScene = scene(section, 'profile', 'section-intro', '--motion-standard')
+      } else if (id === 'about-the-creator') {
+        mountedScene = scene(section, 'final', 'contact-ending', '--motion-standard')
       }
 
       setMotion('.page-meta', 'micro-copy', { delay: 160 }, section)
@@ -571,8 +571,8 @@ function usePortfolioMotion() {
       ['#portrait-studies', '#character-sheets'],
       ['#selected-works', '#character-sheets'],
       ['#additional-designs', '#character-sheets'],
-      ['#resume-contact-resume', '#resume-contact-resume'],
-      ['#resume-contact-contact', '#resume-contact-contact'],
+      ['#professional-profile', '#professional-profile'],
+      ['#about-the-creator', '#about-the-creator'],
     ].map(([selector, href]) => {
       const node = document.querySelector(selector)
       return node && navMap.has(href) ? { node, href } : null
@@ -730,13 +730,14 @@ function HomeV9Preview() {
 
       <header className="d0920-home-copy">
         <h1 lang="zh-CN">个人作品集</h1>
-        <p>VISUAL DESIGN&nbsp;&nbsp;·&nbsp;&nbsp;ILLUSTRATION&nbsp;&nbsp;·&nbsp;&nbsp;ART DIRECTION</p>
+        <p className="d1001-home-copy-zh" lang="zh-CN">视觉设计 · 插画创作 · 艺术指导</p>
+        <p className="d1001-home-copy-en">VISUAL DESIGN&nbsp;&nbsp;/&nbsp;&nbsp;ILLUSTRATION&nbsp;&nbsp;/&nbsp;&nbsp;ART DIRECTION</p>
       </header>
 
       <div className="d0920-home-projects">
         <h2><span aria-hidden="true">+</span> SELECTED WORKS</h2>
-        <strong>SELECTED PROJECTS</strong>
-        <p>SELECTED WORKS FROM<br />VARIOUS PROJECTS.</p>
+        <strong>SELECTED WORKS</strong>
+        <p lang="zh-CN">整理思绪，记录灵感。<br />用视觉语言，探索无限可能。</p>
       </div>
 
       <a className="d0920-home-top-link" href="#contents">
@@ -1275,7 +1276,7 @@ function PortfolioResumeDetails() {
 }
 
 const WEBSITE_DEFERRED_SECTIONS = Object.freeze([
-  { id: 'contents', Component: D0919Directory, aliases: [] },
+  { id: 'contents', Component: D1001Directory, aliases: [] },
   { id: 'key-visual-01', Component: D0919Page01, aliases: [] },
   { id: 'key-visual-02', Component: Page02Poster, aliases: ['page-02'] },
   { id: 'key-visual-03', Component: KeyVisualThree, aliases: [] },
@@ -1284,11 +1285,8 @@ const WEBSITE_DEFERRED_SECTIONS = Object.freeze([
   { id: 'portrait-studies', Component: PortraitStudies, aliases: [] },
   { id: 'selected-works', Component: SelectedWorks, aliases: [] },
   { id: 'additional-designs', Component: AdditionalCharacterDesigns, aliases: [] },
-  {
-    id: 'end',
-    Component: EndPageSection,
-    aliases: ['resume-contact-resume', 'resume-contact-contact'],
-  },
+  { id: 'professional-profile', Component: D1001ProfessionalProfile, aliases: ['resume-contact-resume'] },
+  { id: 'about-the-creator', Component: D1001AboutCreator, aliases: ['end', 'resume-contact-contact'] },
 ])
 
 function DeferredPortfolioSection({ definition, enabled, mounted, ensureMounted }) {
@@ -1427,7 +1425,7 @@ function WebsitePortfolioPageSequence({ className, forceContents = false }) {
 function PortfolioPageSequence({ className, includeResumeDetails = false }) {
   return <main className={className}>
     <HomeV9Preview />
-    <D0919Directory />
+    <D1001Directory />
     <D0919Page01 />
     <Page02Poster />
     <KeyVisualThree />
@@ -1436,8 +1434,8 @@ function PortfolioPageSequence({ className, includeResumeDetails = false }) {
     <PortraitStudies />
     <SelectedWorks />
     <AdditionalCharacterDesigns />
-    {includeResumeDetails ? <PortfolioResumeDetails /> : null}
-    <EndPageSection />
+    {includeResumeDetails ? <PortfolioResumeDetails /> : <D1001ProfessionalProfile />}
+    <D1001AboutCreator />
   </main>
 }
 

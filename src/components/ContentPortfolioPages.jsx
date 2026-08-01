@@ -217,7 +217,7 @@ export function PortraitStudies() {
       </figure>
       <header className="d06-identity-heading">
         <span>06 / PORTRAIT STUDIES</span>
-        <h2>IDENTITY<br /><b>&amp; EXPRESSION</b></h2>
+        <h2><span>IDENTITY</span><b>&amp;</b><b>EXPRESSION</b></h2>
         <i aria-hidden="true" />
       </header>
       <figure className="d06-identity-light">

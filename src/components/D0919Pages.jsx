@@ -344,9 +344,9 @@ export function D0919Directory() {
 }
 
 function Page01Brand() {
-  return <div className="d0919-page01-brand" aria-label="Visual Archive Concept Design">
+  return <div className="d0919-page01-brand" aria-label="Arche Studio Concept Design">
     <span aria-hidden="true"><i /><i /><i /></span>
-    <strong>VISUAL ARCHIVE</strong>
+    <strong>ARCHE STUDIO</strong>
     <b aria-hidden="true" />
     <small>CONCEPT DESIGN</small>
   </div>
@@ -394,10 +394,10 @@ export function D0919Page01() {
         <span className="d0919-page01-star" aria-hidden="true">✦</span>
         <b className="d0919-page01-number">01</b>
         <p className="d0919-page01-project">PROJECT</p>
-        <h2><span>KEY</span><span>VISUAL</span></h2>
+        <h2><span>DRAGON</span><span>OATH</span></h2>
         <div className="d0919-page01-facts">
-          <p><small>WORK TYPE</small>CHARACTER ILLUSTRATION</p>
-          <p><small>FOCUS</small>CHARACTER · DRAGON · ARCHITECTURE</p>
+          <p><small>KEY THEME</small>BETWEEN THE ACTS</p>
+          <p><small>KEYWORDS</small>DECENT · OATH · GUARDIAN</p>
         </div>
       </div>
 
@@ -410,9 +410,9 @@ export function D0919Page01() {
       </aside>
 
       <nav className="d0919-page01-bottom" aria-label="Selected work pages">
-        <a className="is-current" href="#key-visual-01"><b>01</b><span>KEY VISUAL 01<small>CHARACTER ILLUSTRATION</small></span></a>
-        <a href="#key-visual-02"><b>02</b><span>KEY VISUAL 02<small>CHARACTER ILLUSTRATION</small></span></a>
-        <a href="#key-visual-03"><b>03</b><span>KEY VISUAL 03<small>CHARACTER ILLUSTRATION</small></span></a>
+        <a className="is-current" href="#key-visual-01"><b>01</b><span>DRAGON OATH<small>BETWEEN THE ACTS</small></span></a>
+        <a href="#key-visual-02"><b>02</b><span>SILENT VOYAGE<small>UNKNOWN SEAS</small></span></a>
+        <a href="#key-visual-03"><b>03</b><span>ECHOES OF VALOR<small>LAST STAND</small></span></a>
         <a className="d0919-page01-directory-link" href="#contents">DIRECTORY / INDEX</a>
       </nav>
     </div>
