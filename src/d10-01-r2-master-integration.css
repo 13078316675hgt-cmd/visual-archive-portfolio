@@ -287,7 +287,8 @@
 
 /* PAGE 01 / R2 copy and calibration */
 @media (min-width: 901px) {
-  #key-visual-01.d0919-page01 { background: #fafbfc; }
+  #key-visual-01.d0919-page01 { background: #f7f8fb !important; }
+  #key-visual-01.d0919-page01 .d0919-page01-canvas { background: #f7f8fb; }
   .d0919-page01-brand { left: 2.55%; top: 3.1%; }
   .d0919-page01-brand strong { letter-spacing: .02em; }
   .d0919-page01-number { position: relative; top: -7.2vh; }
