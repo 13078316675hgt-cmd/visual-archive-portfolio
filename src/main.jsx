@@ -27,25 +27,12 @@ import './premium-agency-motion.css'
 import { initArchiveMotion } from './motion/archiveMotion.js'
 import { initPage02PosterMotion } from './motion/page02PosterMotion.js'
 import { initD06Page03Motion, initD07Page01Motion } from './motion/innerPagesMotion.js'
-import { initD1101HomeMotion } from './motion/d1001LockedMasterMotion.js'
-import {
-  AdditionalCharacterDesigns,
-  CharacterSheets,
-  CostumeDetail,
-  PortraitStudies,
-  SelectedWorks,
-} from './components/ContentPortfolioPages.jsx'
+import { initD1101HomeMotion } from './motion/d1101HomeMotion.js'
 import {
   ApprovedDirectoryMotion,
   ApprovedEndMotion,
   ApprovedPage03Motion,
 } from './components/ApprovedMotionPages.jsx'
-import { D0919Page01 } from './components/D0919Pages.jsx'
-import {
-  D1001AboutCreator,
-  D1001Directory,
-  D1001ProfessionalProfile,
-} from './components/D1001LockedMasterPages.jsx'
 import {
   PerformancePicture,
   performanceImageAttrs,
@@ -60,6 +47,23 @@ import {
   endPageIntegrated,
 } from './data/artworkManifest.js'
 import resumeContent from './data/resumeContent.js'
+
+const lazyNamed = (loader, exportName) => React.lazy(() => loader().then((module) => ({
+  default: module[exportName],
+})))
+
+const loadContentPortfolioPages = () => import('./components/ContentPortfolioPages.jsx')
+const loadD1001Pages = () => import('./components/D1001LockedMasterPages.jsx')
+
+const AdditionalCharacterDesigns = lazyNamed(loadContentPortfolioPages, 'AdditionalCharacterDesigns')
+const CharacterSheets = lazyNamed(loadContentPortfolioPages, 'CharacterSheets')
+const CostumeDetail = lazyNamed(loadContentPortfolioPages, 'CostumeDetail')
+const PortraitStudies = lazyNamed(loadContentPortfolioPages, 'PortraitStudies')
+const SelectedWorks = lazyNamed(loadContentPortfolioPages, 'SelectedWorks')
+const D0919Page01 = lazyNamed(() => import('./components/D0919Pages.jsx'), 'D0919Page01')
+const D1001AboutCreator = lazyNamed(loadD1001Pages, 'D1001AboutCreator')
+const D1001Directory = lazyNamed(loadD1001Pages, 'D1001Directory')
+const D1001ProfessionalProfile = lazyNamed(loadD1001Pages, 'D1001ProfessionalProfile')
 
 const PORTFOLIO_URL_ROUTES = Object.freeze([
   { id: 'title', hash: '', aliases: ['#title'] },
@@ -669,6 +673,14 @@ function TitleSection() {
 function HomeV9Preview() {
   const base = import.meta.env.BASE_URL
   const poster = `${base}assets/d11-home/homepage-master-locked-1672x941.png`
+  const posterWebp = `${base}assets/d11-home/homepage-master-locked-1672x941.webp`
+  const posterSrcSet = [
+    `${base}assets/d11-home/homepage-master-locked-480.webp 480w`,
+    `${base}assets/d11-home/homepage-master-locked-720.webp 720w`,
+    `${base}assets/d11-home/homepage-master-locked-960.webp 960w`,
+    `${base}assets/d11-home/homepage-master-locked-1280.webp 1280w`,
+    `${posterWebp} 1672w`,
+  ].join(', ')
 
   return <section
     id="title"
@@ -678,31 +690,37 @@ function HomeV9Preview() {
     tabIndex={-1}
   >
     <div className="d1101-homepage-poster">
-      <img
-        className="d1101-homepage-master"
-        src={poster}
-        alt=""
-        width="1672"
-        height="941"
-        loading="eager"
-        decoding="sync"
-        fetchPriority="high"
-        draggable="false"
-        aria-hidden="true"
-      />
+      <picture className="performance-picture">
+        <source type="image/webp" srcSet={posterSrcSet} sizes="100vw" />
+        <img
+          className="d1101-homepage-master"
+          src={poster}
+          alt=""
+          width="1672"
+          height="941"
+          loading="eager"
+          decoding="async"
+          fetchPriority="high"
+          draggable="false"
+          aria-hidden="true"
+        />
+      </picture>
 
       <span className="d1101-homepage-title-backdrop" aria-hidden="true" />
-      <img
-        className="d1101-homepage-title-clone"
-        src={poster}
-        alt=""
-        width="1672"
-        height="941"
-        loading="eager"
-        decoding="sync"
-        draggable="false"
-        aria-hidden="true"
-      />
+      <picture className="performance-picture">
+        <source type="image/webp" srcSet={posterSrcSet} sizes="100vw" />
+        <img
+          className="d1101-homepage-title-clone"
+          src={poster}
+          alt=""
+          width="1672"
+          height="941"
+          loading="eager"
+          decoding="async"
+          draggable="false"
+          aria-hidden="true"
+        />
+      </picture>
       <span className="d1101-homepage-opening-veil" aria-hidden="true" />
 
       <h1 id="d1101-homepage-title" className="d1101-visually-hidden" lang="zh-CN">个人作品集</h1>
@@ -1302,7 +1320,22 @@ function DeferredPortfolioSection({ definition, enabled, mounted, ensureMounted 
     return () => observer.disconnect()
   }, [definition.id, enabled, ensureMounted, mounted])
 
-  if (mounted) return <definition.Component />
+  if (mounted) return <React.Suspense fallback={
+    <section
+      id={definition.id}
+      className="performance-section-placeholder page"
+      data-performance-placeholder={definition.id}
+      aria-label={`${definition.id} loading boundary`}
+      tabIndex={-1}
+    >
+      {definition.aliases.map((alias) =>
+        <span id={alias} className="page-deep-link-alias" aria-hidden="true" key={alias} />,
+      )}
+      <span className="performance-section-placeholder-mark" aria-hidden="true" />
+    </section>
+  }>
+    <definition.Component />
+  </React.Suspense>
 
   return <section
     ref={placeholderRef}
@@ -1390,17 +1423,19 @@ function WebsitePortfolioPageSequence({ className, forceContents = false }) {
 function PortfolioPageSequence({ className, includeResumeDetails = false }) {
   return <main className={className}>
     <HomeV9Preview />
-    <D1001Directory />
-    <D0919Page01 />
-    <Page02Poster />
-    <KeyVisualThree />
-    <CharacterSheets />
-    <CostumeDetail />
-    <PortraitStudies />
-    <SelectedWorks />
-    <AdditionalCharacterDesigns />
-    {includeResumeDetails ? <PortfolioResumeDetails /> : <D1001ProfessionalProfile />}
-    <D1001AboutCreator />
+    <React.Suspense fallback={null}>
+      <D1001Directory />
+      <D0919Page01 />
+      <Page02Poster />
+      <KeyVisualThree />
+      <CharacterSheets />
+      <CostumeDetail />
+      <PortraitStudies />
+      <SelectedWorks />
+      <AdditionalCharacterDesigns />
+      {includeResumeDetails ? <PortfolioResumeDetails /> : <D1001ProfessionalProfile />}
+      <D1001AboutCreator />
+    </React.Suspense>
   </main>
 }
 
