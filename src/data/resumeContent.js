@@ -157,6 +157,18 @@ export const resumeContent = Object.freeze({
       name: 'Clip Studio Paint',
       usage: '线稿绘制、角色细化与插画制作。',
     },
+    {
+      name: 'Adobe After Effects',
+      usage: '动效设计、合成特效与片头制作。',
+    },
+    {
+      name: 'Adobe Premiere Pro',
+      usage: '视频剪辑、节奏整理与成片输出。',
+    },
+    {
+      name: 'SAI Ver.2',
+      usage: '数码绘画、插画细化与色彩练习。',
+    },
   ],
   education: {
     school: '广东文理职业学院',

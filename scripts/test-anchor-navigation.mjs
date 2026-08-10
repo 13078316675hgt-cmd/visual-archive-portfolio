@@ -41,7 +41,13 @@ const canonicalIdentity = Object.freeze({
   location: '中国：广东',
   email: '2488731102@qq.com',
   wechat: 'Veiko_9029',
-  software: ['Adobe Photoshop', 'Clip Studio Paint'],
+  software: [
+    'Adobe Photoshop',
+    'Clip Studio Paint',
+    'Adobe After Effects',
+    'Adobe Premiere Pro',
+    'SAI Ver.2',
+  ],
 })
 
 await mkdir(reviewDir, { recursive: true })
