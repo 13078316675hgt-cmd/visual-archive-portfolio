@@ -343,6 +343,27 @@ html.portfolio-pdf-mode .pdf-resume-software-list {
   gap: 20px;
 }
 
+html.portfolio-pdf-mode .pdf-resume-software-list article {
+  display: grid;
+  grid-template-columns: 38px 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
+html.portfolio-pdf-mode .pdf-resume-software-logo {
+  display: block;
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+
+html.portfolio-pdf-mode .pdf-resume-software-list article:nth-child(2) .pdf-resume-software-logo,
+html.portfolio-pdf-mode .pdf-resume-software-list article:nth-child(5) .pdf-resume-software-logo {
+  padding: 2px;
+  border-radius: 8px;
+  background: #eff7fb;
+}
+
 html.portfolio-pdf-mode .pdf-resume-software h4,
 html.portfolio-pdf-mode .pdf-resume-capabilities h4,
 html.portfolio-pdf-mode .pdf-resume-workflow h4 {

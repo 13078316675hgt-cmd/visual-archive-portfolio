@@ -1,6 +1,7 @@
 import React, { useLayoutEffect, useRef } from 'react'
 import d1001DirectoryCards from '../data/d1001DirectoryConfig.js'
 import resumeContent from '../data/resumeContent.js'
+import softwareLogoAssets from '../data/softwareLogoAssets.js'
 import { initD1001LockedMasterMotion } from '../motion/d1001LockedMasterMotion.js'
 
 function useD1001Motion() {
@@ -38,31 +39,11 @@ const softwareCodeForName = (name) => ({
   'SAI Ver.2': 'SAI',
 }[name] || '')
 
-function SoftwareIcon({ code }) {
-  if (code === 'CSP') {
-    return <svg className="d1001-software-csp-mark" viewBox="0 0 48 48" aria-hidden="true">
-      <path d="M11 27c-2-8 2-15 10-18 7-2 14 1 17 8-5-3-10-2-14 2-4 3-5 8-3 13-5 0-8-2-10-5Z" fill="#53c7df" />
-      <path d="M17 18c5-7 15-6 20 1 4 7 1 16-6 20 2-5 0-10-4-13-4-3-10-3-14 1 0-4 1-7 4-9Z" fill="#83d9e9" />
-      <path d="M14 30c4 5 11 7 17 4 5-2 8-7 8-12 3 5 2 12-2 16-6 6-16 6-22 0-3-3-4-7-3-11 0 1 1 2 2 3Z" fill="#2eaecb" />
-      <circle cx="24" cy="24" r="5.5" fill="#effdff" />
-      <path d="M21 25c2-3 5-4 8-3" fill="none" stroke="#55c1d7" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  }
-
-  if (code === 'SAI') {
-    return <svg className="d1001-software-sai-mark" viewBox="0 0 48 48" aria-hidden="true">
-      <circle cx="24" cy="24" r="18" fill="#fff" stroke="#87c765" strokeWidth="3" />
-      <path d="M24 24 24 8A16 16 0 0 1 37.9 16Z" fill="#ef735e" />
-      <path d="M24 24 37.9 16A16 16 0 0 1 39.2 31Z" fill="#f0c952" />
-      <path d="M24 24 39.2 31A16 16 0 0 1 27 40Z" fill="#77c67b" />
-      <path d="M24 24 27 40A16 16 0 0 1 10.1 33Z" fill="#5ba7d9" />
-      <path d="M24 24 10.1 33A16 16 0 0 1 10 17Z" fill="#9b71c7" />
-      <path d="M24 24 10 17A16 16 0 0 1 24 8Z" fill="#d96d9d" />
-      <circle cx="24" cy="24" r="3.3" fill="#fff" />
-    </svg>
-  }
-
-  return <span className="d1001-software-lettermark">{code}</span>
+function SoftwareIcon({ code, name }) {
+  const src = softwareLogoAssets[name]
+  return src
+    ? <img className="d1001-software-logo" src={src} alt="" width="44" height="44" decoding="async" draggable="false" />
+    : <span className="d1001-software-lettermark">{code}</span>
 }
 
 function RegistrationCorners() {
@@ -254,7 +235,7 @@ export function D1001ProfessionalProfile() {
           const code = softwareCodeForName(item.name)
           return <article key={item.name}>
             <i className={`d1001-software-icon d1001-software-icon--${code.toLowerCase()}`} aria-hidden="true">
-              <SoftwareIcon code={code} />
+              <SoftwareIcon code={code} name={item.name} />
             </i>
             <strong>{item.name}</strong>
             <span>{item.usage}</span>

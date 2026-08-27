@@ -28,7 +28,7 @@ const CONTENT_ALT = Object.freeze({
   'design-14': '黑白金配色女性角色正面、侧面、背面三视图设定',
   'design-15': '黑白蓝配色短发角色正面、侧面、背面三视图设定',
   'design-16': '白橙配色角色正面、侧面、背面三视图设定',
-  'design-tianzi': '蓝白铠甲男性角色正面、侧面、背面三视图设定',
+  'design-tianzi': '黑白荧光绿配色工业女性角色正面、侧面、背面三视图与武器设定',
 })
 
 function getAssetDimensions(asset) {

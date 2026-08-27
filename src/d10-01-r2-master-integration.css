@@ -448,14 +448,13 @@
 .d1001-profile-tools article { display: grid; grid-template-rows: 48px auto auto; justify-items: start; min-width: 0; }
 .d1001-profile-tools article i { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 8px; background: #071f3d; color: #3ba9ff; font-size: 22px; font-style: normal; overflow: hidden; }
 .d1001-software-lettermark { font-weight: 500; letter-spacing: -.055em; line-height: 1; }
+.d1001-software-logo { display: block; width: 40px; height: 40px; object-fit: contain; }
 .d1001-software-icon--ps { background: #001e36 !important; color: #31a8ff !important; }
 .d1001-software-icon--ae { background: #00005b !important; color: #d6a8ff !important; }
 .d1001-software-icon--pr { background: #00005b !important; color: #ea77ff !important; }
-.d1001-software-icon--csp { background: #eefcff !important; }
+.d1001-software-icon--csp { background: transparent !important; }
 .d1001-software-icon--sai { background: #f5f7fa !important; }
-.d1001-software-csp-mark,
-.d1001-software-sai-mark { display: block; width: 35px; height: 35px; }
-.d1001-software-icon--sai .d1001-software-sai-mark { width: 37px; height: 37px; }
+.d1001-software-icon--sai .d1001-software-logo { width: 42px; height: 42px; }
 .d1001-profile-tools article strong { align-self: end; overflow: hidden; max-width: 100%; font-size: clamp(7px, .55vw, 9px); white-space: nowrap; text-overflow: ellipsis; }
 .d1001-profile-tools article span { margin-top: 6px; overflow: hidden; max-width: 100%; color: #4d5870; font-size: clamp(5px, .42vw, 7px); white-space: nowrap; text-overflow: ellipsis; }
 .d1001-profile-canvas > footer { position: absolute; left: 4%; right: 4%; bottom: 2.5%; padding-top: 9px; border-top: 1px solid #a9bce0; color: #37445f; font-size: clamp(7px, .55vw, 9px); }

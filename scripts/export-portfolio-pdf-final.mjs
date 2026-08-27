@@ -302,7 +302,7 @@ async function preparePage(browser, name, configuration) {
   if (count !== pageNames.length) throw new Error(`Expected 12 pages, found ${count}`)
   result.pageCount = count
   result.softwareHeading = await page.locator('.pdf-resume-software h3').innerText()
-  result.wechat = await page.locator('#end').innerText()
+  result.wechat = await page.locator('.pdf-resume-footer').innerText()
   result.imageSources = await page.evaluate(() =>
     Array.from(document.querySelectorAll('.portfolio-pdf-root img')).map((image) => ({
       src: image.currentSrc || image.src,

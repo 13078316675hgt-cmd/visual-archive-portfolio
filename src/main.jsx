@@ -47,6 +47,7 @@ import {
   endPageIntegrated,
 } from './data/artworkManifest.js'
 import resumeContent from './data/resumeContent.js'
+import softwareLogoAssets from './data/softwareLogoAssets.js'
 
 const lazyNamed = (loader, exportName) => React.lazy(() => loader().then((module) => ({
   default: module[exportName],
@@ -1209,8 +1210,8 @@ function PortfolioResumeDetails() {
           <h3><span aria-hidden="true"></span>SOFTWARE / TOOLS</h3>
           <div className="pdf-resume-software-list">
             {software.map((item) => <article key={item.name}>
-              <h4>{item.name}</h4>
-              <p>{item.usage}</p>
+              <img className="pdf-resume-software-logo" src={softwareLogoAssets[item.name]} alt="" width="36" height="36" decoding="async" />
+              <div><h4>{item.name}</h4><p>{item.usage}</p></div>
             </article>)}
           </div>
         </section>
