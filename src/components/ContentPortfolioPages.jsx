@@ -1,8 +1,7 @@
-import React, { useLayoutEffect, useRef } from 'react'
+import React, { useLayoutEffect, useRef, useState } from 'react'
 import {
   additionalCharacterDesigns,
   characterSheets,
-  costumeDetailAsset,
   portraitStudies,
   selectedWorks,
 } from '../data/artworkManifest.js'
@@ -55,18 +54,26 @@ function ContentPageMeta({ number, label }) {
   return <div className="page-meta content-page-meta"><span>{label}</span><b>{number}</b></div>
 }
 
-function D06AssetFigure({ asset, className, index, label = asset.label, critical = false, linkLabel = 'VIEW FULL SHEET' }) {
+function D06AssetFigure({ asset, className, index, label = asset.label, critical = false, linkLabel = 'VIEW FULL SHEET', onSelect = null }) {
+  const artwork = <img
+    {...imageAttrs(asset)}
+    alt={assetAlt(asset)}
+    loading="eager"
+    decoding="async"
+    className={critical ? 'd06-critical-art' : undefined}
+  />
+
   return <figure className={`d06-asset ${className}`.trim()}>
-    <img
-      {...imageAttrs(asset)}
-      alt={assetAlt(asset)}
-      loading="eager"
-      decoding="async"
-      className={critical ? 'd06-critical-art' : undefined}
-    />
+    {onSelect ? <button
+      type="button"
+      className="d06-sheet-select"
+      onClick={onSelect}
+      aria-label={`放大查看 ${label}`}
+    >{artwork}</button> : artwork}
     <figcaption>
       <span><b>{String(index).padStart(2, '0')}</b>{label}</span>
-      {linkLabel ? <a href={asset.src} target="_blank" rel="noreferrer">{linkLabel}</a> : null}
+      {onSelect ? <button type="button" onClick={onSelect} aria-label={`放大查看 ${label}`}>VIEW FULL SHEET</button> : null}
+      {!onSelect && linkLabel ? <a href={asset.src} target="_blank" rel="noreferrer">{linkLabel}</a> : null}
     </figcaption>
   </figure>
 }
@@ -79,15 +86,19 @@ function FullSheetFigure({ asset, index, className = '', characterSheet = false,
     {frameClassName ? <div className={frameClassName}>{artwork}</div> : artwork}
     <figcaption>
       <span><b>{String(index).padStart(2, '0')}</b>{asset.label}</span>
-      <a href={asset.src} target="_blank" rel="noreferrer">{linkLabel}</a>
+      {linkLabel ? <a href={asset.src} target="_blank" rel="noreferrer">{linkLabel}</a> : null}
     </figcaption>
   </figure>
 }
 
 export function CharacterSheets() {
-  const [sheetOne, sheetTwo, sheetThree, sheetFour] = characterSheets
+  const [activeSheetIndex, setActiveSheetIndex] = useState(0)
   const sectionRef = useRef(null)
   useLayoutEffect(() => initD06Page04Motion(sectionRef.current), [])
+  const activeSheet = characterSheets[activeSheetIndex]
+  const supportSheets = characterSheets
+    .map((asset, index) => ({ asset, index }))
+    .filter(({ index }) => index !== activeSheetIndex)
 
   return <section ref={sectionRef} id="character-sheets" className="content-portfolio-page content-sheets page d06-page04" data-page-family="design-evidence" data-d06-page="04">
     <div className="d06-desktop-layout d06-sheet-canvas">
@@ -96,11 +107,22 @@ export function CharacterSheets() {
         <h2>CHARACTER <span>SHEETS</span></h2>
         <i aria-hidden="true" />
       </header>
-      <D06AssetFigure asset={sheetOne} index={1} className="d06-sheet-primary" critical />
+      <D06AssetFigure
+        key={`primary-${activeSheet.id}`}
+        asset={activeSheet}
+        index={activeSheetIndex + 1}
+        className="d06-sheet-primary"
+        critical
+        linkLabel={null}
+      />
       <div className="d06-sheet-supports">
-        <D06AssetFigure asset={sheetTwo} index={2} className="d06-sheet-support d06-sheet-support-a" />
-        <D06AssetFigure asset={sheetThree} index={3} className="d06-sheet-support d06-sheet-support-b" />
-        <D06AssetFigure asset={sheetFour} index={4} className="d06-sheet-support d06-sheet-support-c" />
+        {supportSheets.map(({ asset, index }, slot) => <D06AssetFigure
+          key={asset.id}
+          asset={asset}
+          index={index + 1}
+          className={`d06-sheet-support d06-sheet-support-${String.fromCharCode(97 + slot)}`}
+          onSelect={() => setActiveSheetIndex(index)}
+        />)}
       </div>
       <p className="d06-sheet-order" aria-hidden="true"><span>FRONT</span><span>SIDE</span><span>BACK</span></p>
       <i className="d06-sheet-axis" aria-hidden="true" />
@@ -118,7 +140,7 @@ export function CharacterSheets() {
       </header>
 
       <div className="sheet-opening content-spread">
-        <FullSheetFigure asset={sheetOne} index={1} className="sheet-main sheet-opening-art" characterSheet />
+        <FullSheetFigure asset={characterSheets[0]} index={1} className="sheet-main sheet-opening-art" characterSheet />
         <aside className="sheet-reading-note" aria-label="设定图阅读顺序">
           <b>01</b>
           <p>FRONT<br />SIDE<br />BACK</p>
@@ -128,8 +150,8 @@ export function CharacterSheets() {
       </div>
 
       <div className="sheet-comparison content-spread d03-paired-spread" aria-label="角色设定图对照">
-        <FullSheetFigure asset={sheetTwo} index={2} className="sheet-support sheet-comparison-a" characterSheet pairedFrame />
-        <FullSheetFigure asset={sheetThree} index={3} className="sheet-support sheet-comparison-b" characterSheet pairedFrame />
+        <FullSheetFigure asset={characterSheets[1]} index={2} className="sheet-support sheet-comparison-a" characterSheet pairedFrame />
+        <FullSheetFigure asset={characterSheets[2]} index={3} className="sheet-support sheet-comparison-b" characterSheet pairedFrame />
       </div>
 
       <div className="sheet-closing content-spread">
@@ -137,7 +159,7 @@ export function CharacterSheets() {
           <span>FORM / SILHOUETTE</span>
           <b>04</b>
         </div>
-        <FullSheetFigure asset={sheetFour} index={4} className="sheet-support sheet-closing-art" characterSheet />
+        <FullSheetFigure asset={characterSheets[3]} index={4} className="sheet-support sheet-closing-art" characterSheet />
       </div>
     </div>
     <ContentPageMeta number="04" label="CHARACTER SHEETS" />
@@ -148,55 +170,18 @@ export function CharacterSheets() {
 export function CostumeDetail() {
   const sectionRef = useRef(null)
   useLayoutEffect(() => initD06Page05Motion(sectionRef.current), [])
+  const industrialDesign = additionalCharacterDesigns.find((item) => item.id === 'design-tianzi')
 
   return <section ref={sectionRef} id="costume-detail" className="content-portfolio-page content-costume page d06-page05" data-page-family="detail-focus" data-d06-page="05">
-    <div className="d06-desktop-layout d06-costume-canvas">
-      <header className="d06-costume-heading">
-        <span>05 / DETAIL STUDY</span>
-        <h2>COSTUME<br /><b>CONSTRUCTION</b></h2>
-        <p>DETAIL / CONSTRUCTION STUDY</p>
-      </header>
-      <D06AssetFigure asset={costumeDetailAsset} index={1} className="d06-costume-sheet" critical label="COMPLETE SHEET / CONTEXT" linkLabel={null} />
-      <figure className="d06-costume-crop d06-costume-upper">
-        <div><img {...imageAttrs(costumeDetailAsset)} alt="" loading="eager" decoding="async" aria-hidden="true" /></div>
-        <figcaption><b>02</b>UPPER BODY / LAYERING</figcaption>
+    <div className="d06-desktop-layout d06-costume-canvas d06-costume-single-canvas">
+      <figure className="d06-costume-sheet d06-costume-sheet-single">
+        <img {...imageAttrs(industrialDesign)} alt={assetAlt(industrialDesign)} loading="eager" decoding="async" className="d06-critical-art" />
       </figure>
-      <figure className="d06-costume-crop d06-costume-back">
-        <div><img {...imageAttrs(costumeDetailAsset)} alt="" loading="eager" decoding="async" aria-hidden="true" /></div>
-        <figcaption><b>03</b>BACK / SILHOUETTE</figcaption>
-      </figure>
-      <i className="d06-costume-marker d06-costume-marker-a" aria-hidden="true" />
-      <i className="d06-costume-marker d06-costume-marker-b" aria-hidden="true" />
     </div>
 
     <div className="d06-legacy-layout">
     <div className="content-shell">
-      <header className="costume-index" aria-labelledby="costume-title">
-        <span><b>05</b>DETAIL / CONSTRUCTION STUDY</span>
-        <h2 id="costume-title">COSTUME CONSTRUCTION</h2>
-        <p>由局部观察返回完整设定；裁切只强调原图中已有的服装结构。</p>
-      </header>
-
-      <div className="costume-focus content-spread">
-        <figure className="content-figure costume-primary">
-          <div className="costume-crop-window costume-upper-window">
-            <img {...imageAttrs(costumeDetailAsset)} alt="兜帽角色的领口、胸前装饰、袖部和腰部服装结构" loading="lazy" decoding="async" />
-          </div>
-          <figcaption><span><b>01</b>UPPER BODY / LAYERING</span></figcaption>
-        </figure>
-
-        <figure className="content-figure detail-crop costume-context">
-          <img {...imageAttrs(costumeDetailAsset)} alt={`${assetAlt(costumeDetailAsset)}完整参考`} loading="lazy" decoding="async" />
-          <figcaption><span><b>02</b>COMPLETE SHEET / CONTEXT</span></figcaption>
-        </figure>
-
-        <figure className="content-figure detail-crop costume-back">
-          <div className="costume-crop-window costume-back-window">
-            <img {...imageAttrs(costumeDetailAsset)} alt="兜帽角色背部轮廓和十字纹样细节" loading="lazy" decoding="async" />
-          </div>
-          <figcaption><span><b>03</b>BACK / SILHOUETTE</span></figcaption>
-        </figure>
-      </div>
+      <FullSheetFigure asset={industrialDesign} index={1} className="costume-context" characterSheet linkLabel={null} />
     </div>
     <ContentPageMeta number="05" label="COSTUME DETAIL" />
     </div>

@@ -22,7 +22,7 @@
   .d06-page05,
   .d06-page06-primary,
   .d06-page06-secondary,
-  .d06-page07 { background: #f1f2f2; }
+  .d06-page07 { background: #f4f5f3; }
 
   .d06-asset { margin: 0; }
   .d06-asset > img {
@@ -30,6 +30,33 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
+  }
+  .d06-sheet-select {
+    display: block;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+  .d06-sheet-select img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 420ms cubic-bezier(.22, 1, .36, 1), filter 420ms ease;
+  }
+  .d06-sheet-support .d06-sheet-select:hover img,
+  .d06-sheet-support .d06-sheet-select:focus-visible img {
+    transform: scale(1.018);
+    filter: contrast(1.025);
+  }
+  .d06-sheet-select:focus-visible {
+    outline: 2px solid #2f61ef;
+    outline-offset: 3px;
   }
   .d06-asset figcaption {
     display: flex;
@@ -57,7 +84,20 @@
     transition: color var(--motion-fast) var(--ease-out);
   }
   .d06-asset figcaption a:hover,
-  .d06-asset figcaption a:focus-visible { color: var(--red); }
+  .d06-asset figcaption a:focus-visible,
+  .d06-asset figcaption button:hover,
+  .d06-asset figcaption button:focus-visible { color: #2f61ef; }
+  .d06-asset figcaption button {
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    cursor: pointer;
+  }
 
   /* 03 / CINEMATIC ARTWORK SPREAD */
   .d06-page03 {
@@ -168,7 +208,7 @@
   }
 
   /* 04 / PRODUCTION DESIGN SPREAD */
-  .d06-sheet-canvas { position: absolute; inset: 0; }
+  .d06-sheet-canvas { position: absolute; inset: 0; background: #f4f5f3; }
   .d06-sheet-heading {
     position: absolute;
     left: 4.3%;
@@ -220,6 +260,13 @@
     width: 56.5%;
     height: 68%;
   }
+  .d06-sheet-primary > img {
+    animation: d06-sheet-swap 420ms cubic-bezier(.22, 1, .36, 1) both;
+  }
+  @keyframes d06-sheet-swap {
+    from { opacity: .18; transform: translate3d(0, 7px, 0) scale(.995); }
+    to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  }
   .d06-sheet-supports {
     position: absolute;
     right: 4.2%;
@@ -253,12 +300,27 @@
     top: 8%;
     bottom: 5%;
     width: 1px;
-    background: var(--red);
-    opacity: .55;
+    background: #cfd5dc;
+    opacity: .72;
   }
 
   /* 05 / COSTUME CONSTRUCTION */
-  .d06-costume-canvas { position: absolute; inset: 0; background: #eeeae5; }
+  .d06-costume-canvas { position: absolute; inset: 0; background: #f7f8f7; }
+  .d06-costume-single-canvas { display: grid; place-items: center; }
+  .d06-costume-sheet-single {
+    position: relative;
+    inset: auto;
+    width: min(96vw, calc(96svh * 3 / 2));
+    height: min(92svh, calc(96vw * 2 / 3));
+    margin: 0;
+    overflow: hidden;
+  }
+  .d06-costume-sheet-single img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
   .d06-costume-heading {
     position: absolute;
     left: 4.5%;
@@ -289,6 +351,14 @@
     top: 7%;
     width: 57%;
     height: 84%;
+  }
+  .d06-costume-sheet.d06-costume-sheet-single {
+    position: relative;
+    inset: auto;
+    right: auto;
+    top: auto;
+    width: min(96vw, calc(96svh * 3 / 2));
+    height: min(92svh, calc(96vw * 2 / 3));
   }
   .d06-costume-crop {
     position: absolute;

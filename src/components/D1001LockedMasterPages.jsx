@@ -31,21 +31,6 @@ function ArchiveMark({ className = '' }) {
   </svg>
 }
 
-const softwareCodeForName = (name) => ({
-  'Adobe Photoshop': 'Ps',
-  'Clip Studio Paint': 'CSP',
-  'Adobe After Effects': 'AE',
-  'Adobe Premiere Pro': 'PR',
-  'SAI Ver.2': 'SAI',
-}[name] || '')
-
-function SoftwareIcon({ code, name }) {
-  const src = softwareLogoAssets[name]
-  return src
-    ? <img className="d1001-software-logo" src={src} alt="" width="44" height="44" decoding="async" draggable="false" />
-    : <span className="d1001-software-lettermark">{code}</span>
-}
-
 function RegistrationCorners() {
   return <g className="d1001-symbol-corners">
     <path d="M18 36V19h17M86 19h17v17M18 84v17h17M103 84v17H86" />
@@ -231,16 +216,11 @@ export function D1001ProfessionalProfile() {
 
       <section className="d1001-profile-tools d1001-profile-rule-reveal">
         <h3><b>05</b>软件与工具</h3>
-        <div>{software.map((item) => {
-          const code = softwareCodeForName(item.name)
-          return <article key={item.name}>
-            <i className={`d1001-software-icon d1001-software-icon--${code.toLowerCase()}`} aria-hidden="true">
-              <SoftwareIcon code={code} name={item.name} />
-            </i>
-            <strong>{item.name}</strong>
-            <span>{item.usage}</span>
-          </article>
-        })}</div>
+        <div>{software.map((item) => <article key={item.name}>
+          <i aria-hidden="true"><img className="d1001-software-logo" src={softwareLogoAssets[item.name]} alt="" width="44" height="44" decoding="async" draggable="false" /></i>
+          <strong>{item.name}</strong>
+          <span>{item.usage}</span>
+        </article>)}</div>
       </section>
 
       <footer>系统：Windows 10</footer>
@@ -289,9 +269,6 @@ export function D1001AboutCreator() {
             <div><dt>邮箱</dt><dd><a href={`mailto:${contact.email}`}>{contact.email}</a></dd></div>
             <div><dt>微信</dt><dd>{contact.wechat}</dd></div>
           </dl>
-          <footer className="d1001-about-window-status" aria-hidden="true">
-            <span>ARCHIVE CONTACT / 03</span><i /><span>VERIFIED</span>
-          </footer>
         </div>
       </aside>
 
