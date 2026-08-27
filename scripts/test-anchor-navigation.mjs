@@ -35,22 +35,20 @@ const directoryDestinations = [
   '#about-the-creator',
 ]
 
-const forbiddenIdentity = [
-  ['1310764448', 'qq.com'].join('@'),
-  ['131', '0764', '4448'].join(' '),
-  ['Vekko', '9029'].join('_'),
-  ['GH', 'TAI', '1995'].join('_'),
-  ['HUANG', 'GUO', 'TAI'].join(' '),
-]
-
-const forbiddenProfileData = [
-  ['Wacom', 'Intuos', 'Pro'].join(' '),
-  ['数位', '屏'].join(''),
-  ['Pro', 'create'].join(''),
-  ['Blend', 'er'].join(''),
-  ['Pure', 'Ref'].join(''),
-  ['Not', 'ion'].join(''),
-]
+const canonicalIdentity = Object.freeze({
+  name: '黄国泰',
+  role: '角色概念设计师',
+  location: '中国：广东',
+  email: '2488731102@qq.com',
+  wechat: 'Veiko_9029',
+  software: [
+    'Adobe Photoshop',
+    'Clip Studio Paint',
+    'Adobe After Effects',
+    'Adobe Premiere Pro',
+    'SAI Ver.2',
+  ],
+})
 
 await mkdir(reviewDir, { recursive: true })
 
@@ -194,27 +192,69 @@ try {
 
   const identityContext = await browser.newContext({ viewport: { width: 1440, height: 900 } })
   const identityPage = await identityContext.newPage()
-  for (const [hash, canonicalId] of [['#professional-profile', 'professional-profile'], ['#about-the-creator', 'about-the-creator']]) {
-    await identityPage.goto(`${baseUrl}/${hash}`, { waitUntil: 'networkidle' })
-    await waitForRoute(identityPage, canonicalId)
-    const text = await identityPage.locator(`#${canonicalId}`).innerText()
-    record(`canonical identity ${hash}`, text.includes('黄国泰') && text.includes('2488731102@qq.com') && (hash !== '#about-the-creator' || text.includes('Veiko_9029')) && forbiddenIdentity.every((value) => !text.includes(value)))
-    if (hash === '#professional-profile') {
-      record('D10.02 verified Professional Profile data',
-        text.includes('所在地')
-        && text.includes('邮箱')
-        && text.includes('2488731102@qq.com')
-        && text.includes('微信')
-        && text.includes('Veiko_9029')
-        && text.includes('可合作时间')
-        && text.includes('随时')
-        && text.includes('Adobe Photoshop')
-        && text.includes('Clip Studio Paint')
-        && !text.includes('电话')
-        && !text.includes('手机')
-        && forbiddenProfileData.every((value) => !text.includes(value)))
+  await identityPage.goto(`${baseUrl}/#professional-profile`, { waitUntil: 'networkidle' })
+  await waitForRoute(identityPage, 'professional-profile')
+  await identityPage.evaluate(() => window.__portfolioEnsureSection?.('about-the-creator'))
+  await waitForRoute(identityPage, 'about-the-creator')
+
+  const identityState = await identityPage.evaluate((canonical) => {
+    const profile = document.getElementById('professional-profile')
+    const about = document.getElementById('about-the-creator')
+    const definitionList = (container) => Object.fromEntries([...container.querySelectorAll('dl > div')].map((row) => [
+      row.querySelector('dt')?.textContent.trim() || '',
+      row.querySelector('dd')?.textContent.trim() || '',
+    ]))
+    const profileFields = definitionList(profile.querySelector('.d1001-profile-identity'))
+    const aboutFields = definitionList(about.querySelector('.d1001-about-window'))
+    const identityNames = [
+      profile.querySelector('.d1001-profile-identity h3')?.textContent.trim() || '',
+      about.querySelector('.d1001-about-window h3')?.textContent.trim() || '',
+    ]
+    const identityRoles = [
+      profile.querySelector('.d1001-profile-identity > p')?.textContent.trim() || '',
+      about.querySelector('.d1001-about-window h3 + p')?.textContent.trim() || '',
+    ]
+    const contactSections = [profile, about]
+    const renderedEmails = contactSections.flatMap((section) => [...section.querySelectorAll('a[href^="mailto:"]')].map((link) => ({
+      text: link.textContent.trim(),
+      href: link.getAttribute('href')?.slice('mailto:'.length) || '',
+    })))
+    const extractedEmails = contactSections.flatMap((section) => section.innerText.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi) || [])
+    const telephoneLinks = contactSections.flatMap((section) => [...section.querySelectorAll('a[href^="tel:"]')].map((link) => link.getAttribute('href')))
+    const contactText = contactSections.map((section) => section.innerText).join('\n')
+    const telephoneLabels = contactText.match(/电话|手机|联系电话|telephone|phone|mobile/gi) || []
+    const mainlandTelephoneValues = contactText.match(/(?:\+?86[-\s]?)?1[3-9]\d{9}/g) || []
+    const software = [...profile.querySelectorAll('.d1001-profile-tools article strong')].map((node) => node.textContent.trim())
+
+    return {
+      identityNames,
+      identityRoles,
+      profileFields,
+      aboutFields,
+      renderedEmails,
+      extractedEmails,
+      telephoneLinks,
+      telephoneLabels,
+      mainlandTelephoneValues,
+      software,
+      checks: {
+        exactNames: identityNames.length === 2 && identityNames.every((value) => value === canonical.name),
+        exactRoles: identityRoles.length === 2 && identityRoles.every((value) => value === canonical.role),
+        exactLocation: profileFields['所在地'] === canonical.location,
+        exactEmails: renderedEmails.length === 2
+          && renderedEmails.every(({ text, href }) => text === canonical.email && href === canonical.email)
+          && extractedEmails.length === 2
+          && extractedEmails.every((value) => value === canonical.email),
+        exactWechat: profileFields['微信'] === canonical.wechat && aboutFields['微信'] === canonical.wechat,
+        noTelephone: telephoneLinks.length === 0 && telephoneLabels.length === 0 && mainlandTelephoneValues.length === 0,
+        exactSoftware: JSON.stringify(software) === JSON.stringify(canonical.software),
+        noAdditionalIdentityFields: JSON.stringify(Object.keys(profileFields)) === JSON.stringify(['所在地', '邮箱', '微信', '可合作时间'])
+          && JSON.stringify(Object.keys(aboutFields)) === JSON.stringify(['擅长方向', '邮箱', '微信']),
+      },
     }
-  }
+  }, canonicalIdentity)
+
+  for (const [name, pass] of Object.entries(identityState.checks)) record(`canonical profile allowlist: ${name}`, pass, identityState)
   await identityContext.close()
 
   const lazyContext = await browser.newContext({ viewport: { width: 1440, height: 900 } })
