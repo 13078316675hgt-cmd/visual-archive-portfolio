@@ -366,8 +366,8 @@ export function D0919Page01() {
     <div className="d0919-page01-canvas">
       <Page01Brand />
       <nav className="d0919-page01-topnav" aria-label="Key visual navigation">
-        <a href="#contents"><span aria-hidden="true">‹</span> PREV</a>
-        <a href="#key-visual-02">NEXT <span aria-hidden="true">›</span></a>
+        <span className="d0919-page01-nav-label" aria-hidden="true"><i>‹</i> PREV</span>
+        <span className="d0919-page01-nav-label" aria-hidden="true">NEXT <i>›</i></span>
         <a className="d0919-page01-grid-link" href="#contents" aria-label="Back to directory">
           {Array.from({ length: 9 }, (_, index) => <i key={index} />)}
         </a>
@@ -420,3 +420,4 @@ export function D0919Page01() {
 }
 
 export { DIRECTORY_NODES, page01Asset }
+

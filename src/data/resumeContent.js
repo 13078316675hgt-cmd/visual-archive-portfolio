@@ -199,3 +199,4 @@ export const resumeContent = Object.freeze({
 })
 
 export default resumeContent
+

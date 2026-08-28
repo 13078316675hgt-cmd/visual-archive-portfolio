@@ -1,4 +1,4 @@
-﻿import React from 'react'
+import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { flushSync } from 'react-dom'
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
@@ -22,17 +22,28 @@ import './d09-20-home-static.css'
 import './portfolio-pdf.css'
 import './performance-loading.css'
 import './d10-01-r2-master-integration.css'
-import './d11-01-homepage-locked.css'
-import './premium-agency-motion.css'
 import { initArchiveMotion } from './motion/archiveMotion.js'
 import { initPage02PosterMotion } from './motion/page02PosterMotion.js'
 import { initD06Page03Motion, initD07Page01Motion } from './motion/innerPagesMotion.js'
-import { initD1101HomeMotion } from './motion/d1101HomeMotion.js'
+import {
+  AdditionalCharacterDesigns,
+  CharacterSheets,
+  CostumeDetail,
+  PortraitStudies,
+  SelectedWorks,
+} from './components/ContentPortfolioPages.jsx'
 import {
   ApprovedDirectoryMotion,
   ApprovedEndMotion,
   ApprovedPage03Motion,
 } from './components/ApprovedMotionPages.jsx'
+import { D0919Page01 } from './components/D0919Pages.jsx'
+import {
+  D1001AboutCreator,
+  D1001Directory,
+  D1001ProcessWorkflow,
+  D1001ProfessionalProfile,
+} from './components/D1001LockedMasterPages.jsx'
 import {
   PerformancePicture,
   performanceImageAttrs,
@@ -49,29 +60,13 @@ import {
 import resumeContent from './data/resumeContent.js'
 import softwareLogoAssets from './data/softwareLogoAssets.js'
 
-const lazyNamed = (loader, exportName) => React.lazy(() => loader().then((module) => ({
-  default: module[exportName],
-})))
-
-const loadContentPortfolioPages = () => import('./components/ContentPortfolioPages.jsx')
-const loadD1001Pages = () => import('./components/D1001LockedMasterPages.jsx')
-
-const AdditionalCharacterDesigns = lazyNamed(loadContentPortfolioPages, 'AdditionalCharacterDesigns')
-const CharacterSheets = lazyNamed(loadContentPortfolioPages, 'CharacterSheets')
-const CostumeDetail = lazyNamed(loadContentPortfolioPages, 'CostumeDetail')
-const PortraitStudies = lazyNamed(loadContentPortfolioPages, 'PortraitStudies')
-const SelectedWorks = lazyNamed(loadContentPortfolioPages, 'SelectedWorks')
-const D0919Page01 = lazyNamed(() => import('./components/D0919Pages.jsx'), 'D0919Page01')
-const D1001AboutCreator = lazyNamed(loadD1001Pages, 'D1001AboutCreator')
-const D1001Directory = lazyNamed(loadD1001Pages, 'D1001Directory')
-const D1001ProfessionalProfile = lazyNamed(loadD1001Pages, 'D1001ProfessionalProfile')
-
 const PORTFOLIO_URL_ROUTES = Object.freeze([
   { id: 'title', hash: '', aliases: ['#title'] },
   { id: 'contents', hash: '#contents', aliases: [] },
   { id: 'key-visual-01', hash: '#key-visual-01', aliases: [] },
   { id: 'key-visual-02', hash: '#key-visual-02', aliases: ['#page-02'] },
   { id: 'key-visual-03', hash: '#key-visual-03', aliases: [] },
+  { id: 'process-workflow', hash: '#process-workflow', aliases: [] },
   { id: 'character-sheets', hash: '#character-sheets', aliases: [] },
   { id: 'costume-detail', hash: '#costume-detail', aliases: [] },
   { id: 'portrait-studies', hash: '#portrait-studies', aliases: [] },
@@ -124,10 +119,26 @@ function usePortfolioMotion() {
 
     const navigateToAnchorOnce = (hash, target = resolveAnchorTarget(hash)) => {
       if (!target) return false
-      target.scrollIntoView({
-        block: 'start',
-        behavior: 'instant',
-      })
+
+      // Deferred sections replace a fixed-height placeholder after the click.
+      // Wait for that commit and then calculate the final document position;
+      // otherwise scrollIntoView can land on the old placeholder geometry.
+      const settle = (attempt = 0) => {
+        const resolved = resolveAnchorTarget(hash) || target
+        const isPlaceholder = resolved instanceof Element
+          && resolved.classList.contains('performance-section-placeholder')
+        if (isPlaceholder && attempt < 8) {
+          window.requestAnimationFrame(() => settle(attempt + 1))
+          return
+        }
+        resolved.scrollIntoView({
+          block: 'start',
+          behavior: 'instant',
+        })
+        if (resolved instanceof HTMLElement) resolved.focus({ preventScroll: true })
+      }
+
+      window.requestAnimationFrame(() => window.requestAnimationFrame(() => settle()))
       return true
     }
 
@@ -146,10 +157,7 @@ function usePortfolioMotion() {
     const cleanupArchiveMotion = mobileMotion
       ? initArchiveMotion(document.querySelector('.archive-selection-scene'), { reducedMotion: reduceMotion })
       : () => {}
-    const cleanupHomeMotion = initD1101HomeMotion(
-      document.querySelector('.d1101-homepage-locked'),
-      { reducedMotion: reduceMotion },
-    )
+    const cleanupHomeMotion = () => {}
 
     let routeSyncFrame = 0
     let routeSyncUnlockFrame = 0
@@ -404,6 +412,7 @@ function usePortfolioMotion() {
 
     scene('#key-visual-01', 'kv01', 'artwork-sequence', '--motion-section')
     scene('#key-visual-03', 'kv03', 'artwork-static-first', '--motion-standard')
+    scene('#process-workflow', 'process', 'section-intro', '--motion-standard')
     scene('#character-sheets', 'sheets', 'artwork-sequence', '--motion-section')
     scene('#costume-detail', 'detail', 'artwork-sequence', '--motion-section')
     scene('#portrait-studies', 'portraits', 'artwork-sequence', '--motion-section')
@@ -673,66 +682,93 @@ function TitleSection() {
 
 function HomeV9Preview() {
   const base = import.meta.env.BASE_URL
-  const poster = `${base}assets/d11-home/homepage-master-locked-1672x941.png`
-  const posterWebp = `${base}assets/d11-home/homepage-master-locked-1672x941.webp`
-  const posterSrcSet = [
-    `${base}assets/d11-home/homepage-master-locked-480.webp 480w`,
-    `${base}assets/d11-home/homepage-master-locked-720.webp 720w`,
-    `${base}assets/d11-home/homepage-master-locked-960.webp 960w`,
-    `${base}assets/d11-home/homepage-master-locked-1280.webp 1280w`,
-    `${posterWebp} 1672w`,
-  ].join(', ')
+  const homeAsset = (filename) => `${base}assets/approved-motion/home/${filename}`
+  const pdfMode = document.documentElement.classList.contains('portfolio-pdf-mode')
+  const layers = [
+    'home-background-neutralized.png',
+    'home-layer-statue-disc-v2.png',
+    'home-layer-rocks.png',
+    'home-layer-frame.png',
+    'home-layer-blue-accents.png',
+    'home-layer-birds.png',
+    'home-layer-fine-marks.png',
+  ]
 
-  return <section
-    id="title"
-    className="home-v9-preview d1101-homepage-locked"
-    data-home-visual="d11-01-locked-poster"
-    aria-labelledby="d1101-homepage-title"
-    tabIndex={-1}
-  >
-    <div className="d1101-homepage-poster">
-      <picture className="performance-picture">
-        <source type="image/webp" srcSet={posterSrcSet} sizes="100vw" />
-        <img
-          className="d1101-homepage-master"
-          src={poster}
-          alt=""
-          width="1672"
-          height="941"
-          loading="eager"
-          decoding="async"
-          fetchPriority="high"
-          draggable="false"
-          aria-hidden="true"
-        />
-      </picture>
+  return <section id="title" className="home-v9-preview d0920-home-static" data-home-visual="d09-20-locked-static" tabIndex={-1}>
+    <div className="d0920-home-canvas">
+      <div className="d0920-home-art" aria-hidden="true">
+        {pdfMode
+          ? layers.map((filename, index) => <img
+              key={filename}
+              src={homeAsset(filename)}
+              alt=""
+              width="2560"
+              height="1440"
+              loading="eager"
+              decoding="async"
+              fetchPriority={index < 2 ? 'high' : 'auto'}
+              draggable="false"
+            />)
+          : <PerformancePicture
+              sourceKey="home-clean"
+              widths={[960, 1800, 2560]}
+              fallback={`${base}assets/performance-v1-source/home-approved-composite-2560x1440.png`}
+              sizes="100vw"
+              className="d0920-home-flat-image"
+              alt=""
+              width="2560"
+              height="1440"
+              loading="eager"
+              decoding="async"
+              fetchPriority="high"
+              draggable="false"
+            />}
+      </div>
 
-      <span className="d1101-homepage-title-backdrop" aria-hidden="true" />
-      <picture className="performance-picture">
-        <source type="image/webp" srcSet={posterSrcSet} sizes="100vw" />
-        <img
-          className="d1101-homepage-title-clone"
-          src={poster}
-          alt=""
-          width="1672"
-          height="941"
-          loading="eager"
-          decoding="async"
-          draggable="false"
-          aria-hidden="true"
-        />
-      </picture>
-      <span className="d1101-homepage-opening-veil" aria-hidden="true" />
+      <a className="d0920-home-brand" href="#contents" aria-label="Open portfolio directory">
+        <svg viewBox="0 0 64 56" aria-hidden="true">
+          <g>
+            <rect x="28" y="0" width="8" height="8" />
+            <rect x="20" y="8" width="8" height="8" />
+            <rect x="36" y="8" width="8" height="8" />
+            <rect x="16" y="16" width="8" height="8" />
+            <rect x="40" y="16" width="8" height="8" />
+            <rect x="12" y="24" width="8" height="8" />
+            <rect x="44" y="24" width="8" height="8" />
+            <rect x="8" y="32" width="8" height="8" />
+            <rect x="48" y="32" width="8" height="8" />
+            <rect x="4" y="40" width="8" height="8" />
+            <rect x="52" y="40" width="8" height="8" />
+            <rect x="4" y="48" width="56" height="8" />
+            <rect x="28" y="18" width="8" height="18" />
+            <rect x="28" y="40" width="8" height="8" />
+          </g>
+        </svg>
+        <strong>ARCHIVE STUDIO</strong>
+        <span>VISUAL DESIGN &amp; ART DIRECTION</span>
+      </a>
 
-      <h1 id="d1101-homepage-title" className="d1101-visually-hidden" lang="zh-CN">个人作品集</h1>
-      <nav className="d1101-homepage-links" aria-label="Homepage poster navigation">
-        <a className="d1101-homepage-hotspot d1101-homepage-hotspot-brand" href="#contents" aria-label="Open portfolio directory from Archive Studio" />
-        <a className="d1101-homepage-hotspot d1101-homepage-hotspot-prev" href="#about-the-creator" aria-label="Previous section: About the Creator" />
-        <a className="d1101-homepage-hotspot d1101-homepage-hotspot-next" href="#contents" aria-label="Next section: Portfolio Directory" />
-        <a className="d1101-homepage-hotspot d1101-homepage-hotspot-grid" href="#contents" aria-label="Open portfolio directory grid" />
-        <a className="d1101-homepage-hotspot d1101-homepage-hotspot-selected" href="#contents" aria-label="Open Selected Works directory" />
-        <a className="d1101-homepage-hotspot d1101-homepage-hotspot-scroll" href="#contents" aria-label="Scroll to explore the portfolio directory" />
-      </nav>
+      <header className="d0920-home-copy">
+        <h1 lang="zh-CN">个人作品集</h1>
+        <p className="d1001-home-copy-zh" lang="zh-CN">视觉设计 · 插画创作 · 艺术指导</p>
+        <p className="d1001-home-copy-en">VISUAL DESIGN&nbsp;&nbsp;/&nbsp;&nbsp;ILLUSTRATION&nbsp;&nbsp;/&nbsp;&nbsp;ART DIRECTION</p>
+      </header>
+
+      <div className="d0920-home-projects">
+        <h2><span aria-hidden="true">+</span> SELECTED WORKS</h2>
+        <strong>SELECTED WORKS</strong>
+        <p lang="zh-CN">整理思绪，记录灵感。<br />用视觉语言，探索无限可能。</p>
+      </div>
+
+      <a className="d0920-home-top-link" href="#contents">
+        <span>PORTFOLIO</span>
+        <strong>SELECTED WORKS</strong>
+        <i aria-hidden="true" />
+      </a>
+      <p className="d0920-home-discipline" aria-hidden="true">DESIGN&nbsp;&nbsp;/&nbsp;&nbsp;ILLUSTRATION&nbsp;&nbsp;/&nbsp;&nbsp;ART DIRECTION</p>
+      <a className="d0920-home-scroll" href="#contents"><i aria-hidden="true" /><span>SCROLL TO EXPLORE</span><b aria-hidden="true" /></a>
+      <p className="d0920-home-page-index"><b>01</b><i>/</i><span>PORTFOLIO</span></p>
+      <p className="d0920-home-total"><b>01</b><i>/ 12</i><span aria-hidden="true" /></p>
     </div>
   </section>
 }
@@ -1264,6 +1300,7 @@ const WEBSITE_DEFERRED_SECTIONS = Object.freeze([
   { id: 'key-visual-01', Component: D0919Page01, aliases: [] },
   { id: 'key-visual-02', Component: Page02Poster, aliases: ['page-02'] },
   { id: 'key-visual-03', Component: KeyVisualThree, aliases: [] },
+  { id: 'process-workflow', Component: D1001ProcessWorkflow, aliases: [] },
   { id: 'character-sheets', Component: CharacterSheets, aliases: [] },
   { id: 'costume-detail', Component: CostumeDetail, aliases: [] },
   { id: 'portrait-studies', Component: PortraitStudies, aliases: [] },
@@ -1321,22 +1358,7 @@ function DeferredPortfolioSection({ definition, enabled, mounted, ensureMounted 
     return () => observer.disconnect()
   }, [definition.id, enabled, ensureMounted, mounted])
 
-  if (mounted) return <React.Suspense fallback={
-    <section
-      id={definition.id}
-      className="performance-section-placeholder page"
-      data-performance-placeholder={definition.id}
-      aria-label={`${definition.id} loading boundary`}
-      tabIndex={-1}
-    >
-      {definition.aliases.map((alias) =>
-        <span id={alias} className="page-deep-link-alias" aria-hidden="true" key={alias} />,
-      )}
-      <span className="performance-section-placeholder-mark" aria-hidden="true" />
-    </section>
-  }>
-    <definition.Component />
-  </React.Suspense>
+  if (mounted) return <definition.Component />
 
   return <section
     ref={placeholderRef}
@@ -1424,19 +1446,18 @@ function WebsitePortfolioPageSequence({ className, forceContents = false }) {
 function PortfolioPageSequence({ className, includeResumeDetails = false }) {
   return <main className={className}>
     <HomeV9Preview />
-    <React.Suspense fallback={null}>
-      <D1001Directory />
-      <D0919Page01 />
-      <Page02Poster />
-      <KeyVisualThree />
-      <CharacterSheets />
-      <CostumeDetail />
-      <PortraitStudies />
-      <SelectedWorks />
-      <AdditionalCharacterDesigns />
-      {includeResumeDetails ? <PortfolioResumeDetails /> : <D1001ProfessionalProfile />}
-      <D1001AboutCreator />
-    </React.Suspense>
+    <D1001Directory />
+    <D0919Page01 />
+    <Page02Poster />
+    <KeyVisualThree />
+    <D1001ProcessWorkflow />
+    <CharacterSheets />
+    <CostumeDetail />
+    <PortraitStudies />
+    <SelectedWorks />
+    <AdditionalCharacterDesigns />
+    {includeResumeDetails ? <PortfolioResumeDetails /> : <D1001ProfessionalProfile />}
+    <D1001AboutCreator />
   </main>
 }
 
@@ -1466,3 +1487,4 @@ if (portfolioPdfRoute) {
 }
 
 createRoot(document.getElementById('root')).render(portfolioPdfRoute ? <PortfolioPdfApp /> : <App />)
+

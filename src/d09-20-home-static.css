@@ -223,22 +223,54 @@
 .d0920-home-scroll {
   position: absolute;
   z-index: 3;
-  left: 4.72%;
-  bottom: 9.5%;
-  display: grid;
-  justify-items: center;
-  gap: 11px;
-  color: #23272c;
-  font: 500 clamp(5px, .43vw, 8px)/1 "IBM Plex Mono", monospace;
-  letter-spacing: .14em;
-  writing-mode: vertical-rl;
+  left: 4.15%;
+  bottom: 23%;
+  display: flex;
+  align-items: center;
+  width: 24%;
+  min-width: 260px;
+  color: var(--d0920-blue);
+  font: 650 clamp(6px, .52vw, 9px)/1 "IBM Plex Mono", monospace;
+  letter-spacing: .08em;
 }
 
 .d0920-home-scroll i {
-  width: 3px;
-  height: 3px;
-  margin-top: 7px;
-  background: var(--d0920-blue);
+  position: relative;
+  flex: 0 0 auto;
+  width: clamp(38px, 3.2vw, 58px);
+  height: clamp(38px, 3.2vw, 58px);
+  margin-right: 16px;
+  border: 1px solid var(--d0920-blue);
+  border-radius: 50%;
+}
+
+.d0920-home-scroll i::before,
+.d0920-home-scroll i::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+}
+
+.d0920-home-scroll i::before {
+  left: 28%;
+  width: 42%;
+  border-top: 1px solid var(--d0920-blue);
+  transform: translateY(-50%);
+}
+
+.d0920-home-scroll i::after {
+  right: 27%;
+  width: 7px;
+  height: 7px;
+  border-top: 1px solid var(--d0920-blue);
+  border-right: 1px solid var(--d0920-blue);
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.d0920-home-scroll b {
+  flex: 1 1 auto;
+  margin-left: 16px;
+  border-top: 1px solid rgba(22, 87, 243, .28);
 }
 
 .d0920-home-page-index,
@@ -408,3 +440,4 @@
     transition: none !important;
   }
 }
+

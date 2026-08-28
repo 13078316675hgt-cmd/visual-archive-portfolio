@@ -82,3 +82,4 @@ export function PerformancePicture({
     />
   </picture>
 }
+

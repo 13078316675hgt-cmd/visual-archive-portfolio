@@ -12,7 +12,7 @@ export const d1001DirectoryCards = Object.freeze([
     title: 'CHARACTER',
     titleZh: '角色设定与形象塑造',
     subtitle: 'CHARACTER DESIGN',
-    href: '#key-visual-02',
+    href: '#selected-works',
     symbol: 'bust',
   },
   {
@@ -20,7 +20,7 @@ export const d1001DirectoryCards = Object.freeze([
     title: 'ARCHIVE',
     titleZh: '灵感归档与设定研究',
     subtitle: 'ARCHIVE & RESEARCH',
-    href: '#key-visual-03',
+    href: '#additional-designs',
     symbol: 'archive',
   },
   {
@@ -28,7 +28,7 @@ export const d1001DirectoryCards = Object.freeze([
     title: 'PROCESS',
     titleZh: '创作流程与过程记录',
     subtitle: 'PROCESS & WORKFLOW',
-    href: '#costume-detail',
+    href: '#process-workflow',
     symbol: 'layers',
   },
   {
@@ -58,3 +58,4 @@ export const d1001DirectoryCards = Object.freeze([
 ])
 
 export default d1001DirectoryCards
+

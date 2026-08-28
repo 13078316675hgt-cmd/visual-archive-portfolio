@@ -212,3 +212,4 @@ export function initHomeMotion(section, { reducedMotion = false } = {}) {
 }
 
 export const homeMotionDuration = HOME_COMPLETE_TIME * 1000
+

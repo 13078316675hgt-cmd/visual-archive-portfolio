@@ -340,3 +340,4 @@ export function initEndPageDvdMotion(section, panel) {
     if (window.__END_PAGE_DVD_MOTION__ === api) delete window.__END_PAGE_DVD_MOTION__
   }
 }
+

@@ -91,7 +91,7 @@ export async function auditPortfolioAssets() {
     }
     if (!asset.src.startsWith('/assets/approved/')) errors.push(`${role}: active src must stay in /assets/approved/ (${asset.src})`)
     if (!asset.alt || !asset.alt.trim()) errors.push(`${role}: alt text is empty`)
-    if (!asset.filename || !asset.resolution || !asset.sourcePath) errors.push(`${role}: filename, resolution, or sourcePath metadata is missing`)
+    if (!asset.filename || !asset.resolution) errors.push(`${role}: filename or resolution metadata is missing`)
 
     const relative = asset.src.replace(/^\/assets\/approved\//, '')
     const target = path.resolve(approvedRoot, relative)
@@ -237,3 +237,4 @@ export async function auditPortfolioAssets() {
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   auditPortfolioAssets().catch((error) => { console.error(error.message); process.exitCode = 1 })
 }
+

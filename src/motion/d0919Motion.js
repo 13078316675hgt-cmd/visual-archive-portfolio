@@ -258,3 +258,4 @@ export function initD0919Page01Motion(section) {
     delete section.dataset.d0919Page01ImageFallback
   }
 }
+

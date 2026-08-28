@@ -183,6 +183,15 @@ export function initD06Page05Motion(section) {
   const markers = qa('.d06-costume-marker')
   const targets = () => [sheet, ...crops, heading, ...markers].filter(Boolean)
 
+  if (sheet && !heading && crops.length === 0 && markers.length === 0) {
+    return createOneShotMotion(section, '05', (finish) => {
+      gsap.set(sheet, { opacity: 0, scale: 1.012, transformOrigin: 'center' })
+      return gsap.timeline({ paused: true, defaults: { ease: 'power3.out' }, onComplete: finish })
+        .to(sheet, { opacity: 1, scale: 1, duration: .82, ease: 'power3.inOut' }, 0)
+        .to({}, { duration: .42 }, .82)
+    }, targets)
+  }
+
   return createOneShotMotion(section, '05', (finish) => {
     gsap.set(sheet, { scale: 1.04, xPercent: 2, transformOrigin: '62% 48%' })
     gsap.set(crops, { clipPath: 'inset(100% 0 0 0)', y: 14 })
@@ -276,3 +285,4 @@ export function initD06Page07Motion(section) {
       .to({}, { duration: .62 }, 1.7)
   }, targets)
 }
+

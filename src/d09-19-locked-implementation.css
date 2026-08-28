@@ -600,6 +600,20 @@
   text-decoration: none;
 }
 
+.d0919-page01-nav-label {
+  color: #191d25;
+  font: 600 clamp(7px, .72vw, 12px)/1 Inter, sans-serif;
+  cursor: default;
+  user-select: none;
+}
+
+.d0919-page01-nav-label i {
+  color: #1762f0;
+  font-size: 1.7em;
+  font-style: normal;
+  vertical-align: -.11em;
+}
+
 .d0919-page01-topnav a span {
   color: #1762f0;
   font-size: 1.7em;
@@ -1109,3 +1123,4 @@
     transition: none;
   }
 }
+

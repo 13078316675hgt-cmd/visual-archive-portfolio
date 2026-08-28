@@ -281,3 +281,4 @@ export const archiveMotionDurations = Object.freeze({
   tablet: TABLET_DURATION,
   mobile: MOBILE_DURATION,
 })
+

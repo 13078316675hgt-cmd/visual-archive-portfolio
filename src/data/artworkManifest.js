@@ -7,11 +7,10 @@ const directory = `${appBase}assets/directory/`
 
 const buildSrcSet = (entries) => entries.map(([filename, width]) => `${web}${filename} ${width}w`).join(', ')
 
-const asset = ({ id, filename, sourcePath, resolution, alt, label, ratio = 'portrait', src, srcSet, sizes }) => ({
+const asset = ({ id, filename, resolution, alt, label, ratio = 'portrait', src, srcSet, sizes }) => ({
   id,
   src: src || `${approved}${filename}`,
   filename,
-  sourcePath,
   resolution,
   alt,
   label,
@@ -24,7 +23,6 @@ export const contentsV6CleanAtmosphere = {
   id: 'contents-v6-4-clean-atmosphere-plate',
   src: `${contentsV64}contents-v6-4-clean-atmosphere-plate.png`,
   filename: 'contents-v6-4-clean-atmosphere-plate.png',
-  sourcePath: 'contents_v6_4_clean_atmosphere_plate.png',
   resolution: '1672 x 941',
   alt: '冷白与浅蓝灰色冰雪氛围场景，中央偏右为半透明女性巨像、遗迹、山体、冰晶结构与飞鸟',
   label: 'V6.4 CLEAN ATMOSPHERE PLATE',
@@ -36,7 +34,6 @@ export const directoryMasterApproved = {
   id: 'directory-master-approved',
   src: `${directory}directory-master-approved.png`,
   filename: 'directory-master-approved.png',
-  sourcePath: 'project root / directory-master-approved.png',
   resolution: '1672 x 941',
   alt: '浅灰白技术档案场景，中央为悬浮石材与织物装置，下方设有黑色展示平台',
   label: 'APPROVED DIRECTORY MASTER',
@@ -48,7 +45,6 @@ export const directoryMasterIntegrated = {
   id: 'directory-master-d04-locked',
   src: `${approved}directory-master-d04-locked.png`,
   filename: 'directory-master-d04-locked.png',
-  sourcePath: 'Q:/A图片/PS/image.png',
   resolution: '2048 x 1152',
   alt: '\u51b7\u767d\u8272\u6863\u6848\u7a7a\u95f4\u4e0e\u4e2d\u592e\u60ac\u6d6e\u77f3\u6750\u7ec7\u7269\u88c5\u7f6e\uff0c\u8fb9\u7f18\u4ee5\u5efa\u7b51\u7ed3\u6784\u7ebf\u5ef6\u5c55',
   label: 'D04 LOCKED DIRECTORY MOTHER IMAGE',
@@ -65,7 +61,6 @@ export const homeV9Artwork = {
   ].join(', '),
   sizes: '(max-width: 900px) 100vw, 93.5vw',
   filename: 'home-v9-clean-master-2560x1440.png',
-  sourcePath: 'home_v9_clean_asset_pack / home_v9_clean_master_2560x1440.png',
   resolution: '2560 x 1440',
   alt: '浅色拼贴画面，右侧包含古典雕塑头像、倾斜装饰画框、黑色圆形、蓝色图形碎片、山地与飞鸟',
   label: 'HOME V9 CLEAN MASTER',
@@ -75,7 +70,6 @@ export const homeV9Artwork = {
 const titleBackground = asset({
   id: 'title-architecture-00',
   filename: 'web/title-architecture-1672.webp',
-  sourcePath: '作品集(1).zip / 00.png',
   resolution: '1672 x 941',
   alt: '灰白色废墟建筑、断桥和高塔场景',
   label: 'TITLE ARCHITECTURE',
@@ -87,7 +81,6 @@ const titleBackground = asset({
 export const artworkOne = asset({
   id: 'artwork-one',
   filename: 'web/kv01-1800.webp',
-  sourcePath: '作品集(1).zip / 1.png',
   resolution: '1800 x 2326',
   alt: '黑发持剑角色与蓝黑色龙形生物、建筑和环形能量构成的竖幅角色插画',
   label: 'KEY VISUAL 01',
@@ -102,7 +95,6 @@ export const artworkOne = asset({
 export const artworkTwo = asset({
   id: 'artwork-two',
   filename: 'web/kv02-1800.webp',
-  sourcePath: '作品集(1).zip / 2.png',
   resolution: '1800 x 2326',
   alt: '白发角色与黑白红色巨型生物形态、武器和碎石构成的竖幅角色插画',
   label: 'KEY VISUAL 02',
@@ -117,7 +109,6 @@ export const artworkTwo = asset({
 export const artworkThree = asset({
   id: 'artwork-three',
   filename: 'web/kv03-1800.webp',
-  sourcePath: '作品集(1).zip / 3.png',
   resolution: '1800 x 1996',
   alt: '绿色长发角色与绿色龙形剪影的竖幅角色插画',
   label: 'KEY VISUAL 03',
@@ -132,7 +123,6 @@ export const artworkThree = asset({
 export const contactHandsTech = asset({
   id: 'contact-hands-tech',
   filename: 'web/contact-hands-tech-1672.webp',
-  sourcePath: 'generated asset / contact-hands-tech.png',
   resolution: '1672 x 941',
   alt: '两只手从左右两侧靠近并带有蓝色技术标记的线稿图',
   label: 'CONTACT HANDS TECH',
@@ -144,7 +134,6 @@ export const contactHandsTech = asset({
 export const endPageArtwork = asset({
   id: 'end-page-master',
   filename: 'end-page-master.png',
-  sourcePath: 'project root / end-page-master.png',
   resolution: '1672 x 941',
   alt: '明亮的未来列车内部，两只半透明解剖结构手从两侧伸向彼此，画面包含 E、N、D、T、THE END 与 SYSTEM LOG 字样',
   label: 'END PAGE MASTER',
@@ -155,7 +144,6 @@ export const endPageArtwork = asset({
 export const endPageIntegrated = asset({
   id: 'end-page-master-integrated-v3',
   filename: 'end-page-master-integrated-v3.png',
-  sourcePath: 'Figma / 05 — D03.3 STATIC + MOTION CORRECTION / selected option A',
   resolution: '2560 x 1440',
   alt: '\u660e\u4eae\u7684\u51b7\u8272\u672a\u6765\u8f66\u53a2\u4e2d\uff0c\u4e24\u53ea\u534a\u900f\u660e\u89e3\u5256\u7ed3\u6784\u624b\u4ece\u5de6\u4e0a\u4e0e\u53f3\u4e0b\u65b9\u4f38\u5411\u5f7c\u6b64\uff0c\u753b\u9762\u53f3\u4e0a\u4e3a THE END \u5b57\u6837',
   label: 'D03.3 INTEGRATED END PAGE MASTER',
@@ -181,7 +169,6 @@ export const characterSheets = [
   asset({
     id: 'sheet-01',
     filename: 'web/character-sheet-01-1600.webp',
-    sourcePath: '作品集.zip / 8.png',
     resolution: '1536 x 1024',
     alt: '黑蓝配色角色正面侧面背面三视图',
     label: 'CHARACTER SHEET / 01',
@@ -192,7 +179,6 @@ export const characterSheets = [
   asset({
     id: 'sheet-02',
     filename: 'web/character-sheet-02-1600.webp',
-    sourcePath: '作品集.zip / 10.png',
     resolution: '1536 x 1024',
     alt: '紫白配色长发角色正面侧面背面三视图',
     label: 'CHARACTER SHEET / 02',
@@ -203,7 +189,6 @@ export const characterSheets = [
   asset({
     id: 'sheet-03',
     filename: 'web/character-sheet-03-1600.webp',
-    sourcePath: '作品集.zip / 12.png',
     resolution: '1408 x 1117',
     alt: '黑白红配色兜帽角色正面侧面背面三视图',
     label: 'CHARACTER SHEET / 03',
@@ -214,7 +199,6 @@ export const characterSheets = [
   asset({
     id: 'sheet-04',
     filename: 'web/character-sheet-04-1800.webp',
-    sourcePath: '作品集.zip / 13.png',
     resolution: '1800 x 1761',
     alt: '黑金配色白发角色正面侧面背面三视图',
     label: 'CHARACTER SHEET / 04',
@@ -230,7 +214,6 @@ export const portraitStudies = [
   asset({
     id: 'portrait-01',
     filename: 'web/portrait-01-1600.webp',
-    sourcePath: '作品集.zip / 4.png',
     resolution: '1600 x 2400',
     alt: '白发持剑角色半身肖像',
     label: 'PORTRAIT STUDY / 01',
@@ -240,7 +223,6 @@ export const portraitStudies = [
   asset({
     id: 'portrait-white-hair',
     filename: 'web/portrait-white-hair-1600.webp',
-    sourcePath: '作品集(1).zip / 6.png',
     resolution: '1600 x 1126',
     alt: '白发红角角色横向半身肖像',
     label: 'PORTRAIT STUDY / 02',
@@ -254,7 +236,6 @@ export const selectedWorks = [
   asset({
     id: 'character-presentation-purple',
     filename: 'web/character-presentation-purple-1600.webp',
-    sourcePath: '作品集(1).zip / 11.png',
     resolution: '1600 x 1879',
     alt: '紫白配色角色展示页与配色说明',
     label: 'CHARACTER PRESENTATION',
@@ -264,7 +245,6 @@ export const selectedWorks = [
   asset({
     id: 'study-red-profile',
     filename: 'web/study-red-profile-1600.webp',
-    sourcePath: '作品集(1).zip / 5.png',
     resolution: '1600 x 1067',
     alt: '浅绿色背景中的红发侧脸角色肖像',
     label: 'IMAGE STUDY / RED PROFILE',
@@ -275,7 +255,6 @@ export const selectedWorks = [
   asset({
     id: 'study-blue-sky',
     filename: 'web/study-blue-sky-1600.webp',
-    sourcePath: '作品集(1).zip / 7.png',
     resolution: '1600 x 1067',
     alt: '蓝天雪山背景下的白发角色横向肖像',
     label: 'IMAGE STUDY / BLUE SKY',
@@ -289,7 +268,6 @@ export const additionalCharacterDesigns = [
   asset({
     id: 'design-14',
     filename: 'web/character-design-14-1448.webp',
-    sourcePath: '作品集(1).zip / 14.jpg',
     resolution: '1448 x 1086',
     alt: '黑白金配色女性角色三视图设定',
     label: '14 / CHARACTER DESIGN',
@@ -300,7 +278,6 @@ export const additionalCharacterDesigns = [
   asset({
     id: 'design-15',
     filename: 'web/character-design-15-1448.webp',
-    sourcePath: '作品集(1).zip / 15.jpg',
     resolution: '1448 x 1086',
     alt: '黑白蓝配色短发角色三视图设定',
     label: '15 / CHARACTER DESIGN',
@@ -311,7 +288,6 @@ export const additionalCharacterDesigns = [
   asset({
     id: 'design-16',
     filename: 'web/character-design-16-1355.webp',
-    sourcePath: '作品集(1).zip / 16.png',
     resolution: '1355 x 1161',
     alt: '白橙配色角色三视图设定',
     label: '16 / CHARACTER DESIGN',
@@ -322,7 +298,6 @@ export const additionalCharacterDesigns = [
   asset({
     id: 'design-tianzi',
     filename: 'web/character-design-tianzi-1536.webp',
-    sourcePath: '工业女02.png',
     resolution: '1536 x 1024',
     alt: '黑白荧光绿配色工业女性角色正面侧面背面三视图与武器设定',
     label: 'INDUSTRIAL WOMAN / CHARACTER DESIGN',
@@ -335,7 +310,6 @@ export const additionalCharacterDesigns = [
 const contentsArtworkOne = asset({
   id: 'contents-artwork-one',
   filename: 'web/thumb-contents-01-900.webp',
-  sourcePath: '作品集(1).zip / 1.png',
   resolution: '900 x 1163',
   alt: artworkOne.alt,
   label: 'KEY VISUAL 01',
@@ -345,7 +319,6 @@ const contentsArtworkOne = asset({
 const contentsArtworkTwo = asset({
   id: 'contents-artwork-two',
   filename: 'web/thumb-contents-02-900.webp',
-  sourcePath: '作品集(1).zip / 2.png',
   resolution: '900 x 1163',
   alt: artworkTwo.alt,
   label: 'KEY VISUAL 02',
@@ -355,7 +328,6 @@ const contentsArtworkTwo = asset({
 const contentsArtworkThree = asset({
   id: 'contents-artwork-three',
   filename: 'web/thumb-contents-03-900.webp',
-  sourcePath: '作品集(1).zip / 3.png',
   resolution: '900 x 998',
   alt: artworkThree.alt,
   label: 'KEY VISUAL 03',
@@ -365,7 +337,6 @@ const contentsArtworkThree = asset({
 const contentsSheetOne = asset({
   id: 'contents-sheet-01',
   filename: 'web/thumb-contents-04-900.webp',
-  sourcePath: '作品集.zip / 8.png',
   resolution: '900 x 600',
   alt: characterSheets[0].alt,
   label: 'CHARACTER SHEETS',
@@ -376,7 +347,6 @@ const contentsSheetOne = asset({
 const contentsCostumeDetail = asset({
   id: 'contents-costume-detail',
   filename: 'web/thumb-contents-05-900.webp',
-  sourcePath: '作品集.zip / 12.png',
   resolution: '900 x 714',
   alt: costumeDetailAsset.alt,
   label: 'COSTUME DETAIL',
@@ -387,7 +357,6 @@ const contentsCostumeDetail = asset({
 const contentsPortraitStudy = asset({
   id: 'contents-portrait-white-hair',
   filename: 'web/thumb-contents-06-900.webp',
-  sourcePath: '作品集(1).zip / 6.png',
   resolution: '900 x 633',
   alt: portraitStudies[1].alt,
   label: 'PORTRAIT STUDIES',
@@ -398,7 +367,6 @@ const contentsPortraitStudy = asset({
 const contentsAdditionalDesign = asset({
   id: 'contents-design-tianzi',
   filename: 'web/thumb-contents-07-900.webp',
-  sourcePath: '工业女02.png',
   resolution: '900 x 600',
   alt: additionalCharacterDesigns.find((item) => item.id === 'design-tianzi').alt,
   label: 'ADDITIONAL CHARACTER DESIGNS',
@@ -725,3 +693,4 @@ export const contentsChapters = [
     lines: ['BACK TO TOP', 'RETURN TO TITLE'],
   },
 ]
+

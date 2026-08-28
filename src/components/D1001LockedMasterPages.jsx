@@ -31,21 +31,6 @@ function ArchiveMark({ className = '' }) {
   </svg>
 }
 
-const softwareCodeForName = (name) => ({
-  'Adobe Photoshop': 'Ps',
-  'Clip Studio Paint': 'CSP',
-  'Adobe After Effects': 'AE',
-  'Adobe Premiere Pro': 'PR',
-  'SAI Ver.2': 'SAI',
-}[name] || '')
-
-function SoftwareIcon({ code, name }) {
-  const src = softwareLogoAssets[name]
-  return src
-    ? <img className="d1001-software-logo" src={src} alt="" width="44" height="44" decoding="async" draggable="false" />
-    : <span className="d1001-software-lettermark">{code}</span>
-}
-
 function RegistrationCorners() {
   return <g className="d1001-symbol-corners">
     <path d="M18 36V19h17M86 19h17v17M18 84v17h17M103 84v17H86" />
@@ -182,6 +167,40 @@ export function D1001Directory() {
   </section>
 }
 
+export function D1001ProcessWorkflow() {
+  const ref = useD1001Motion()
+  const steps = [
+    ['01', 'BRIEF ANALYSIS', '梳理世界观、目标与视觉语汇，建立清晰的设计方向。'],
+    ['02', 'VISUAL KEYWORDS', '提炼关键词、比例与材质，形成可执行的视觉基准。'],
+    ['03', 'ITERATION', '通过草图、轮廓与配色方案反复验证，逐步收敛方案。'],
+    ['04', 'DELIVERY', '整理三视图、细节与说明文档，输出完整归档文件。'],
+  ]
+
+  return <section ref={ref} id="process-workflow" className="page d1001-process" aria-labelledby="d1001-process-title">
+    <div className="d1001-process-canvas">
+      <header className="d1001-process-heading d1001-reveal-header">
+        <p><b>04</b> PROCESS ARCHIVE <i aria-hidden="true" /></p>
+        <h2 id="d1001-process-title">PROCESS<br /><span>&amp; WORKFLOW</span></h2>
+        <p lang="zh-CN">从概念到交付的设计路径</p>
+      </header>
+      <div className="d1001-process-intro d1001-reveal-meta">
+        <span>CONTROLLED EDITORIAL / DESIGN EVIDENCE</span>
+        <p lang="zh-CN">每一阶段都留下可追溯的视觉证据，<br />让想法稳定地变成可用的设定资产。</p>
+      </div>
+      <ol className="d1001-process-steps d1001-reveal-meta">
+        {steps.map(([number, title, copy]) => <li key={number}>
+          <b>{number}</b>
+          <div><h3>{title}</h3><p lang="zh-CN">{copy}</p></div>
+          <i aria-hidden="true" />
+        </li>)}
+      </ol>
+      <div className="d1001-process-axis" aria-hidden="true"><span /><span /><span /><span /></div>
+      <p className="d1001-process-index d1001-reveal-meta"><b>04</b><i aria-hidden="true" /> / PROCESS</p>
+      <p className="d1001-process-total d1001-reveal-meta">04 / 08 <i aria-hidden="true" /></p>
+    </div>
+  </section>
+}
+
 export function D1001ProfessionalProfile() {
   const ref = useD1001Motion()
   const { contact, coreCapabilities, identity, profile, software, strengths, workflow, website } = resumeContent
@@ -231,16 +250,11 @@ export function D1001ProfessionalProfile() {
 
       <section className="d1001-profile-tools d1001-profile-rule-reveal">
         <h3><b>05</b>软件与工具</h3>
-        <div>{software.map((item) => {
-          const code = softwareCodeForName(item.name)
-          return <article key={item.name}>
-            <i className={`d1001-software-icon d1001-software-icon--${code.toLowerCase()}`} aria-hidden="true">
-              <SoftwareIcon code={code} name={item.name} />
-            </i>
-            <strong>{item.name}</strong>
-            <span>{item.usage}</span>
-          </article>
-        })}</div>
+        <div>{software.map((item) => <article key={item.name}>
+          <i aria-hidden="true"><img className="d1001-software-logo" src={softwareLogoAssets[item.name]} alt="" width="44" height="44" decoding="async" draggable="false" /></i>
+          <strong>{item.name}</strong>
+          <span>{item.usage}</span>
+        </article>)}</div>
       </section>
 
       <footer>系统：Windows 10</footer>
@@ -289,9 +303,6 @@ export function D1001AboutCreator() {
             <div><dt>邮箱</dt><dd><a href={`mailto:${contact.email}`}>{contact.email}</a></dd></div>
             <div><dt>微信</dt><dd>{contact.wechat}</dd></div>
           </dl>
-          <footer className="d1001-about-window-status" aria-hidden="true">
-            <span>ARCHIVE CONTACT / 03</span><i /><span>VERIFIED</span>
-          </footer>
         </div>
       </aside>
 
@@ -303,3 +314,4 @@ export function D1001AboutCreator() {
 }
 
 export { ArchiveMark, DirectorySymbol }
+
