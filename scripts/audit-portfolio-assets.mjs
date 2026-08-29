@@ -237,4 +237,3 @@ export async function auditPortfolioAssets() {
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   auditPortfolioAssets().catch((error) => { console.error(error.message); process.exitCode = 1 })
 }
-

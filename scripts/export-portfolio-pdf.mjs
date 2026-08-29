@@ -21,13 +21,14 @@ const pageNames = [
   '03-page-01',
   '04-page-02',
   '05-page-03',
-  '06-page-04',
-  '07-page-05',
-  '08-page-06-portrait',
-  '09-page-06-presentation',
-  '10-page-07',
-  '11-full-resume-details',
-  '12-resume-contact',
+  '06-process-workflow',
+  '07-page-04',
+  '08-page-05',
+  '09-page-06-portrait',
+  '10-page-06-presentation',
+  '11-page-07',
+  '12-full-resume-details',
+  '13-resume-contact',
 ]
 
 const masterPdf = path.join(pdfDir, '黄国泰_角色概念设计作品集_MASTER_v2.pdf')

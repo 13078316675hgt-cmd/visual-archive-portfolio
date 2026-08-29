@@ -375,6 +375,51 @@
     width: min(98vw, calc(96svh * 3 / 2));
     height: min(96svh, calc(98vw * 2 / 3));
   }
+  /* Replace the source sheet's temporary identity block while keeping the
+     character artwork and technical layout untouched. */
+  .d06-costume-copy-mask,
+  .d06-costume-keyword-mask {
+    position: absolute;
+    z-index: 4;
+    display: block;
+    background: #f8f8f7;
+  }
+  .d06-costume-copy-mask {
+    left: 4.2%;
+    top: 2.2%;
+    width: 29%;
+    height: 14.2%;
+    padding: 1.8% 0 0 10.5%;
+    color: #17181b;
+  }
+  .d06-costume-infinity {
+    position: absolute;
+    left: 0;
+    top: 4%;
+    color: #1b54ee;
+    font: 600 clamp(28px, 3.4vw, 54px)/.8 Inter, sans-serif;
+    letter-spacing: -.18em;
+    transform: scaleX(1.2);
+    transform-origin: left center;
+  }
+  .d06-costume-copy-mask strong {
+    display: block;
+    font: 700 clamp(18px, 1.8vw, 30px)/1.05 "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    letter-spacing: .06em;
+  }
+  .d06-costume-copy-mask small {
+    display: block;
+    margin-top: 6px;
+    color: #616b72;
+    font: 500 clamp(9px, .72vw, 13px)/1.1 "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    letter-spacing: .12em;
+  }
+  .d06-costume-keyword-mask {
+    left: 4.2%;
+    top: 30.5%;
+    width: 25.7%;
+    height: 25.5%;
+  }
   .d06-costume-crop {
     position: absolute;
     margin: 0;
@@ -595,4 +640,3 @@
   .d06-legacy-layout,
   .d06-mobile-legacy { display: contents; }
 }
-

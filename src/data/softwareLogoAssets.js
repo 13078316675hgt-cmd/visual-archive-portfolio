@@ -9,4 +9,3 @@ const softwareLogoAssets = Object.freeze({
 })
 
 export default softwareLogoAssets
-

@@ -23,13 +23,14 @@ const pageNames = [
   '03-page-01',
   '04-page-02',
   '05-page-03',
-  '06-page-04',
-  '07-page-05',
-  '08-page-06-portrait',
-  '09-page-06-presentation',
-  '10-page-07',
-  '11-full-resume-details',
-  '12-resume-contact',
+  '06-process-workflow',
+  '07-page-04',
+  '08-page-05',
+  '09-page-06-portrait',
+  '10-page-06-presentation',
+  '11-page-07',
+  '12-full-resume-details',
+  '13-resume-contact',
 ]
 const variants = {
   master: {
@@ -299,7 +300,7 @@ async function preparePage(browser, name, configuration) {
     window.scrollTo(0, 0)
   })
   const count = await page.locator('.portfolio-pdf-root > section').count()
-  if (count !== pageNames.length) throw new Error(`Expected 12 pages, found ${count}`)
+  if (count !== pageNames.length) throw new Error(`Expected ${pageNames.length} pages, found ${count}`)
   result.pageCount = count
   result.softwareHeading = await page.locator('.pdf-resume-software h3').innerText()
   result.wechat = await page.locator('.pdf-resume-footer').innerText()
@@ -365,7 +366,7 @@ try {
     }
   }
   const pass = Object.values(results).every((result) => (
-    result.pageCount === 12
+    result.pageCount === pageNames.length
     && result.softwareHeading.trim() === 'SOFTWARE / TOOLS'
     && result.wechat.includes('Veiko_9029')
     && result.consoleErrors.length === 0

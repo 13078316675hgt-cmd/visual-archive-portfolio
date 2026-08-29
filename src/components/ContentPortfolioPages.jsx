@@ -176,6 +176,12 @@ export function CostumeDetail() {
     <div className="d06-desktop-layout d06-costume-canvas d06-costume-single-canvas">
       <figure className="d06-costume-sheet d06-costume-sheet-single">
         <img {...imageAttrs(industrialDesign)} alt={assetAlt(industrialDesign)} loading="eager" decoding="async" className="d06-critical-art" />
+        <span className="d06-costume-copy-mask" aria-hidden="true">
+          <i className="d06-costume-infinity">∞</i>
+          <strong>卡琳</strong>
+          <small>生态研究员</small>
+        </span>
+        <span className="d06-costume-keyword-mask" aria-hidden="true" />
       </figure>
     </div>
 
@@ -349,4 +355,3 @@ export function AdditionalCharacterDesigns() {
     </div>
   </section>
 }
-

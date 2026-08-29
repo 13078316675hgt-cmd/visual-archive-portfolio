@@ -1,4 +1,4 @@
-import React from 'react'
+﻿import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { flushSync } from 'react-dom'
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
@@ -25,6 +25,7 @@ import './d10-01-r2-master-integration.css'
 import { initArchiveMotion } from './motion/archiveMotion.js'
 import { initPage02PosterMotion } from './motion/page02PosterMotion.js'
 import { initD06Page03Motion, initD07Page01Motion } from './motion/innerPagesMotion.js'
+import { initHomeMotion } from './motion/homeMotion.js'
 import {
   AdditionalCharacterDesigns,
   CharacterSheets,
@@ -157,7 +158,7 @@ function usePortfolioMotion() {
     const cleanupArchiveMotion = mobileMotion
       ? initArchiveMotion(document.querySelector('.archive-selection-scene'), { reducedMotion: reduceMotion })
       : () => {}
-    const cleanupHomeMotion = () => {}
+    const cleanupHomeMotion = initHomeMotion(document.querySelector('#title.home-v9-preview'), { reducedMotion: reduceMotion })
 
     let routeSyncFrame = 0
     let routeSyncUnlockFrame = 0
@@ -682,47 +683,18 @@ function TitleSection() {
 
 function HomeV9Preview() {
   const base = import.meta.env.BASE_URL
-  const homeAsset = (filename) => `${base}assets/approved-motion/home/${filename}`
-  const pdfMode = document.documentElement.classList.contains('portfolio-pdf-mode')
-  const layers = [
-    'home-background-neutralized.png',
-    'home-layer-statue-disc-v2.png',
-    'home-layer-rocks.png',
-    'home-layer-frame.png',
-    'home-layer-blue-accents.png',
-    'home-layer-birds.png',
-    'home-layer-fine-marks.png',
-  ]
+  const homeAsset = `${base}assets/home-v9/home-v9-blue-archive-master.png`
 
-  return <section id="title" className="home-v9-preview d0920-home-static" data-home-visual="d09-20-locked-static" tabIndex={-1}>
+  return <section id="title" className="home-v9-preview d0920-home-static" data-home-visual="v9master" tabIndex={-1}>
     <div className="d0920-home-canvas">
-      <div className="d0920-home-art" aria-hidden="true">
-        {pdfMode
-          ? layers.map((filename, index) => <img
-              key={filename}
-              src={homeAsset(filename)}
-              alt=""
-              width="2560"
-              height="1440"
-              loading="eager"
-              decoding="async"
-              fetchPriority={index < 2 ? 'high' : 'auto'}
-              draggable="false"
-            />)
-          : <PerformancePicture
-              sourceKey="home-clean"
-              widths={[960, 1800, 2560]}
-              fallback={`${base}assets/performance-v1-source/home-approved-composite-2560x1440.png`}
-              sizes="100vw"
-              className="d0920-home-flat-image"
-              alt=""
-              width="2560"
-              height="1440"
-              loading="eager"
-              decoding="async"
-              fetchPriority="high"
-              draggable="false"
-            />}
+      <div className="d0920-home-art home-v9-artwork" aria-hidden="true">
+        <div className="home-v9-mother-base" data-home-base>
+          <img src={homeAsset} alt="" width="2000" height="1125" loading="eager" decoding="async" fetchPriority="high" draggable="false" />
+        </div>
+        <i className="home-v9-layer-environment" aria-hidden="true" />
+        <i className="home-v9-layer-subject" aria-hidden="true" />
+        <i className="home-v9-layer-foreground" aria-hidden="true" />
+        <i className="home-v9-blue-wipe" aria-hidden="true" />
       </div>
 
       <a className="d0920-home-brand" href="#contents" aria-label="Open portfolio directory">
@@ -748,7 +720,7 @@ function HomeV9Preview() {
         <span>VISUAL DESIGN &amp; ART DIRECTION</span>
       </a>
 
-      <header className="d0920-home-copy">
+      <header className="d0920-home-copy home-v9-copy">
         <h1 lang="zh-CN">个人作品集</h1>
         <p className="d1001-home-copy-zh" lang="zh-CN">视觉设计 · 插画创作 · 艺术指导</p>
         <p className="d1001-home-copy-en">VISUAL DESIGN&nbsp;&nbsp;/&nbsp;&nbsp;ILLUSTRATION&nbsp;&nbsp;/&nbsp;&nbsp;ART DIRECTION</p>
@@ -766,9 +738,9 @@ function HomeV9Preview() {
         <i aria-hidden="true" />
       </a>
       <p className="d0920-home-discipline" aria-hidden="true">DESIGN&nbsp;&nbsp;/&nbsp;&nbsp;ILLUSTRATION&nbsp;&nbsp;/&nbsp;&nbsp;ART DIRECTION</p>
-      <a className="d0920-home-scroll" href="#contents"><i aria-hidden="true" /><span>SCROLL TO EXPLORE</span><b aria-hidden="true" /></a>
-      <p className="d0920-home-page-index"><b>01</b><i>/</i><span>PORTFOLIO</span></p>
-      <p className="d0920-home-total"><b>01</b><i>/ 12</i><span aria-hidden="true" /></p>
+      <a className="d0920-home-scroll home-v9-scroll" href="#contents"><i aria-hidden="true" /><span>SCROLL TO EXPLORE</span><b aria-hidden="true" /></a>
+      <p className="d0920-home-page-index home-v9-index"><b>01</b><i>/</i><span>PORTFOLIO</span></p>
+      <p className="d0920-home-total home-v9-coordinate"><b>01</b><i>/ 12</i><span aria-hidden="true" /></p>
     </div>
   </section>
 }
@@ -1487,4 +1459,3 @@ if (portfolioPdfRoute) {
 }
 
 createRoot(document.getElementById('root')).render(portfolioPdfRoute ? <PortfolioPdfApp /> : <App />)
-

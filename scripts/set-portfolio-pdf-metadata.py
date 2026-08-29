@@ -38,8 +38,8 @@ def main() -> None:
     actual = {key: str((check.metadata or {}).get(key, "")) for key in METADATA}
     if actual != METADATA:
         raise RuntimeError(f"PDF metadata verification failed: {actual!r}")
-    if len(check.pages) != 12:
-        raise RuntimeError(f"Expected 12 pages, found {len(check.pages)}")
+    if len(check.pages) != 13:
+        raise RuntimeError(f"Expected 13 pages, found {len(check.pages)}")
 
     print(
         {

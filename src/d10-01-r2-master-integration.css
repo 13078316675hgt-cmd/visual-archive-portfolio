@@ -125,6 +125,56 @@
   .d0920-home-art { transform: translate3d(0, -1.15%, 0) scale(1.008); transform-origin: 50% 50%; }
 }
 
+/* V9 homepage: one continuous archive plate with the original deep-blue wipe. */
+#title.home-v9-preview .d0920-home-art { background: #f5f7fa; }
+#title.home-v9-preview .home-v9-mother-base,
+#title.home-v9-preview .home-v9-mother-base img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+#title.home-v9-preview .home-v9-mother-base { z-index: 1; will-change: transform; }
+#title.home-v9-preview .home-v9-mother-base img {
+  object-fit: cover;
+  object-position: center;
+  opacity: 1;
+  filter: none;
+}
+#title.home-v9-preview .home-v9-layer-environment,
+#title.home-v9-preview .home-v9-layer-subject,
+#title.home-v9-preview .home-v9-layer-foreground { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+#title.home-v9-preview .home-v9-blue-wipe {
+  position: absolute;
+  z-index: 4;
+  top: 0;
+  right: -1px;
+  width: 38%;
+  height: 100%;
+  background: #173cff;
+  pointer-events: none;
+  transform-origin: center;
+  animation: none;
+  will-change: transform, opacity;
+}
+#title.home-v9-preview .home-v9-blue-wipe.is-wipe-running {
+  animation: v9-blue-wipe 1.12s cubic-bezier(.76,0,.18,1) .08s both;
+}
+@keyframes v9-blue-wipe {
+  0% { transform: translate3d(0,0,0); opacity: .98; }
+  62% { transform: translate3d(-185%,0,0); opacity: .98; }
+  100% { transform: translate3d(-290%,0,0); opacity: 0; }
+}
+
+/* Keep the process title clear of the first workflow marker. */
+@media (min-width: 901px) {
+  .d1001-process-heading { width: 31%; }
+  .d1001-process-heading h2 { max-width: 100%; font-size: clamp(54px, 5.25vw, 92px); }
+  .d1001-process-steps,
+  .d1001-process-axis { left: 40.5%; }
+}
+
 /* DIRECTORY */
 .d1001-directory {
   background:
@@ -671,4 +721,3 @@
   .d1001-about-version, .d1001-about-return, .d1001-about-index { position: relative; left: auto; right: auto; bottom: auto; margin-top: 34px; }
   .d1001-about-index { text-align: right; }
 }
-

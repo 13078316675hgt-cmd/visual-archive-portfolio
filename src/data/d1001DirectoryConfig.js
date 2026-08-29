@@ -58,4 +58,3 @@ export const d1001DirectoryCards = Object.freeze([
 ])
 
 export default d1001DirectoryCards
-

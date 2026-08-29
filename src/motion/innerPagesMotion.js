@@ -285,4 +285,3 @@ export function initD06Page07Motion(section) {
       .to({}, { duration: .62 }, 1.7)
   }, targets)
 }
-

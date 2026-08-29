@@ -120,4 +120,3 @@ export function initEndPageMotion(section, panel) {
     delete section.dataset.endMotionState
   }
 }
-

@@ -86,4 +86,3 @@ export function initPage02PosterMotion(section) {
     delete section.dataset.page02Motion
   }
 }
-

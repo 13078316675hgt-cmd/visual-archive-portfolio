@@ -16,12 +16,13 @@ export function initHomeMotion(section, { reducedMotion = false } = {}) {
   const environment = section.querySelector('.home-v9-layer-environment')
   const subject = section.querySelector('.home-v9-layer-subject')
   const foreground = section.querySelector('.home-v9-layer-foreground')
+  const blueWipe = section.querySelector('.home-v9-blue-wipe')
   const layers = [environment, subject, foreground].filter(Boolean)
   const nav = section.querySelector('.top-nav')
   const copy = section.querySelector('.home-v9-copy')
   const utility = Array.from(section.querySelectorAll('.home-v9-index, .home-v9-coordinate, .home-v9-scroll'))
   const rules = Array.from(section.querySelectorAll('.home-v9-rule'))
-  const animated = [base, ...layers, nav, copy, ...utility, ...rules].filter(Boolean)
+  const animated = [base, ...layers, nav, copy, ...utility, ...rules, blueWipe].filter(Boolean)
   const mobile = window.matchMedia('(max-width: 900px)').matches
   const tablet = !mobile && window.matchMedia('(max-width: 1100px)').matches
 
@@ -36,11 +37,23 @@ export function initHomeMotion(section, { reducedMotion = false } = {}) {
 
   const setFinalState = () => {
     gsap.killTweensOf(animated)
-    gsap.set(base, { clearProps: 'transform,opacity,visibility' })
-    gsap.set(layers, { opacity: 0, clearProps: 'transform,visibility' })
-    gsap.set([nav, copy, ...utility, ...rules], { clearProps: 'transform,opacity,clipPath,visibility' })
+    if (base) gsap.set(base, { clearProps: 'transform,opacity,visibility' })
+    if (layers.length) gsap.set(layers, { opacity: 0, clearProps: 'transform,visibility' })
+    const finalTargets = [nav, copy, ...utility, ...rules].filter(Boolean)
+    if (finalTargets.length) gsap.set(finalTargets, { clearProps: 'transform,opacity,clipPath,visibility' })
+    if (blueWipe) {
+      blueWipe.classList.remove('is-wipe-running')
+      gsap.set(blueWipe, { transform: 'translate3d(-290%,0,0)', opacity: 0 })
+    }
     section.classList.add('is-inview', 'is-complete')
     section.dataset.homeMotionState = 'complete'
+  }
+
+  const replayBlueWipe = () => {
+    if (!blueWipe) return
+    blueWipe.classList.remove('is-wipe-running')
+    void blueWipe.offsetWidth
+    blueWipe.classList.add('is-wipe-running')
   }
 
   const prepare = () => {
@@ -153,6 +166,7 @@ export function initHomeMotion(section, { reducedMotion = false } = {}) {
   const play = ({ replay = false } = {}) => {
     if (disposed || reducedMotion || !mediaReady || !inViewport || (played && !replay)) return
     played = true
+    replayBlueWipe()
     prepare()
     buildTimeline().play(0)
   }
@@ -212,4 +226,3 @@ export function initHomeMotion(section, { reducedMotion = false } = {}) {
 }
 
 export const homeMotionDuration = HOME_COMPLETE_TIME * 1000
-

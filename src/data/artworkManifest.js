@@ -213,11 +213,11 @@ export const costumeDetailAsset = characterSheets.find((item) => item.id === 'sh
 export const portraitStudies = [
   asset({
     id: 'portrait-01',
-    filename: 'web/portrait-01-1600.webp',
-    resolution: '1600 x 2400',
+    filename: 'web/portrait-saber-2000.png',
+    resolution: '2000 x 3000',
     alt: '白发持剑角色半身肖像',
     label: 'PORTRAIT STUDY / 01',
-    src: `${web}portrait-01-1600.webp`,
+    src: `${web}portrait-saber-2000.png`,
     sizes: '(max-width: 900px) 100vw, 42vw',
   }),
   asset({
@@ -693,4 +693,3 @@ export const contentsChapters = [
     lines: ['BACK TO TOP', 'RETURN TO TITLE'],
   },
 ]
-
