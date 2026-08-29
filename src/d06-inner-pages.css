@@ -594,6 +594,10 @@
     z-index: 2;
   }
   .d06-archive-support { position: absolute; z-index: 3; }
+  .d06-archive-support > img {
+    background: #eceeed;
+    filter: grayscale(1) brightness(1.035) contrast(.94);
+  }
   .d06-archive-support-a { left: 4.2%; top: 43%; width: 23%; height: 28%; }
   .d06-archive-support-b { right: 4.2%; top: 12%; width: 22%; height: 25%; }
   .d06-archive-support-c { right: 5.2%; top: 55%; width: 25%; height: 29%; }

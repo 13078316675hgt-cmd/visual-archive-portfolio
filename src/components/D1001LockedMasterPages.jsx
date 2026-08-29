@@ -287,8 +287,8 @@ export function D1001AboutCreator() {
         <p lang="zh-CN">角色概念设计师，专注于日系动漫角色<br />与工业题材的设计探索，擅长将叙事、<br />结构与美学融合，输出可落地的高完成度<br />角色设定方案。</p>
       </div>
 
-      <figure className="d1001-about-hand" aria-label="Approved anatomical hand study">
-        <img src={`${base}assets/d10-01/about-hand-locked-r2.png`} alt="淡蓝色解剖手部视觉研究" width="758" height="941" loading="eager" decoding="async" />
+      <figure className="d1001-about-hand" aria-label="Right arm anatomical bitmap study">
+        <img src={`${base}assets/approved/web/contact-hands-tech-1672.webp`} alt="灰蓝色右臂解剖位图视觉研究" width="1672" height="941" loading="eager" decoding="async" />
       </figure>
       <i className="d1001-about-scan" aria-hidden="true" />
 

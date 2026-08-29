@@ -598,32 +598,64 @@
 .d1001-about-copy > i { display: block; width: 30px; margin-top: 4vh; border-top: 3px solid var(--d1001-blue); }
 .d1001-about-copy > p:last-child { margin: 2.1vh 0 0; color: #18223a; font-size: clamp(11px, 1.03vw, 17px); line-height: 2.15; letter-spacing: .06em; }
 
-.d1001-about-hand { position: absolute; z-index: 2; left: 17.94%; top: 0; width: 45.34%; height: 100%; margin: 0; }
-.d1001-about-hand img { display: block; width: 100%; height: 100%; object-fit: fill; }
+.d1001-about-hand {
+  position: absolute;
+  z-index: 2;
+  left: 17.94%;
+  top: 0;
+  width: 45.34%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: #f7f9fb;
+  isolation: isolate;
+}
+.d1001-about-hand img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 82% 50%;
+  filter: grayscale(1) sepia(.08) hue-rotate(175deg) saturate(1.4) contrast(1.08) brightness(1.055);
+  opacity: .72;
+  mix-blend-mode: multiply;
+}
+.d1001-about-hand::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(circle, rgba(24, 64, 138, .24) 0 1px, transparent 1.15px) 0 0 / 5px 5px,
+    linear-gradient(90deg, rgba(255, 255, 255, .34), rgba(218, 228, 244, .12));
+  mix-blend-mode: multiply;
+  opacity: .34;
+}
 .d1001-about-scan { position: absolute; z-index: 3; left: 32%; top: 70.8%; width: 46%; border-top: 1px solid rgba(30, 92, 214, .42); }
 
 .d1001-about-window {
   position: absolute;
   z-index: 7;
-  left: 63.3%;
-  top: 26.4%;
-  width: 31.25%;
-  height: 46.2%;
+  left: 61.8%;
+  top: 23.2%;
+  width: 34.9%;
+  height: 55.8%;
   border: 1px solid #9ca6b5;
   border-radius: 7px;
   background: rgba(252, 253, 254, .93);
   box-shadow: 0 16px 30px rgba(14, 29, 52, .12);
 }
-.d1001-about-window > header { display: flex; align-items: center; gap: 18px; height: 10%; padding: 0 3.7%; border-bottom: 1px solid #bcc4cf; font-size: clamp(8px, .7vw, 12px); letter-spacing: .05em; }
+.d1001-about-window > header { display: flex; align-items: center; gap: 18px; height: 9%; padding: 0 3.7%; border-bottom: 1px solid #bcc4cf; font-size: clamp(8px, .7vw, 12px); letter-spacing: .05em; }
 .d1001-about-window > header span { margin-left: auto; font-size: 1.45em; letter-spacing: .16em; }
-.d1001-about-window > div { position: relative; height: 90%; padding: 11% 7%; }
+.d1001-about-window > div { position: relative; height: 91%; padding: 8% 7% 6%; }
 .d1001-about-window h3 { margin: 0; color: #07142e; font-family: "Noto Serif SC", SimSun, serif; font-size: clamp(29px, 2.25vw, 38px); font-weight: 600; letter-spacing: .14em; }
 .d1001-about-window h3 i { display: inline-block; width: 12px; height: 12px; margin-left: 7px; border-radius: 50%; background: var(--d1001-blue); }
 .d1001-about-window h3 i::after { content: "✓"; display: block; color: white; font: 8px/12px sans-serif; text-align: center; }
-.d1001-about-window > div > p { margin: 4px 0 8%; font-size: clamp(10px, .95vw, 16px); letter-spacing: .08em; }
+.d1001-about-window > div > p { margin: 4px 0 6%; font-size: clamp(10px, .95vw, 16px); letter-spacing: .08em; }
 .d1001-about-person { position: absolute; right: 9%; top: 14%; width: 42px; height: 31px; border: 3px solid var(--d1001-blue); border-top: 0; border-radius: 25px 25px 0 0; }
 .d1001-about-person::before { content: ""; position: absolute; left: 9px; top: -32px; width: 20px; height: 20px; border: 3px solid var(--d1001-blue); border-radius: 50%; background: #fcfdfe; }
-.d1001-about-window dl { display: grid; gap: 3.1vh; margin: 0; padding-top: 4.2vh; border-top: 1px dashed #b6bec9; }
+.d1001-about-window dl { display: grid; gap: 2.3vh; margin: 0; padding-top: 3.2vh; border-top: 1px dashed #b6bec9; }
 .d1001-about-window dl div { display: grid; grid-template-columns: 28% 1fr; font-size: clamp(9px, .78vw, 13px); line-height: 1.55; }
 .d1001-about-window dt { font-weight: 650; }
 .d1001-about-window dt::before { content: ""; display: inline-block; width: 7px; height: 7px; margin-right: 14px; background: var(--d1001-blue); }
@@ -711,7 +743,8 @@
   .d1001-about-copy h2 { font-size: clamp(42px, 13vw, 58px); }
   .d1001-about-copy > p:last-child { font-size: 12px; line-height: 2; }
   .d1001-about-hand { position: relative; left: -18%; top: auto; width: 115%; height: auto; margin-top: -90px; opacity: .62; }
-  .d1001-about-hand img { height: auto; object-fit: contain; }
+  .d1001-about-hand { aspect-ratio: 4 / 5; }
+  .d1001-about-hand img { width: 180%; max-width: none; height: 100%; object-fit: cover; object-position: 82% 50%; }
   .d1001-about-scan { display: none; }
   .d1001-about-window { position: relative; left: auto; top: auto; width: 100%; height: auto; min-height: 410px; margin-top: -100px; }
   .d1001-about-window > header { height: 42px; }
