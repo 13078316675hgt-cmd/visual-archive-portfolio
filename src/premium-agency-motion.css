@@ -1,0 +1,81 @@
+/* Premium agency motion layer: one continuous reveal plane, no fragmented wipes. */
+
+.d1101-homepage-title-backdrop,
+.d1101-homepage-title-clone,
+.d1101-homepage-opening-veil {
+  position: absolute;
+  display: none;
+  pointer-events: none;
+  user-select: none;
+}
+
+.d1101-homepage-title-backdrop {
+  z-index: 2;
+  left: 2.65%;
+  top: 38%;
+  width: 30.75%;
+  height: 17.2%;
+  background: #fefefe;
+}
+
+.d1101-homepage-title-clone {
+  inset: 0;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  object-position: 50% 50%;
+}
+
+.d1101-homepage-opening-veil {
+  inset: 0;
+  z-index: 4;
+  background: linear-gradient(90deg, #07142f 0%, #123cff 58%, #0b32e7 100%);
+  transform: translateZ(0);
+}
+
+.d1101-homepage-opening-veil::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 1px;
+  height: 100%;
+  background: rgba(255, 255, 255, .84);
+  box-shadow: 0 0 34px rgba(255, 255, 255, .44);
+}
+
+.d1101-homepage-locked[data-d1101-opening="armed"] .d1101-homepage-title-backdrop,
+.d1101-homepage-locked[data-d1101-opening="armed"] .d1101-homepage-title-clone,
+.d1101-homepage-locked[data-d1101-opening="armed"] .d1101-homepage-opening-veil {
+  display: block;
+}
+
+.d1101-homepage-locked[data-d1101-opening="armed"] .d1101-homepage-hotspot {
+  pointer-events: none;
+}
+
+.d1101-homepage-links { z-index: 6; }
+
+.d1001-directory[data-d1001-motion="premium"] .d1001-directory-copy h2,
+.d1001-directory[data-d1001-motion="premium"] .d1001-directory-copy h3,
+.d1001-profile[data-d1001-motion="premium"] .d1001-profile-header h2,
+.d1001-profile[data-d1001-motion="premium"] .d1001-profile-identity h3,
+.d1001-about[data-d1001-motion="premium"] .d1001-about-copy h2,
+.d1001-about[data-d1001-motion="premium"] .d1001-about-copy h3 {
+  backface-visibility: hidden;
+}
+
+.d1001-about[data-d1001-motion="premium"] .d1001-about-hand { contain: paint; }
+
+@media (prefers-reduced-motion: reduce) {
+  .d1101-homepage-title-backdrop,
+  .d1101-homepage-title-clone,
+  .d1101-homepage-opening-veil { display: none !important; }
+}
+
+@media print {
+  .d1101-homepage-title-backdrop,
+  .d1101-homepage-title-clone,
+  .d1101-homepage-opening-veil { display: none !important; }
+}

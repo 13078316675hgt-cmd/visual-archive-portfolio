@@ -22,10 +22,12 @@ import './d09-20-home-static.css'
 import './portfolio-pdf.css'
 import './performance-loading.css'
 import './d10-01-r2-master-integration.css'
+import './d11-01-homepage-locked.css'
+import './premium-agency-motion.css'
 import { initArchiveMotion } from './motion/archiveMotion.js'
 import { initPage02PosterMotion } from './motion/page02PosterMotion.js'
 import { initD06Page03Motion, initD07Page01Motion } from './motion/innerPagesMotion.js'
-import { initHomeMotion } from './motion/homeMotion.js'
+import { initD1101HomeMotion } from './motion/d1101HomeMotion.js'
 import {
   AdditionalCharacterDesigns,
   CharacterSheets,
@@ -158,7 +160,10 @@ function usePortfolioMotion() {
     const cleanupArchiveMotion = mobileMotion
       ? initArchiveMotion(document.querySelector('.archive-selection-scene'), { reducedMotion: reduceMotion })
       : () => {}
-    const cleanupHomeMotion = initHomeMotion(document.querySelector('#title.home-v9-preview'), { reducedMotion: reduceMotion })
+    const cleanupHomeMotion = initD1101HomeMotion(
+      document.querySelector('.d1101-homepage-locked'),
+      { reducedMotion: reduceMotion },
+    )
 
     let routeSyncFrame = 0
     let routeSyncUnlockFrame = 0
@@ -683,64 +688,66 @@ function TitleSection() {
 
 function HomeV9Preview() {
   const base = import.meta.env.BASE_URL
-  const homeAsset = `${base}assets/home-v9/home-v9-blue-archive-master.png`
+  const poster = `${base}assets/d11-home/homepage-master-locked-1672x941.png`
+  const posterWebp = `${base}assets/d11-home/homepage-master-locked-1672x941.webp`
+  const posterSrcSet = [
+    `${base}assets/d11-home/homepage-master-locked-480.webp 480w`,
+    `${base}assets/d11-home/homepage-master-locked-720.webp 720w`,
+    `${base}assets/d11-home/homepage-master-locked-960.webp 960w`,
+    `${base}assets/d11-home/homepage-master-locked-1280.webp 1280w`,
+    `${posterWebp} 1672w`,
+  ].join(', ')
 
-  return <section id="title" className="home-v9-preview d0920-home-static" data-home-visual="v9master" tabIndex={-1}>
-    <div className="d0920-home-canvas">
-      <div className="d0920-home-art home-v9-artwork" aria-hidden="true">
-        <div className="home-v9-mother-base" data-home-base>
-          <img src={homeAsset} alt="" width="2000" height="1125" loading="eager" decoding="async" fetchPriority="high" draggable="false" />
-        </div>
-        <i className="home-v9-layer-environment" aria-hidden="true" />
-        <i className="home-v9-layer-subject" aria-hidden="true" />
-        <i className="home-v9-layer-foreground" aria-hidden="true" />
-        <i className="home-v9-blue-wipe" aria-hidden="true" />
-      </div>
+  return <section
+    id="title"
+    className="home-v9-preview d1101-homepage-locked"
+    data-home-visual="d11-01-locked-poster"
+    aria-labelledby="d1101-homepage-title"
+    tabIndex={-1}
+  >
+    <div className="d1101-homepage-poster">
+      <picture className="performance-picture">
+        <source type="image/webp" srcSet={posterSrcSet} sizes="100vw" />
+        <img
+          className="d1101-homepage-master"
+          src={poster}
+          alt=""
+          width="1672"
+          height="941"
+          loading="eager"
+          decoding="async"
+          fetchPriority="high"
+          draggable="false"
+          aria-hidden="true"
+        />
+      </picture>
 
-      <a className="d0920-home-brand" href="#contents" aria-label="Open portfolio directory">
-        <svg viewBox="0 0 64 56" aria-hidden="true">
-          <g>
-            <rect x="28" y="0" width="8" height="8" />
-            <rect x="20" y="8" width="8" height="8" />
-            <rect x="36" y="8" width="8" height="8" />
-            <rect x="16" y="16" width="8" height="8" />
-            <rect x="40" y="16" width="8" height="8" />
-            <rect x="12" y="24" width="8" height="8" />
-            <rect x="44" y="24" width="8" height="8" />
-            <rect x="8" y="32" width="8" height="8" />
-            <rect x="48" y="32" width="8" height="8" />
-            <rect x="4" y="40" width="8" height="8" />
-            <rect x="52" y="40" width="8" height="8" />
-            <rect x="4" y="48" width="56" height="8" />
-            <rect x="28" y="18" width="8" height="18" />
-            <rect x="28" y="40" width="8" height="8" />
-          </g>
-        </svg>
-        <strong>ARCHIVE STUDIO</strong>
-        <span>VISUAL DESIGN &amp; ART DIRECTION</span>
-      </a>
+      <span className="d1101-homepage-title-backdrop" aria-hidden="true" />
+      <picture className="performance-picture">
+        <source type="image/webp" srcSet={posterSrcSet} sizes="100vw" />
+        <img
+          className="d1101-homepage-title-clone"
+          src={poster}
+          alt=""
+          width="1672"
+          height="941"
+          loading="eager"
+          decoding="async"
+          draggable="false"
+          aria-hidden="true"
+        />
+      </picture>
+      <span className="d1101-homepage-opening-veil" aria-hidden="true" />
 
-      <header className="d0920-home-copy home-v9-copy">
-        <h1 lang="zh-CN">个人作品集</h1>
-        <p className="d1001-home-copy-zh" lang="zh-CN">视觉设计 · 插画创作 · 艺术指导</p>
-        <p className="d1001-home-copy-en">VISUAL DESIGN&nbsp;&nbsp;/&nbsp;&nbsp;ILLUSTRATION&nbsp;&nbsp;/&nbsp;&nbsp;ART DIRECTION</p>
-      </header>
-
-      <div className="d0920-home-projects">
-        <h2><span aria-hidden="true">+</span> SELECTED WORKS</h2>
-        <strong>SELECTED WORKS</strong>
-        <p lang="zh-CN">整理思绪，记录灵感。<br />用视觉语言，探索无限可能。</p>
-      </div>
-
-      <a className="d0920-home-top-link" href="#contents">
-        <span>PORTFOLIO</span>
-        <strong>SELECTED WORKS</strong>
-        <i aria-hidden="true" />
-      </a>
-      <p className="d0920-home-discipline" aria-hidden="true">DESIGN&nbsp;&nbsp;/&nbsp;&nbsp;ILLUSTRATION&nbsp;&nbsp;/&nbsp;&nbsp;ART DIRECTION</p>
-      <a className="d0920-home-scroll home-v9-scroll" href="#contents"><i aria-hidden="true" /><span>SCROLL TO EXPLORE</span><b aria-hidden="true" /></a>
-      <p className="d0920-home-page-index home-v9-index"><b>01</b><i>/</i><span>PORTFOLIO</span></p>
-      <p className="d0920-home-total home-v9-coordinate"><b>01</b><i>/ 12</i><span aria-hidden="true" /></p>
+      <h1 id="d1101-homepage-title" className="d1101-visually-hidden" lang="zh-CN">个人作品集</h1>
+      <nav className="d1101-homepage-links" aria-label="Homepage poster navigation">
+        <a className="d1101-homepage-hotspot d1101-homepage-hotspot-brand" href="#contents" aria-label="Open portfolio directory from Archive Studio" />
+        <a className="d1101-homepage-hotspot d1101-homepage-hotspot-prev" href="#about-the-creator" aria-label="Previous section: About the Creator" />
+        <a className="d1101-homepage-hotspot d1101-homepage-hotspot-next" href="#contents" aria-label="Next section: Portfolio Directory" />
+        <a className="d1101-homepage-hotspot d1101-homepage-hotspot-grid" href="#contents" aria-label="Open portfolio directory grid" />
+        <a className="d1101-homepage-hotspot d1101-homepage-hotspot-selected" href="#contents" aria-label="Open Selected Works directory" />
+        <a className="d1101-homepage-hotspot d1101-homepage-hotspot-scroll" href="#contents" aria-label="Scroll to explore the portfolio directory" />
+      </nav>
     </div>
   </section>
 }
