@@ -55,7 +55,7 @@ const preloadImages = async (root) => {
   }))
 }
 
-function useApprovedMotion(createTimeline, { eventName, current = false } = {}) {
+function useApprovedMotion(createTimeline, { eventName, current = false, once = false } = {}) {
   const rootRef = useRef(null)
 
   useLayoutEffect(() => {
@@ -116,9 +116,17 @@ function useApprovedMotion(createTimeline, { eventName, current = false } = {}) 
         if (entry.target !== section) continue
         if (entry.isIntersecting && entry.intersectionRatio >= 0.28) {
           const revisiting = root.dataset.hasEntered === 'true'
+          if (once && revisiting) {
+            active = true
+            activateImageSources(root)
+            showFinal()
+            observer.disconnect()
+            continue
+          }
           root.dataset.hasEntered = 'true'
           active = true
-          void play({ restart: revisiting })
+          if (once) observer.disconnect()
+          void play({ restart: once ? false : revisiting })
         } else if (!entry.isIntersecting) {
           active = false
           enterToken += 1
@@ -136,7 +144,9 @@ function useApprovedMotion(createTimeline, { eventName, current = false } = {}) 
     if (eventName) window.addEventListener(eventName, replay)
 
     if (current) {
+      root.dataset.hasEntered = 'true'
       active = true
+      if (once) observer.disconnect()
       void play()
     }
 
@@ -148,7 +158,7 @@ function useApprovedMotion(createTimeline, { eventName, current = false } = {}) 
       delete root.__approvedMotionTimeline
       context.revert()
     }
-  }, [createTimeline, eventName, current])
+  }, [createTimeline, eventName, current, once])
 
   return rootRef
 }
@@ -275,6 +285,7 @@ export function ApprovedDirectoryMotion() {
 export function ApprovedPage03Motion() {
   const ref = useApprovedMotion(createApprovedPage03Timeline, {
     current: window.location.hash === '#key-visual-03',
+    once: true,
   })
 
   return <div ref={ref} className="approved-motion-desktop approved-motion-page03" data-approved-motion="page03">
