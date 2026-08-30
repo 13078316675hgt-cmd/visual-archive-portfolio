@@ -697,6 +697,7 @@
   margin-bottom: clamp(20px, 3vw, 48px);
 }
 .additional-band-b .additional-major { grid-column: 6 / 13; }
+.additional-band-single .additional-major { grid-column: 3 / 11; }
 
 .additional-outro {
   display: grid;
@@ -731,6 +732,12 @@
   .content-additional .additional-band-a .additional-minor,
   .content-additional .additional-band-b .additional-major {
     grid-column: 2;
+  }
+
+  .content-additional .additional-band-single .additional-major {
+    grid-column: 1 / -1;
+    width: 58%;
+    justify-self: center;
   }
 
   .content-additional .additional-band-a .additional-minor,

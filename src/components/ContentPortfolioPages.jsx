@@ -308,7 +308,7 @@ export function SelectedWorks() {
 }
 
 export function AdditionalCharacterDesigns() {
-  const [designOne, designTwo, designThree, designFour] = additionalCharacterDesigns
+  const [designOne, designTwo, designThree] = additionalCharacterDesigns
   const sectionRef = useRef(null)
   useLayoutEffect(() => initD06Page07Motion(sectionRef.current), [])
 
@@ -319,7 +319,6 @@ export function AdditionalCharacterDesigns() {
         <span>07 / FINAL DESIGN EVIDENCE</span>
         <h2>CHARACTER DESIGN<br /><b>ARCHIVE</b></h2>
       </header>
-      <D06AssetFigure asset={designFour} index={4} className="d06-archive-anchor" critical />
       <D06AssetFigure asset={designOne} index={1} className="d06-archive-support d06-archive-support-a" />
       <D06AssetFigure asset={designTwo} index={2} className="d06-archive-support d06-archive-support-b" />
       <D06AssetFigure asset={designThree} index={3} className="d06-archive-support d06-archive-support-c" />
@@ -332,7 +331,7 @@ export function AdditionalCharacterDesigns() {
       <header className="archive-close-head" aria-labelledby="archive-close-title">
         <div><b>07</b><span>ARCHIVE CLOSURE<br />FINAL DESIGN EVIDENCE</span></div>
         <h2 id="archive-close-title">CHARACTER DESIGN ARCHIVE</h2>
-        <p>四张三视图保持完整技术可读性，以两组证据带完成内容收束。</p>
+        <p>三张三视图保持完整技术可读性，以均衡的档案陈列完成内容收束。</p>
       </header>
 
       <div className="additional-band additional-band-a content-spread d03-paired-spread">
@@ -340,9 +339,8 @@ export function AdditionalCharacterDesigns() {
         <FullSheetFigure asset={designTwo} index={2} className="additional-item additional-minor" normalizedFrame pairedFrame />
       </div>
 
-      <div className="additional-band additional-band-b content-spread d03-paired-spread">
-        <FullSheetFigure asset={designThree} index={3} className="additional-item additional-minor" pairedFrame />
-        <FullSheetFigure asset={designFour} index={4} className="additional-item additional-major" pairedFrame />
+      <div className="additional-band additional-band-b additional-band-single content-spread d03-paired-spread">
+        <FullSheetFigure asset={designThree} index={3} className="additional-item additional-major" pairedFrame />
       </div>
 
       <footer className="additional-outro" aria-label="内容章节结束">

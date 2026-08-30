@@ -585,19 +585,11 @@
     line-height: .82;
   }
   .d06-archive-heading h2 b { color: var(--red); font-weight: 700; }
-  .d06-archive-anchor {
-    position: absolute;
-    left: 30%;
-    top: 9%;
-    width: 40%;
-    height: 83%;
-    z-index: 2;
-  }
   .d06-archive-support { position: absolute; z-index: 3; }
   .d06-archive-support > img { background: #fff; }
-  .d06-archive-support-a { left: 4.2%; top: 43%; width: 23%; height: 28%; }
-  .d06-archive-support-b { right: 4.2%; top: 12%; width: 22%; height: 25%; }
-  .d06-archive-support-c { right: 5.2%; top: 55%; width: 25%; height: 29%; }
+  .d06-archive-support-a { left: 4.2%; top: 33%; width: 27.5%; height: 47%; }
+  .d06-archive-support-b { left: 36.25%; top: 33%; width: 27.5%; height: 47%; }
+  .d06-archive-support-c { right: 4.2%; top: 33%; width: 27.5%; height: 47%; }
   .d06-archive-ghost {
     position: absolute;
     left: 3%;
@@ -620,7 +612,7 @@
     font-weight: 600;
     letter-spacing: .18em;
   }
-  .d06-archive-axis { position: absolute; left: 28.3%; top: 8%; bottom: 6%; width: 1px; background: rgba(24, 32, 39, .28); }
+  .d06-archive-axis { position: absolute; left: 4.2%; right: 4.2%; top: 29%; height: 1px; background: rgba(24, 32, 39, .28); }
 
   @media (max-width: 1439px) {
     .d06-kv03-art-main { left: 34%; width: 44%; }
