@@ -1,0 +1,385 @@
+/* Website only: preserve the directory and the fixed artwork compositions. */
+.marlsa-site {
+  --marlsa-paper: #fafbf9;
+  --marlsa-rule: #cbd3db;
+  --marlsa-accent: #1454e8;
+  --marlsa-type: #242a31;
+}
+.marlsa-site :is(.d1001-process, .d1001-profile, .d1001-about) {
+  color: var(--marlsa-type);
+  background: var(--marlsa-paper);
+}
+.marlsa-site :is(.d1001-process-heading, .d1001-profile-header, .d1001-about-copy) h2 {
+  color: var(--marlsa-type);
+  font-family: Impact, 'Arial Narrow', sans-serif;
+  font-weight: 400;
+  letter-spacing: -.015em;
+}
+.marlsa-site .d1001-process-heading h2 { line-height: 1.04; }
+.marlsa-site .d1001-process-heading h2 span { display: inline-block; margin-top: .08em; font-size: .69em; }
+.marlsa-site .d1001-process-steps li { grid-template-columns: 42px 1fr; gap: 18px; border-color: var(--marlsa-rule); }
+.marlsa-site .d1001-process-steps li > b { font: 400 35px/1 Impact, 'Arial Narrow', sans-serif; }
+.marlsa-site .d1001-process-steps h3 { font: 400 clamp(19px, 1.7vw, 28px)/1.2 Impact, 'Arial Narrow', sans-serif; letter-spacing: .025em; }
+.marlsa-site .d1001-process-steps p { font-size: clamp(12px, .86vw, 14px); line-height: 1.85; }
+.marlsa-site .d1001-process-steps li > i { top: 20px; width: 5px; height: 5px; transform: none; background: var(--marlsa-accent); }
+.marlsa-site .d1001-process-axis { opacity: .35; }
+
+/* Resume: retain three columns, let descriptions wrap instead of clipping. */
+.marlsa-site .d1001-profile-header > p { font: 10px/1.6 'Courier New', monospace; letter-spacing: .07em; }
+.marlsa-site .d1001-profile-header > p span { margin-left: 0; font-size: 8px; }
+.marlsa-site .d1001-profile-header h2 { margin-top: 28px; font-size: clamp(29px, 2.7vw, 45px); line-height: 1.08; }
+.marlsa-site .d1001-profile-header h2::before { content: none; }
+.marlsa-site .d1001-profile-header h2::after { width: 50px; margin-top: 25px; border-color: var(--marlsa-accent); }
+.marlsa-site .d1001-profile-intro p { color: #4a535d; font-size: 12px; font-weight: 400; line-height: 1.95; }
+.marlsa-site .d1001-profile-identity h3 { font-size: 30px; border-color: var(--marlsa-rule); }
+.marlsa-site .d1001-profile-identity > p { margin: 10px 0 20px; transform: none; font-size: 11px; letter-spacing: .15em; }
+.marlsa-site .d1001-profile-identity dl { margin: 0; gap: 12px; font-size: 11px; }
+.marlsa-site .d1001-profile-identity dl div { grid-template-columns: 32% minmax(0, 1fr); }
+.marlsa-site .d1001-profile-identity dt::before { content: none; }
+.marlsa-site .d1001-profile-identity dd { overflow-wrap: anywhere; }
+.marlsa-site :is(.d1001-profile-panel, .d1001-profile-strengths, .d1001-profile-tools) h3 { margin-bottom: 22px; color: var(--marlsa-type); background: transparent; font-size: 16px; font-weight: 500; }
+.marlsa-site :is(.d1001-profile-panel, .d1001-profile-strengths, .d1001-profile-tools) h3::after { border-color: var(--marlsa-rule); }
+.marlsa-site :is(.d1001-profile-panel, .d1001-profile-strengths, .d1001-profile-tools) h3 b { font: 400 24px/1 Impact, 'Arial Narrow', sans-serif; }
+.marlsa-site .d1001-profile-panel ul { gap: 18px; }
+.marlsa-site .d1001-profile-panel ul li { padding-left: 15px; font-size: 12px; line-height: 1.9; color: #4a535d; }
+.marlsa-site .d1001-profile-panel ul li::before { width: 4px; height: 4px; }
+.marlsa-site .d1001-profile-panel ol li { grid-template-columns: 23px minmax(0, 1fr); gap: 2px 9px; padding-bottom: 12px; margin-bottom: 12px; font-size: 12px; line-height: 1.65; border-color: #e1e5e8; }
+.marlsa-site .d1001-profile-panel ol li > b { grid-column: 1; grid-row: 1 / 3; font: 10px/2 'Courier New', monospace; }
+.marlsa-site .d1001-profile-panel ol li > strong { grid-column: 2; font-weight: 600; color: var(--marlsa-type); }
+.marlsa-site .d1001-profile-panel ol li > span { grid-column: 2; overflow: visible; white-space: normal; text-overflow: clip; color: #626b73; font-size: 11px; line-height: 1.8; }
+.marlsa-site .d1001-profile-strengths article { padding: 0 13px; }
+.marlsa-site .d1001-profile-strengths article > b { width: auto; height: auto; display: block; border: 0; margin-bottom: 12px; font: 10px 'Courier New', monospace; }
+.marlsa-site .d1001-profile-strengths article strong { font-size: 11px; line-height: 1.65; overflow: visible; white-space: normal; }
+.marlsa-site .d1001-profile-strengths article p { font-size: 10px; line-height: 1.9; color: #626b73; }
+.marlsa-site .d1001-profile-tools article { grid-template-rows: 44px auto auto; row-gap: 7px; align-content: start; }
+.marlsa-site .d1001-profile-tools article strong { font-size: 10px; line-height: 1.6; white-space: normal; overflow: visible; overflow-wrap: anywhere; }
+.marlsa-site .d1001-profile-tools article span { margin: 0; font-size: 10px; line-height: 1.7; white-space: normal; overflow: visible; }
+.marlsa-site .d1001-profile-canvas > footer { font: 9px/1.5 'Courier New', monospace; color: #6c7881; border-color: var(--marlsa-rule); padding-top: 14px; }
+
+/* Contact retains the text / hand study / contact-panel arrangement. */
+.marlsa-site .d1001-about-copy h2 { font-size: clamp(42px, 4.4vw, 74px); line-height: 1.02; }
+.marlsa-site .d1001-about-copy h3 { font-size: clamp(16px, 1.45vw, 23px); font-weight: 500; letter-spacing: .15em; }
+.marlsa-site .d1001-about-copy > p:last-child { font-size: clamp(12px, .88vw, 15px); line-height: 2.15; color: #57616b; letter-spacing: .025em; }
+.marlsa-site .d1001-about-copy > i { width: 48px; border-width: 1px; }
+.marlsa-site .d1001-about-window { border-radius: 0; border: 1px solid var(--marlsa-rule); border-top: 2px solid var(--marlsa-accent); background: rgba(250,251,249,.95); box-shadow: none; }
+.marlsa-site .d1001-about-window > header { font: 10px 'Courier New', monospace; letter-spacing: .08em; border-bottom-color: var(--marlsa-rule); }
+.marlsa-site .d1001-about-window > header b { color: var(--marlsa-accent); }
+.marlsa-site .d1001-about-window > header span { font-size: 10px; opacity: .45; }
+.marlsa-site .d1001-about-window dl { border-top-style: solid; border-color: var(--marlsa-rule); }
+.marlsa-site .d1001-about-window dl div { font-size: clamp(11px, .86vw, 14px); line-height: 1.9; }
+.marlsa-site .d1001-about-window dt::before { width: 4px; height: 4px; margin-right: 10px; }
+.marlsa-site .d1001-about-window dd { overflow-wrap: anywhere; color: #57616b; }
+.marlsa-site .d1001-about-return { font-size: 10px; padding: 10px 0; border-bottom: 1px solid var(--marlsa-accent); }
+
+@media (min-width: 901px) {
+  .marlsa-site .approved-motion-page03 { background: #fafbf9; }
+  .marlsa-site .approved-motion-page03 > .approved-motion-canvas { transform: translate(-50%, -50%) scale(var(--marlsa-art-scale, 1)); }
+  .marlsa-site .d06-costume-copy-mask { width: 23.5%; }
+  .marlsa-site .d06-costume-keyword-mask {
+    width: 18.8%; height: 26.5%; padding: 1.4% 1.5%;
+    color: var(--marlsa-type); background-color: var(--marlsa-paper);
+    background-image: linear-gradient(rgba(20,84,232,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(20,84,232,.07) 1px, transparent 1px);
+    background-size: 12px 12px; border-left: 1px solid rgba(20,84,232,.38);
+  }
+  .marlsa-site .d06-costume-keyword-mask > small,
+  .marlsa-site .d06-costume-keyword-mask > strong,
+  .marlsa-site .d06-costume-keyword-mask > span,
+  .marlsa-site .d06-costume-keyword-mask > b { position: relative; z-index: 1; display: block; }
+  .marlsa-site .d06-costume-keyword-mask > small { color: #617186; font: 7px/1.5 'Courier New', monospace; letter-spacing: .12em; }
+  .marlsa-site .d06-costume-keyword-mask > strong { margin-top: 12%; color: #37414b; font: 400 clamp(20px, 1.65vw, 28px)/.92 Impact, 'Arial Narrow', sans-serif; letter-spacing: .015em; }
+  .marlsa-site .d06-costume-keyword-mask > i { position: relative; z-index: 1; display: block; width: 48%; height: 2px; margin: 10% 0 8%; background: var(--marlsa-accent); }
+  .marlsa-site .d06-costume-keyword-mask > span { color: #536273; font: 7px/1.5 'Courier New', monospace; letter-spacing: .08em; }
+  .marlsa-site .d06-costume-keyword-mask > b { max-width: 150px; margin-top: 7%; color: #7a8793; font: 6px/1.75 'Courier New', monospace; font-weight: 400; letter-spacing: .1em; }
+  .marlsa-site .d0919-page01-canvas { background: var(--marlsa-paper); }
+  .marlsa-site .d0919-page01-number { font: 400 clamp(96px, 10vw, 168px)/.9 Impact, 'Arial Narrow', sans-serif; letter-spacing: -.025em; }
+  .marlsa-site .d0919-page01-left h2 { font: 400 clamp(52px, 5.7vw, 96px)/.94 Impact, 'Arial Narrow', sans-serif; letter-spacing: -.02em; }
+  .marlsa-site .d0919-page01-left h2 span:last-child { margin-left: 0; color: var(--marlsa-accent); }
+  .marlsa-site .d0919-page01-project { padding: 0; margin: 24px 0 12px; color: #617184; background: transparent; font: 9px/1.5 'Courier New', monospace; letter-spacing: .14em; }
+  .marlsa-site .d0919-page01-facts { margin-top: 28px; border-color: var(--marlsa-rule); }
+  .marlsa-site .d0919-page01-facts p { font-size: 10px; line-height: 1.7; }
+  .marlsa-site .kv02-poster-canvas { background: var(--marlsa-paper); }
+  .marlsa-site .kv02-blue-field { background: #f0f3f5; }
+  .marlsa-site .kv02-paper-plane { background: #fff; }
+  .marlsa-site .kv02-ghost-title { color: rgba(53,75,110,.035); }
+  .marlsa-site .kv02-poster-copy h2 { font: 400 clamp(50px, 5vw, 86px)/.98 Impact, 'Arial Narrow', sans-serif; letter-spacing: -.015em; }
+  .marlsa-site .kv02-poster-copy h2 span { color: var(--marlsa-accent); }
+  .marlsa-site .kv02-poster-index { font: 10px/1.6 'Courier New', monospace; letter-spacing: .12em; }
+  .marlsa-site .kv02-poster-subtitle { font-size: 10px; line-height: 1.9; letter-spacing: .08em; }
+  .marlsa-site .d1001-process-heading { width: 30%; }
+  .marlsa-site .d1001-process-heading h2 { font-size: clamp(48px, 5.1vw, 86px); }
+  .marlsa-site .d1001-process-steps { top: 17%; bottom: 15%; gap: 0 7%; }
+  .marlsa-site .d1001-process-intro { top: 57%; width: 25%; }
+  .marlsa-site .d1001-profile { height: auto; }
+  .marlsa-site .d1001-profile-canvas {
+    position: relative; inset: auto; min-height: 100svh; height: auto;
+    padding: 5% 4.5% 26px; overflow: visible;
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) minmax(0, .85fr);
+    grid-template-areas: 'heading intro identity' 'columns columns columns' 'strengths strengths tools' 'footer footer footer';
+    gap: 48px 5%; align-items: start;
+  }
+  .marlsa-site .d1001-profile-canvas > :is(header, div, aside, section, footer) { position: relative; inset: auto; width: auto; height: auto; margin: 0; min-width: 0; }
+  .marlsa-site .d1001-profile-header { grid-area: heading; }
+  .marlsa-site .d1001-profile-intro { grid-area: intro; padding-top: 14px; }
+  .marlsa-site .d1001-profile-identity { grid-area: identity; padding-top: 12px; }
+  .marlsa-site .d1001-profile-columns { grid-area: columns; grid-template-columns: 1fr 1.15fr 1.15fr; }
+  .marlsa-site .d1001-profile-panel { padding-right: 24px; }
+  .marlsa-site .d1001-profile-panel + .d1001-profile-panel { padding-left: 24px; border-color: var(--marlsa-rule); }
+  .marlsa-site .d1001-profile-panel:last-child { padding-right: 0; }
+  .marlsa-site .d1001-profile-strengths { grid-area: strengths; }
+  .marlsa-site .d1001-profile-tools { grid-area: tools; }
+  .marlsa-site .d1001-profile-canvas > footer { grid-area: footer; }
+  .marlsa-site .d1001-about-window { top: 25%; height: 54%; }
+
+  /* Type and labels change; artwork bounds and image crops remain authored. */
+  .marlsa-site :is(.d06-sheet-canvas, .d06-presentation-canvas, .d06-archive-canvas) { background: var(--marlsa-paper); }
+  .marlsa-site .d06-sheet-canvas { background: var(--marlsa-paper) !important; }
+  .marlsa-site :is(.d06-sheet-heading p b, .d06-asset figcaption b) { color: var(--marlsa-accent); }
+  .marlsa-site :is(.d06-sheet-heading, .d06-presentation-heading, .d06-archive-heading) h2 { font-family: Impact, 'Arial Narrow', sans-serif; font-weight: 400; color: var(--marlsa-type); letter-spacing: -.015em; line-height: .98; }
+  .marlsa-site .d06-sheet-heading h2 { font-size: clamp(48px, 5vw, 90px); }
+  .marlsa-site .d06-sheet-heading h2 span { color: var(--marlsa-accent); }
+  .marlsa-site .d06-presentation-heading h2 { font-size: clamp(48px, 4.8vw, 86px); line-height: 1.03; }
+  .marlsa-site .d06-presentation-heading h2 b { color: var(--marlsa-accent); font-weight: 400; }
+  .marlsa-site .d06-archive-heading h2 { font-size: clamp(40px, 3.9vw, 68px); line-height: 1.04; }
+  .marlsa-site .d06-archive-heading h2 b { color: var(--marlsa-accent); font-weight: 400; }
+  .marlsa-site :is(.d06-presentation-heading, .d06-archive-heading) > span { color: #626d79; font: 9px/1.6 'Courier New', monospace; letter-spacing: .1em; }
+  .marlsa-site :is(.d06-presentation-ghost, .d06-archive-ghost) { color: rgba(48,78,125,.04); }
+  .marlsa-site .d06-presentation-index { color: var(--marlsa-accent); font-size: 38px; font-weight: 400; }
+  .marlsa-site :is(.d06-sheet-heading > i, .d06-presentation-rule, .d06-identity-heading i) { height: 1px; background: var(--marlsa-accent); }
+  .marlsa-site .d06-identity-heading h2 { font-family: Impact, 'Arial Narrow', sans-serif; font-size: clamp(48px, 5vw, 86px); font-weight: 400; line-height: 1; letter-spacing: -.015em; }
+  .marlsa-site .d06-identity-heading h2 > span { display: block; font: inherit; color: #edf1f4; letter-spacing: inherit; }
+  .marlsa-site .d06-identity-heading h2 b { font-weight: 400; color: #93b4f5; }
+  .marlsa-site :is(.d06-asset figcaption, .d06-presentation-art figcaption) { font-size: 10px; line-height: 1.6; border-color: var(--marlsa-rule); color: #5c6975; }
+}
+.marlsa-site .d0919-page01-field { display: none; }
+
+@media (min-width: 1025px) {
+  .marlsa-site .d06-costume-canvas {
+    background-color: var(--marlsa-paper) !important;
+    background-image: linear-gradient(90deg, transparent 3.5%, rgba(20,84,232,.09) 3.55%, transparent 3.6%, transparent 96.4%, rgba(20,84,232,.09) 96.45%, transparent 96.5%) !important;
+  }
+  .marlsa-site .d06-costume-sheet-single { box-shadow: 0 0 0 1px rgba(85,105,130,.09); }
+  .marlsa-site .d06-costume-interface { position: absolute; inset: 0; z-index: 6; overflow: hidden; pointer-events: none; color: var(--marlsa-type); }
+  .marlsa-site .d06-costume-top-data { position: absolute; left: 34%; top: 4.4%; width: 32%; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 13px; color: #667487; font: 7px/1.5 'Courier New', monospace; letter-spacing: .11em; }
+  .marlsa-site .d06-costume-top-data i { height: 1px; background: linear-gradient(90deg, rgba(20,84,232,.62), rgba(20,84,232,.06)); }
+  .marlsa-site .d06-costume-top-data b { color: #8994a0; font-weight: 400; }
+  .marlsa-site .d06-costume-right-data { position: absolute; right: 3.8%; top: 23%; width: 10.5%; padding-left: 16px; border-left: 1px solid rgba(20,84,232,.25); }
+  .marlsa-site .d06-costume-right-data small { color: #6e7d90; font: 6px/1.5 'Courier New', monospace; letter-spacing: .12em; }
+  .marlsa-site .d06-costume-right-data strong { display: block; margin: 17px 0 13px; color: rgba(20,84,232,.72); font: 400 clamp(22px, 2.15vw, 38px)/.82 Impact, 'Arial Narrow', sans-serif; letter-spacing: .02em; }
+  .marlsa-site .d06-costume-right-data > span { display: block; margin-top: 8px; color: #687688; font: 6px/1.55 'Courier New', monospace; letter-spacing: .1em; }
+  .marlsa-site .d06-costume-right-data > i { display: block; width: 100%; height: 1px; margin: 18px 0 10px; background: linear-gradient(90deg, var(--marlsa-accent), transparent); }
+  .marlsa-site .d06-costume-right-data > b { color: #526176; font: 6px/1.5 'Courier New', monospace; font-weight: 400; letter-spacing: .08em; }
+  .marlsa-site .d06-costume-right-data > b::before { content: ''; display: inline-block; width: 5px; height: 5px; margin-right: 7px; background: var(--marlsa-accent); }
+  .marlsa-site .d06-costume-scan { position: absolute; width: 31px; height: 31px; border: 1px solid rgba(20,84,232,.24); }
+  .marlsa-site .d06-costume-scan::before, .marlsa-site .d06-costume-scan::after { content: ''; position: absolute; left: 50%; top: 50%; background: rgba(20,84,232,.34); transform: translate(-50%,-50%); }
+  .marlsa-site .d06-costume-scan::before { width: 7px; height: 1px; }
+  .marlsa-site .d06-costume-scan::after { width: 1px; height: 7px; }
+  .marlsa-site .d06-costume-scan > i { position: absolute; left: 100%; top: 50%; width: clamp(34px, 4vw, 74px); height: 1px; background: linear-gradient(90deg, rgba(20,84,232,.28), transparent); transform: rotate(-13deg); transform-origin: left center; }
+  .marlsa-site .d06-costume-scan-a { left: 30.2%; top: 20.5%; }
+  .marlsa-site .d06-costume-scan-b { left: 57.7%; top: 18.5%; width: 22px; height: 22px; }
+  .marlsa-site .d06-costume-scan-c { left: 76.5%; top: 45%; width: 25px; height: 25px; }
+  .marlsa-site .d06-costume-signal { position: absolute; left: 4.5%; top: 60%; width: 20%; height: 42px; overflow: visible; }
+  .marlsa-site .d06-costume-signal path { fill: none; stroke: rgba(20,84,232,.42); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .marlsa-site .d06-costume-signal-label { position: absolute; left: 4.5%; top: 66.4%; color: #738196; font: 6px/1.5 'Courier New', monospace; letter-spacing: .13em; }
+}
+@media (min-width: 901px) {
+  /* Key visual 01: compact archive typography with the illustration as the main mass. */
+  .marlsa-site #key-visual-01.d0919-page01,
+  .marlsa-site .d0919-page01-canvas { background: #fafbf9; }
+  .marlsa-site .d0919-page01-canvas {
+    background-image: radial-gradient(circle at 53% 48%, rgba(20,84,232,.055), transparent 37%), linear-gradient(90deg, rgba(20,84,232,.025), transparent 26%, transparent 78%, rgba(20,84,232,.025));
+  }
+  .marlsa-site .d0919-page01-canvas::before { content: ''; position: absolute; left: 30.5%; top: 8%; width: 47%; height: 79%; border: 1px solid rgba(20,84,232,.1); background-image: radial-gradient(circle, rgba(20,84,232,.14) 0 1px, transparent 1.2px); background-size: 13px 13px; mask-image: linear-gradient(90deg, transparent, #000 17%, #000 82%, transparent); -webkit-mask-image: linear-gradient(90deg, transparent, #000 17%, #000 82%, transparent); opacity: .34; }
+  .marlsa-site .d0919-page01-brand { left: 4.2%; top: 5.2%; }
+  .marlsa-site .d0919-page01-brand > span { width: clamp(25px, 2vw, 34px); }
+  .marlsa-site .d0919-page01-brand strong { font: 600 clamp(10px, .8vw, 13px)/1 'Arial Narrow', Arial, sans-serif; letter-spacing: .1em; }
+  .marlsa-site .d0919-page01-brand small { font: 7px/1 'Courier New', monospace; }
+  .marlsa-site .d0919-page01-topnav { top: 5.3%; right: 4.2%; }
+  .marlsa-site .d0919-page01-nav-label { display: none; }
+  .marlsa-site .d0919-page01-art { left: 31.5%; top: 1.5%; width: 51.5%; height: 92%; }
+  .marlsa-site .d0919-page01-left { left: 5.2%; top: 20%; width: 24.5%; }
+  .marlsa-site .d0919-page01-star { display: none; }
+  .marlsa-site .d0919-page01-number { width: max-content; padding: 4px 0 4px 12px; border-left: 5px solid var(--marlsa-accent); color: var(--marlsa-accent); font: 400 clamp(12px, 1vw, 17px)/1 'Courier New', monospace; letter-spacing: .12em; }
+  .marlsa-site .d0919-page01-number::after { content: ' / SELECTED VISUAL'; margin-left: 9px; color: #7a8795; font-size: .52em; letter-spacing: .15em; }
+  .marlsa-site .d0919-page01-project { margin: 24px 0 10px; padding: 0; color: #697789; background: transparent; font: 7px/1.5 'Courier New', monospace; letter-spacing: .14em; }
+  .marlsa-site .d0919-page01-left h2 { display: block; color: #2b323b; font: 400 clamp(41px, 4vw, 67px)/.91 Impact, 'Arial Narrow', sans-serif; letter-spacing: .015em; }
+  .marlsa-site .d0919-page01-left h2 span { display: block; }
+  .marlsa-site .d0919-page01-left h2 span:last-child { margin: 0; color: var(--marlsa-accent); }
+  .marlsa-site .d0919-page01-facts { gap: 13px; width: 90%; margin-top: 12%; padding-top: 15px; border-color: var(--marlsa-rule); }
+  .marlsa-site .d0919-page01-facts p { color: #3f4a56; font: 500 clamp(7px, .55vw, 9px)/1.55 'Courier New', monospace; letter-spacing: .04em; }
+  .marlsa-site .d0919-page01-facts small { color: #718097; font-size: .78em; }
+  .marlsa-site .d0919-page01-side { left: auto; right: 4.2%; top: 27%; width: 10.5%; padding: 14px 12px; border-top: 1px solid rgba(20,84,232,.48); border-bottom: 1px solid rgba(94,113,140,.24); background: rgba(250,251,249,.72); }
+  .marlsa-site .d0919-page01-side > i { width: 38%; height: 2px; margin: 0 0 18px; background: var(--marlsa-accent); }
+  .marlsa-site .d0919-page01-side strong { font: 400 clamp(20px, 2vw, 34px)/.9 Impact, 'Arial Narrow', sans-serif; color: #394653; }
+  .marlsa-site .d0919-page01-side b { margin-top: 20px; color: var(--marlsa-accent); font: 9px/1 'Courier New', monospace; }
+  .marlsa-site .d0919-page01-side span { margin-top: 9px; font: 6px/1.4 'Courier New', monospace; letter-spacing: .13em; }
+  .marlsa-site .d0919-page01-side em { display: inline-block; width: 4px; height: 4px; margin: 18px 7px 0 0; background: var(--marlsa-accent); }
+  .marlsa-site .d0919-page01-side em:first-of-type { margin-top: 18px; }
+  .marlsa-site .d0919-page01-bottom { left: 5.2%; right: 4.2%; bottom: 2.8%; grid-template-columns: repeat(3, minmax(96px, 145px)) 1fr; min-height: 48px; padding: 0; border-color: rgba(94,113,140,.25); background: transparent; }
+  .marlsa-site .d0919-page01-bottom a { gap: 8px; }
+  .marlsa-site .d0919-page01-bottom b { color: inherit; font: 400 11px/1 'Courier New', monospace; }
+  .marlsa-site .d0919-page01-bottom span { font: 600 6px/1.25 'Courier New', monospace; letter-spacing: .05em; }
+  .marlsa-site .d0919-page01-bottom small { font-size: .72em; }
+  .marlsa-site .d0919-page01-diagnostics { position: absolute; inset: 0; z-index: 4; overflow: hidden; pointer-events: none; }
+  .marlsa-site .d0919-page01-diagnostics > svg { position: absolute; left: 5.2%; top: 66.5%; width: 20%; height: 52px; overflow: visible; }
+  .marlsa-site .d0919-page01-diagnostics > svg path { fill: none; stroke: rgba(20,84,232,.4); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .marlsa-site .d0919-page01-diagnostics > p { position: absolute; left: 5.2%; top: 73.5%; margin: 0; color: #738197; font: 6px/1.5 'Courier New', monospace; letter-spacing: .13em; }
+  .marlsa-site .d0919-page01-reticle { position: absolute; width: 28px; height: 28px; border: 1px solid rgba(20,84,232,.25); }
+  .marlsa-site .d0919-page01-reticle::before, .marlsa-site .d0919-page01-reticle::after { content: ''; position: absolute; left: 50%; top: 50%; background: rgba(20,84,232,.38); transform: translate(-50%,-50%); }
+  .marlsa-site .d0919-page01-reticle::before { width: 7px; height: 1px; }
+  .marlsa-site .d0919-page01-reticle::after { width: 1px; height: 7px; }
+  .marlsa-site .d0919-page01-reticle i { position: absolute; left: 100%; top: 50%; width: 72px; height: 1px; background: linear-gradient(90deg, rgba(20,84,232,.28), transparent); transform: rotate(-16deg); transform-origin: left center; }
+  .marlsa-site .d0919-page01-reticle-a { left: 36%; top: 29%; }
+  .marlsa-site .d0919-page01-reticle-b { left: 69%; top: 19%; width: 20px; height: 20px; }
+  .marlsa-site .d0919-page01-reticle-c { left: 75%; top: 63%; width: 23px; height: 23px; }
+
+  /* Key visual 01: P3R-like blue flow wrapped in a technical archive composition. */
+  .marlsa-site #key-visual-01.d0919-page01,
+  .marlsa-site .d0919-page01-canvas { background: #fafbf9; }
+  .marlsa-site .d0919-page01-canvas {
+    width: 100vw;
+    height: 100svh;
+    aspect-ratio: auto;
+    background-image:
+      linear-gradient(rgba(23,71,148,.017) 1px, transparent 1px),
+      radial-gradient(ellipse at 57% 82%, rgba(17,92,231,.095), transparent 47%),
+      linear-gradient(108deg, transparent 0 18%, rgba(83,196,255,.035) 41%, transparent 67%);
+    background-size: 100% 4px, auto, auto;
+  }
+  .marlsa-site .d0919-page01-canvas::before {
+    left: 22%;
+    top: 8%;
+    width: 66%;
+    height: 80%;
+    border: 0;
+    background-image: radial-gradient(circle, rgba(20,84,232,.18) 0 .7px, transparent .95px);
+    background-size: 8px 8px;
+    -webkit-mask-image: radial-gradient(ellipse at 58% 51%, #000 0 30%, rgba(0,0,0,.42) 51%, transparent 75%);
+    mask-image: radial-gradient(ellipse at 58% 51%, #000 0 30%, rgba(0,0,0,.42) 51%, transparent 75%);
+    opacity: .46;
+  }
+  .marlsa-site .d0919-page01-field { position: absolute; inset: 0; z-index: 1; display: block; overflow: hidden; pointer-events: none; }
+  .marlsa-site .d0919-page01-field-orbit {
+    position: absolute;
+    left: 58%;
+    top: 109%;
+    width: 91%;
+    aspect-ratio: 1;
+    border: 1px solid rgba(20,84,232,.2);
+    border-radius: 50%;
+    box-shadow: 0 0 0 7.5vw rgba(20,84,232,.018), 0 0 0 15vw rgba(20,84,232,.012);
+    transform: translate(-50%,-50%);
+  }
+  .marlsa-site .d0919-page01-field-grid {
+    position: absolute;
+    right: 2.7%;
+    top: 8%;
+    width: 25%;
+    height: 38%;
+    background-image: radial-gradient(circle, rgba(18,86,226,.5) 0 1px, transparent 1.25px);
+    background-size: 11px 11px;
+    -webkit-mask-image: linear-gradient(135deg, transparent, #000 37%, transparent 88%);
+    mask-image: linear-gradient(135deg, transparent, #000 37%, transparent 88%);
+    opacity: .25;
+  }
+  .marlsa-site .d0919-page01-field > b {
+    position: absolute;
+    right: 4.1%;
+    top: 5.5%;
+    color: transparent;
+    font: 400 clamp(92px, 10.5vw, 176px)/.8 Impact, 'Arial Narrow', sans-serif;
+    letter-spacing: -.03em;
+    -webkit-text-stroke: 1px rgba(20,84,232,.18);
+  }
+  .marlsa-site .d0919-page01-field > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; fill: none; }
+  .marlsa-site .d0919-page01-field > svg path { stroke: rgba(20,84,232,.25); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .marlsa-site .d0919-page01-field > svg .d0919-page01-field-tide { stroke: rgba(20,76,212,.105); stroke-width: 74; stroke-linecap: round; }
+  .marlsa-site .d0919-page01-field > svg .d0919-page01-field-tide-cyan { stroke: rgba(45,201,244,.105); stroke-width: 25; }
+  .marlsa-site .d0919-page01-field-code { position: absolute; right: 4.5%; bottom: 15%; color: #6c7e98; font: 6px/1.7 'Courier New', monospace; letter-spacing: .11em; text-align: right; }
+
+  .marlsa-site .d0919-page01-art { left: 24%; top: -1%; width: 57%; height: 97%; overflow: visible; }
+  .marlsa-site .d0919-page01-art::before { content: ''; position: absolute; left: 12%; right: 7%; top: 12%; bottom: 7%; border: 1px solid rgba(20,84,232,.13); border-radius: 50%; background: radial-gradient(circle at 50% 48%, rgba(91,195,255,.09), transparent 65%); }
+  .marlsa-site .d0919-page01-art img { position: relative; z-index: 1; }
+
+  .marlsa-site .d0919-page01-left { left: 4.2%; top: 16%; width: 26%; }
+  .marlsa-site .d0919-page01-number { padding-left: 14px; border-left-width: 6px; font-size: clamp(13px, 1.12vw, 19px); }
+  .marlsa-site .d0919-page01-project { margin-top: 30px; }
+  .marlsa-site .d0919-page01-left h2 { color: #19366f; font-size: clamp(43px, 4.4vw, 74px); line-height: .87; }
+  .marlsa-site .d0919-page01-left h2 span:first-child { letter-spacing: -.015em; }
+  .marlsa-site .d0919-page01-left h2 span:last-child { margin-top: 4px; color: #1558e8; font-size: 1.25em; letter-spacing: -.02em; }
+  .marlsa-site .d0919-page01-facts { width: 78%; margin-top: 8%; padding: 16px 0 14px; border-bottom: 1px solid rgba(20,84,232,.14); }
+
+  .marlsa-site .d0919-page01-side { right: 4.2%; top: 37%; width: 11.5%; padding: 16px 0; border-top-color: rgba(20,84,232,.58); border-bottom: 0; background: transparent; backdrop-filter: none; }
+  .marlsa-site .d0919-page01-side strong { color: #203e78; font-size: clamp(22px, 2.2vw, 37px); }
+
+  .marlsa-site .d0919-page01-diagnostics > svg { left: 4.2%; top: 69%; width: 18%; height: 42px; }
+  .marlsa-site .d0919-page01-diagnostics > p { left: 4.2%; top: 74.2%; }
+  .marlsa-site .d0919-page01-reticle-a { left: 31%; top: 28%; }
+  .marlsa-site .d0919-page01-reticle-b { left: 66%; top: 17%; }
+  .marlsa-site .d0919-page01-reticle-c { left: 76%; top: 64%; }
+  .marlsa-site .d0919-page01-bottom { left: 4.2%; right: 4.2%; bottom: 2.2%; min-height: 52px; grid-template-columns: repeat(3, minmax(100px, 156px)) 1fr; }
+
+  /* Key visual 03: preserve the layered artwork and replace the old raster UI. */
+  .marlsa-site .approved-motion-page03,
+  .marlsa-site .approved-motion-page03 > .approved-motion-canvas { background: var(--marlsa-paper); }
+  .marlsa-site .approved-motion-page03 .am-page03-ui { display: none; }
+  .marlsa-site .approved-motion-page03 .am-page03-gold { opacity: .16; filter: grayscale(1) sepia(.4) hue-rotate(175deg) saturate(2); }
+  .marlsa-site .marlsa-page03-interface { position: absolute; inset: 0; z-index: 8; overflow: hidden; pointer-events: none; color: var(--marlsa-type); }
+  .marlsa-site .marlsa-page03-interface::before { content: ''; position: absolute; left: 3.7%; top: 13%; width: 30%; height: 69%; border-left: 1px solid rgba(20,84,232,.17); border-right: 1px solid rgba(20,84,232,.08); background: linear-gradient(135deg, rgba(20,84,232,.025), transparent 55%); }
+  .marlsa-site .marlsa-page03-topline { position: absolute; left: 4.7%; right: 4.7%; top: 5.5%; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 15px; color: #66758a; font: 7px/1.5 'Courier New', monospace; letter-spacing: .13em; }
+  .marlsa-site .marlsa-page03-topline i { height: 1px; background: linear-gradient(90deg, rgba(20,84,232,.48), rgba(20,84,232,.05)); }
+  .marlsa-site .marlsa-page03-topline b { color: #8a96a3; font-weight: 400; }
+  .marlsa-site .marlsa-page03-heading { position: absolute; left: 6%; top: 20%; width: 25%; }
+  .marlsa-site .marlsa-page03-heading > span { display: flex; align-items: center; gap: 10px; color: #68788e; font: 7px/1.5 'Courier New', monospace; letter-spacing: .12em; }
+  .marlsa-site .marlsa-page03-heading > span i { width: 5px; height: 5px; background: var(--marlsa-accent); }
+  .marlsa-site .marlsa-page03-heading h2 { margin: 23px 0 16px; color: #33404c; font: 400 clamp(44px, 4.6vw, 80px)/.88 Impact, 'Arial Narrow', sans-serif; letter-spacing: .015em; }
+  .marlsa-site .marlsa-page03-heading h2 b { display: block; color: var(--marlsa-accent); font-weight: 400; }
+  .marlsa-site .marlsa-page03-heading p { margin: 0; color: #566678; font: 7px/1.8 'Courier New', monospace; letter-spacing: .08em; }
+  .marlsa-site .marlsa-page03-record { position: absolute; left: 6%; bottom: 15%; width: 25%; padding-top: 13px; border-top: 1px solid rgba(20,84,232,.35); }
+  .marlsa-site .marlsa-page03-record > span { color: #6e7d91; font: 7px/1.5 'Courier New', monospace; letter-spacing: .11em; }
+  .marlsa-site .marlsa-page03-record dl { margin: 13px 0 0; }
+  .marlsa-site .marlsa-page03-record dl > div { display: grid; grid-template-columns: 24% 1fr; gap: 10px; padding: 7px 0; border-bottom: 1px solid rgba(103,120,143,.15); }
+  .marlsa-site .marlsa-page03-record dt, .marlsa-site .marlsa-page03-record dd { margin: 0; font: 6px/1.5 'Courier New', monospace; letter-spacing: .08em; }
+  .marlsa-site .marlsa-page03-record dt { color: #8290a0; }
+  .marlsa-site .marlsa-page03-record dd { color: #465563; }
+  .marlsa-site .marlsa-page03-index { position: absolute; right: 4.8%; top: 10%; text-align: right; }
+  .marlsa-site .marlsa-page03-index strong { display: block; color: var(--marlsa-accent); font: 400 clamp(22px, 2.4vw, 42px)/1 Impact, 'Arial Narrow', sans-serif; letter-spacing: .05em; }
+  .marlsa-site .marlsa-page03-index span { display: block; margin-top: 8px; color: #778599; font: 6px/1.4 'Courier New', monospace; letter-spacing: .12em; }
+  .marlsa-site .marlsa-page03-dotfield { position: absolute; left: 31%; top: 18%; width: 10%; height: 24%; background-image: radial-gradient(circle, rgba(20,84,232,.28) 0 1px, transparent 1.2px); background-size: 11px 11px; mask-image: linear-gradient(135deg,#000,transparent 76%); -webkit-mask-image: linear-gradient(135deg,#000,transparent 76%); }
+  .marlsa-site .marlsa-page03-reticle { position: absolute; width: 30px; height: 30px; border: 1px solid rgba(20,84,232,.32); }
+  .marlsa-site .marlsa-page03-reticle::before, .marlsa-site .marlsa-page03-reticle::after { content: ''; position: absolute; left: 50%; top: 50%; background: rgba(20,84,232,.46); transform: translate(-50%,-50%); }
+  .marlsa-site .marlsa-page03-reticle::before { width: 8px; height: 1px; }
+  .marlsa-site .marlsa-page03-reticle::after { width: 1px; height: 8px; }
+  .marlsa-site .marlsa-page03-reticle i { position: absolute; left: 100%; top: 50%; width: clamp(45px, 6vw, 110px); height: 1px; background: linear-gradient(90deg, rgba(20,84,232,.32), transparent); transform: rotate(-15deg); transform-origin: left center; }
+  .marlsa-site .marlsa-page03-reticle-a { left: 47%; top: 27%; }
+  .marlsa-site .marlsa-page03-reticle-b { left: 66%; top: 57%; width: 23px; height: 23px; }
+  .marlsa-site .marlsa-page03-reticle-c { left: 79%; top: 35%; width: 19px; height: 19px; }
+  .marlsa-site .marlsa-page03-sidecode { position: absolute; right: 3%; bottom: 8%; margin: 0; color: #748296; font: 6px/1.5 'Courier New', monospace; letter-spacing: .14em; writing-mode: vertical-rl; }
+}
+@media (max-width: 900px) {
+  .marlsa-site .d1001-profile-header h2 { font-size: 38px; }
+  .marlsa-site .d1001-profile-strengths article { padding-left: 0; }
+  .marlsa-site .d1001-profile-tools > div { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+  .marlsa-site .d1001-about-copy h2 { font-size: clamp(46px, 12vw, 68px); }
+  .marlsa-site .d0919-page01-number { font: 400 14px/1 'Courier New', monospace; letter-spacing: .12em; }
+  .marlsa-site .d0919-page01-star { display: none; }
+  .marlsa-site .d0919-page01-project { margin-top: 20px; padding: 0; color: #697789; background: transparent; }
+  .marlsa-site .d0919-page01-left h2 { margin-top: 8px; font: 400 clamp(44px, 13vw, 62px)/.9 Impact, 'Arial Narrow', sans-serif; }
+  .marlsa-site .d0919-page01-left h2 span:last-child { margin-left: 0; color: var(--marlsa-accent); }
+  .marlsa-site .d0919-page01-diagnostics { display: none; }
+  .marlsa-site #key-visual-03 { background: var(--marlsa-paper) !important; }
+  .marlsa-site #key-visual-03::before,
+  .marlsa-site #key-visual-03::after,
+  .marlsa-site #key-visual-03 .kv-red-shape,
+  .marlsa-site #key-visual-03 .kv-local-plane,
+  .marlsa-site #key-visual-03 .kv-rule,
+  .marlsa-site #key-visual-03 .kv-mark { display: none !important; }
+  .marlsa-site #key-visual-03 .kv-main::before,
+  .marlsa-site #key-visual-03 .kv-main::after { display: none; }
+  .marlsa-site #key-visual-03 .kv-meta { color: var(--marlsa-type); }
+  .marlsa-site #key-visual-03 .kv-number-row { align-items: center; gap: 12px; }
+  .marlsa-site #key-visual-03 .kv-number-row b { padding: 4px 0 4px 11px; border-left: 5px solid var(--marlsa-accent); color: var(--marlsa-accent); background: transparent; font: 400 14px/1 'Courier New', monospace; letter-spacing: .12em; }
+  .marlsa-site #key-visual-03 .kv-title-rule { height: 1px; background: linear-gradient(90deg, rgba(20,84,232,.45), transparent); }
+  .marlsa-site #key-visual-03 .kv-title-copy h2 { color: #303a44; font: 400 clamp(34px, 10vw, 46px)/.95 Impact, 'Arial Narrow', sans-serif; letter-spacing: .02em; }
+  .marlsa-site #key-visual-03 .kv-title-copy p { color: #6c7b8f; font: 7px/1.6 'Courier New', monospace; letter-spacing: .12em; }
+  .marlsa-site #key-visual-03 .kv-main { background: transparent; }
+}

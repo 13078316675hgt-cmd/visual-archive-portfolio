@@ -288,6 +288,16 @@ export function ApprovedPage03Motion() {
     once: true,
   })
 
+  useLayoutEffect(() => {
+    const root = ref.current
+    if (!root?.closest('.marlsa-site')) return undefined
+    const fit = () => root.style.setProperty('--marlsa-art-scale', String(Math.min(root.clientWidth / 1920, root.clientHeight / 1080)))
+    const observer = new ResizeObserver(fit)
+    observer.observe(root)
+    fit()
+    return () => { observer.disconnect(); root.style.removeProperty('--marlsa-art-scale') }
+  }, [ref])
+
   return <div ref={ref} className="approved-motion-desktop approved-motion-page03" data-approved-motion="page03">
     <div className="approved-motion-canvas">
       <div className="am-page03-registered">
@@ -307,6 +317,30 @@ export function ApprovedPage03Motion() {
         <div className="am-page03-ui" data-p3-ui-right><LayerImage page="page03" file="page03-ui-right-markers.png" /></div>
         <div className="am-page03-ui" data-p3-ui-bottom><LayerImage page="page03" file="page03-ui-bottom-wedge.png" /></div>
       </div>
+    </div>
+    <div className="marlsa-page03-interface" data-marlsa-p3-interface>
+      <div className="marlsa-page03-topline">
+        <span>MARLSA / CONCEPT ARCHIVE</span><i /><b>CHARACTER VISUAL STUDY</b>
+      </div>
+      <header className="marlsa-page03-heading">
+        <span><i /> SELECTED WORK / CONCEPT ART</span>
+        <h2>GREEN <b>ORACLE</b></h2>
+        <p>角色视觉研究 / GREEN DRAGON &amp; CHARACTER SILHOUETTE</p>
+      </header>
+      <div className="marlsa-page03-record">
+        <span>PROJECT DATA / 设计记录</span>
+        <dl>
+          <div><dt>TYPE</dt><dd>CHARACTER ILLUSTRATION</dd></div>
+          <div><dt>FORM</dt><dd>FIGURE / DRAGON / RIBBON</dd></div>
+          <div><dt>PALETTE</dt><dd>GREEN / BLACK / WHITE</dd></div>
+        </dl>
+      </div>
+      <div className="marlsa-page03-index"><strong>KV–03</strong><span>ARCHIVE COMPLETE</span></div>
+      <span className="marlsa-page03-reticle marlsa-page03-reticle-a"><i /></span>
+      <span className="marlsa-page03-reticle marlsa-page03-reticle-b"><i /></span>
+      <span className="marlsa-page03-reticle marlsa-page03-reticle-c"><i /></span>
+      <div className="marlsa-page03-dotfield" />
+      <p className="marlsa-page03-sidecode">FORM / MOTION / SILHOUETTE / 03</p>
     </div>
   </div>
 }

@@ -181,13 +181,16 @@ export function initD06Page05Motion(section) {
   const crops = qa('.d06-costume-crop')
   const heading = q('.d06-costume-heading')
   const markers = qa('.d06-costume-marker')
-  const targets = () => [sheet, ...crops, heading, ...markers].filter(Boolean)
+  const interfaceLayer = q('.d06-costume-interface')
+  const targets = () => [sheet, ...crops, heading, ...markers, interfaceLayer].filter(Boolean)
 
   if (sheet && !heading && crops.length === 0 && markers.length === 0) {
     return createOneShotMotion(section, '05', (finish) => {
       gsap.set(sheet, { opacity: 0, scale: 1.012, transformOrigin: 'center' })
+      gsap.set(interfaceLayer, { opacity: 0, y: -8 })
       return gsap.timeline({ paused: true, defaults: { ease: 'power3.out' }, onComplete: finish })
         .to(sheet, { opacity: 1, scale: 1, duration: .82, ease: 'power3.inOut' }, 0)
+        .to(interfaceLayer, { opacity: 1, y: 0, duration: .68 }, .22)
         .to({}, { duration: .42 }, .82)
     }, targets)
   }

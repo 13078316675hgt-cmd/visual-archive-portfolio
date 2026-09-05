@@ -129,6 +129,9 @@ export function createApprovedPage03Timeline(root) {
     .fromTo('[data-p3-ui-bottom]', { clipPath: 'inset(100% 0 0 0)', y: 6 }, {
       clipPath: 'inset(0% 0 0 0)', y: 0, duration: 0.38,
     }, 1.08)
+    .fromTo('[data-marlsa-p3-interface] > *', { opacity: 0, y: 8 }, {
+      opacity: 1, y: 0, duration: 0.38, stagger: 0.035,
+    }, 0.88)
     .addLabel('complete', 1.5)
     .to({}, { duration: 1.1 }, 1.5)
 

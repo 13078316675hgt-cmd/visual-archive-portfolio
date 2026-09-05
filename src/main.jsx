@@ -24,10 +24,14 @@ import './performance-loading.css'
 import './d10-01-r2-master-integration.css'
 import './d11-01-homepage-locked.css'
 import './premium-agency-motion.css'
+import './marlsa-archive-home.css'
+import './marlsa-editorial-pages.css'
 import { initArchiveMotion } from './motion/archiveMotion.js'
 import { initPage02PosterMotion } from './motion/page02PosterMotion.js'
 import { initD06Page03Motion, initD07Page01Motion } from './motion/innerPagesMotion.js'
 import { initD1101HomeMotion } from './motion/d1101HomeMotion.js'
+import MarlsaArchiveHome from './components/MarlsaArchiveHome.jsx'
+import MarlsaArchiveEnding from './components/MarlsaArchiveEnding.jsx'
 import {
   AdditionalCharacterDesigns,
   CharacterSheets,
@@ -969,7 +973,7 @@ function KeyVisualThree() {
     <div className="d06-mobile-legacy">
       <div className="kv-meta kv-title-module">
         <div className="kv-number-row"><b>03</b><i className="kv-title-rule" aria-hidden="true" /></div>
-        <div className="kv-title-copy"><h2>KEY VISUAL 03</h2><p>CHARACTER ILLUSTRATION</p></div>
+        <div className="kv-title-copy"><h2>GREEN ORACLE</h2><p>CHARACTER ILLUSTRATION</p></div>
       </div>
       <figure className="kv-main"><img {...imageAttrs(asset)} alt={asset.alt} loading="lazy" decoding="async" /></figure>
       <div className="kv-red-shape" aria-hidden="true" />
@@ -1286,7 +1290,7 @@ const WEBSITE_DEFERRED_SECTIONS = Object.freeze([
   { id: 'selected-works', Component: SelectedWorks, aliases: [] },
   { id: 'additional-designs', Component: AdditionalCharacterDesigns, aliases: [] },
   { id: 'professional-profile', Component: D1001ProfessionalProfile, aliases: ['resume-contact-resume'] },
-  { id: 'about-the-creator', Component: D1001AboutCreator, aliases: ['end', 'resume-contact-contact'] },
+  { id: 'about-the-creator', Component: MarlsaArchiveEnding, aliases: ['end', 'resume-contact-contact'] },
 ])
 
 function DeferredPortfolioSection({ definition, enabled, mounted, ensureMounted }) {
@@ -1408,8 +1412,8 @@ function WebsitePortfolioPageSequence({ className, forceContents = false }) {
     }
   }, [observerEnabled])
 
-  return <main className={className}>
-    <HomeV9Preview />
+  return <main className={`marlsa-site ${className || ''}`}>
+    <MarlsaArchiveHome />
     {WEBSITE_DEFERRED_SECTIONS.map((definition) =>
       <DeferredPortfolioSection
         definition={definition}
@@ -1465,4 +1469,11 @@ if (portfolioPdfRoute) {
   document.documentElement.classList.add('portfolio-pdf-mode', 'motion-reduced')
 }
 
-createRoot(document.getElementById('root')).render(portfolioPdfRoute ? <PortfolioPdfApp /> : <App />)
+const rootElement = document.getElementById('root')
+const portfolioRoot = import.meta.hot && globalThis.__marlsaPortfolioRoot
+  ? globalThis.__marlsaPortfolioRoot
+  : createRoot(rootElement)
+
+if (import.meta.hot) globalThis.__marlsaPortfolioRoot = portfolioRoot
+
+portfolioRoot.render(portfolioPdfRoute ? <PortfolioPdfApp /> : <App />)

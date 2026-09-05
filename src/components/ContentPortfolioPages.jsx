@@ -181,8 +181,36 @@ export function CostumeDetail() {
           <strong>卡琳</strong>
           <small>生态研究员</small>
         </span>
-        <span className="d06-costume-keyword-mask" aria-hidden="true" />
+        <span className="d06-costume-keyword-mask" aria-hidden="true">
+          <small>MARLSA / CHARACTER DATA</small>
+          <strong>COSTUME<br />CONSTRUCTION</strong>
+          <i />
+          <span>FORM / FUNCTION / MATERIAL</span>
+          <b>SILHOUETTE&nbsp;&nbsp;STRUCTURE&nbsp;&nbsp;UTILITY</b>
+        </span>
       </figure>
+      <div className="d06-costume-interface" aria-hidden="true">
+        <div className="d06-costume-top-data">
+          <span>TECHNICAL MODEL SHEET / COMPLETE</span>
+          <i />
+          <b>CHARACTER VISUAL DEVELOPMENT</b>
+        </div>
+        <div className="d06-costume-right-data">
+          <small>STRUCTURAL RECORD</small>
+          <strong>FORM<br />STUDY</strong>
+          <span>FRONT / SIDE / BACK</span>
+          <span>WEAPON / DETAIL / COLOR</span>
+          <i />
+          <b>ARCHIVE STATUS&nbsp;&nbsp;ACTIVE</b>
+        </div>
+        <div className="d06-costume-scan d06-costume-scan-a"><i /></div>
+        <div className="d06-costume-scan d06-costume-scan-b"><i /></div>
+        <div className="d06-costume-scan d06-costume-scan-c"><i /></div>
+        <svg className="d06-costume-signal" viewBox="0 0 360 44" preserveAspectRatio="none">
+          <path d="M0 24h70l8-3 7 6 7-18 8 28 8-15 8 3 9-2 10 1 9-8 8 22 9-15 8 2 10-5 9 16 9-11 10 2 11-2 10 3 10-18 8 29 8-12 10 1h46" />
+        </svg>
+        <span className="d06-costume-signal-label">DESIGN SIGNAL / STABLE</span>
+      </div>
     </div>
 
     <div className="d06-legacy-layout">

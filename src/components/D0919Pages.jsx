@@ -373,6 +373,19 @@ export function D0919Page01() {
         </a>
       </nav>
 
+      <div className="d0919-page01-field" data-d0919-page01-field aria-hidden="true">
+        <span className="d0919-page01-field-orbit" />
+        <span className="d0919-page01-field-grid" />
+        <b>01</b>
+        <svg viewBox="0 0 1672 941" preserveAspectRatio="none">
+          <path className="d0919-page01-field-tide" d="M-80 690C224 558 418 673 655 606S1063 405 1760 518" />
+          <path className="d0919-page01-field-tide d0919-page01-field-tide-cyan" d="M-90 730C238 614 435 719 690 651S1130 456 1765 569" />
+          <path d="M38 786C311 677 506 762 746 695S1176 520 1632 596" />
+          <path d="M121 840C367 743 554 814 789 756S1197 596 1569 652" />
+        </svg>
+        <span className="d0919-page01-field-code">BLUE CURRENT / NARRATIVE FIELD<br />FORM SIGNAL — 01 : ACTIVE</span>
+      </div>
+
       <figure className="d0919-page01-art" data-d0919-page01-art>
         <PerformancePicture
           sourceKey="page01-original-art"
@@ -408,6 +421,16 @@ export function D0919Page01() {
         <span>SELECTED WORK</span>
         <em aria-hidden="true" /><em aria-hidden="true" /><em aria-hidden="true" />
       </aside>
+
+      <div className="d0919-page01-diagnostics" aria-hidden="true">
+        <span className="d0919-page01-reticle d0919-page01-reticle-a"><i /></span>
+        <span className="d0919-page01-reticle d0919-page01-reticle-b"><i /></span>
+        <span className="d0919-page01-reticle d0919-page01-reticle-c"><i /></span>
+        <svg viewBox="0 0 420 56" preserveAspectRatio="none">
+          <path d="M0 29h69l9-3 8 6 8-21 8 32 9-18 9 4 10-2 12 1 10-10 9 25 10-18 9 2 11-5 10 18 10-13 11 2 12-2 11 4 10-20 9 32 9-14 11 1h49" />
+        </svg>
+        <p>VISUAL SIGNAL / NARRATIVE STRUCTURE</p>
+      </div>
 
       <nav className="d0919-page01-bottom" aria-label="Selected work pages">
         <a className="is-current" href="#key-visual-01"><b>01</b><span>DRAGON OATH<small>BETWEEN THE ACTS</small></span></a>

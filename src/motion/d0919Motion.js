@@ -146,6 +146,9 @@ export function initD0919Page01Motion(section) {
   const art = section.querySelector('[data-d0919-page01-art]')
   const copy = section.querySelector('[data-d0919-page01-copy]')
   const metadata = section.querySelector('[data-d0919-page01-meta]')
+  const diagnostics = section.querySelector('.d0919-page01-diagnostics')
+  const field = section.querySelector('[data-d0919-page01-field]')
+  const fieldLines = Array.from(field?.querySelectorAll('path') || [])
   const number = copy?.querySelector('.d0919-page01-number')
   const project = copy?.querySelector('.d0919-page01-project')
   const titleLines = Array.from(copy?.querySelectorAll('h2 span') || [])
@@ -158,6 +161,9 @@ export function initD0919Page01Motion(section) {
     art,
     copy,
     metadata,
+    diagnostics,
+    field,
+    ...fieldLines,
     number,
     project,
     ...titleLines,
@@ -205,6 +211,9 @@ export function initD0919Page01Motion(section) {
   })
   gsap.set(facts, { opacity: 0, y: 16 })
   gsap.set(metadata, { opacity: 0, x: 12 })
+  gsap.set(diagnostics, { opacity: 0, y: 8 })
+  gsap.set(field, { opacity: 0, scale: 1.025, transformOrigin: '58% 62%' })
+  gsap.set(fieldLines, { strokeDasharray: 1, strokeDashoffset: 1 })
   gsap.set(bottomNav, { opacity: 0, y: 14 })
 
   const stopObserving = runWhenVisible(section, async () => {
@@ -228,6 +237,8 @@ export function initD0919Page01Motion(section) {
         duration: mobile ? .78 : .92,
         ease: 'power3.inOut',
       }, 0)
+      .to(field, { opacity: 1, scale: 1, duration: .86, ease: 'power3.out' }, .03)
+      .to(fieldLines, { strokeDashoffset: 0, duration: .92, stagger: .07, ease: 'power2.inOut' }, .12)
       .to([brand, topnav], { opacity: 1, y: 0, duration: .46, stagger: .07 }, .08)
       .to(number, {
         opacity: 1,
@@ -247,6 +258,7 @@ export function initD0919Page01Motion(section) {
       }, mobile ? .1 : .36)
       .to(facts, { opacity: 1, y: 0, duration: .44, stagger: .09 }, .66)
       .to(metadata, { opacity: 1, x: 0, duration: .4 }, .72)
+      .to(diagnostics, { opacity: 1, y: 0, duration: .42 }, .76)
       .to(bottomNav, { opacity: 1, y: 0, duration: .46 }, .86)
   })
 
