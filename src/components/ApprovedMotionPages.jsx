@@ -301,6 +301,7 @@ export function ApprovedPage03Motion() {
   return <div ref={ref} className="approved-motion-desktop approved-motion-page03" data-approved-motion="page03">
     <div className="approved-motion-canvas">
       <div className="am-page03-registered">
+        <img className="am-page03-base" src={`${base}assets/approved/web/kv03-2400.webp`} alt="" aria-hidden="true" />
         <div className="am-layer"><LayerImage page="page03" file="page03-background-paper.png" critical /></div>
         <div className="am-layer"><LayerImage page="page03" file="page03-background-mountain-wash.png" critical /></div>
         <LayerImage page="page03" file="page03-gold-diagonal-guides.svg" className="am-page03-gold" data-p3-gold />
