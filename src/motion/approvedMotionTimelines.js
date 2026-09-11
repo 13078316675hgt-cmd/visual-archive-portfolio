@@ -93,29 +93,31 @@ export function createApprovedDirectoryTimeline(root) {
 }
 
 export function createApprovedPage03Timeline(root) {
+  const parts = root.querySelectorAll('.am-page03-part')
+  gsap.set(parts, { force3D: true, willChange: 'transform,opacity' })
   const tl = gsap.timeline({
     paused: true,
     defaults: { ease: 'power3.out' },
-    onComplete: () => setLayerFinal(root),
+    onComplete: () => { gsap.set(parts, { willChange: 'auto' }); setLayerFinal(root) },
   })
 
   tl.fromTo('[data-p3-opening]', { x: 6, y: 3 }, {
     x: 0, y: 0, duration: 0.58, ease: 'power3.inOut',
   }, 0)
-    .fromTo('[data-p3-snake-rear]', { '--edge': '3%', x: 7, y: -2 }, {
-      '--edge': '108%', x: 0, y: 0, duration: 0.66, ease: 'power2.inOut',
+    .fromTo('[data-p3-snake-rear]', { opacity: 0, x: 7, y: -2 }, {
+      opacity: 1, x: 0, y: 0, duration: 0.66, ease: 'power2.inOut',
     }, 0.1)
-    .fromTo('[data-p3-ribbons]', { '--edge': '1%', x: -6 }, {
-      '--edge': '108%', x: 0, duration: 0.58, ease: 'power2.inOut',
+    .fromTo('[data-p3-ribbons]', { opacity: 0, x: -6 }, {
+      opacity: 1, x: 0, duration: 0.58, ease: 'power2.inOut',
     }, 0.28)
-    .fromTo('[data-p3-energy]', { '--edge': '0%', x: 7 }, {
-      '--edge': '108%', x: 0, duration: 0.58, ease: 'power2.out',
+    .fromTo('[data-p3-energy]', { opacity: 0, x: 7 }, {
+      opacity: 1, x: 0, duration: 0.58, ease: 'power2.out',
     }, 0.4)
-    .fromTo('[data-p3-waves]', { '--edge': '0%', y: 7 }, {
-      '--edge': '108%', y: 0, duration: 0.54, ease: 'power2.out',
+    .fromTo('[data-p3-waves]', { opacity: 0, y: 7 }, {
+      opacity: 1, y: 0, duration: 0.54, ease: 'power2.out',
     }, 0.56)
-    .fromTo('[data-p3-remainder]', { '--edge': '0%', x: 4 }, {
-      '--edge': '108%', x: 0, duration: 0.5, ease: 'power2.out',
+    .fromTo('[data-p3-remainder]', { opacity: 0, x: 4 }, {
+      opacity: 1, x: 0, duration: 0.5, ease: 'power2.out',
     }, 0.64)
     .fromTo('[data-p3-gold]', { clipPath: 'inset(0 100% 0 0)' }, {
       clipPath: 'inset(0 0% 0 0)', duration: 0.42,

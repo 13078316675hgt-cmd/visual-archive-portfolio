@@ -363,13 +363,13 @@ export default function SeascapeEntryCanvas() {
       if (!frameWindowStarted) frameWindowStarted = now
       frameWindowTotal += delta
       frameWindowCount += 1
-      if (now - frameWindowStarted < 480 || frameWindowCount < 3) return
+      if (now - frameWindowStarted < 900 || frameWindowCount < 12) return
       const average = frameWindowTotal / frameWindowCount
-      const ceiling = window.innerWidth <= 760 ? .7 : .68
       let next = renderQuality
       if (average > 34) next = Math.max(.22, renderQuality * .74)
       else if (average > 25) next = Math.max(.3, renderQuality * .86)
-      else if (average < 18 && renderQuality < ceiling) next = Math.min(ceiling, renderQuality + .035)
+      // Keep one-way quality adaptation during this short entrance. Raising the
+      // resolution again creates load oscillation and changes the print sampling.
       if (Math.abs(next - renderQuality) >= .015) {
         renderQuality = next
         resizeFramebuffer()
@@ -381,16 +381,19 @@ export default function SeascapeEntryCanvas() {
 
     const draw = (now) => {
       if (!active || document.hidden || reduced.matches) { previous = null; return }
-      const delta = previous === null ? 16.67 : Math.min(now - previous, 50)
-      elapsed += delta
+      const delta = previous === null ? 16.67 : now - previous
+      elapsed += Math.min(delta, 50)
       previous = now
+      // Resizing clears the WebGL drawing buffer. Always do it BEFORE drawing,
+      // so the browser never composites a newly cleared, transparent frame.
+      tuneFramebuffer(delta, now)
       gl.useProgram(program)
       gl.uniform3f(resolution, canvas.width, canvas.height, 1)
       gl.uniform1f(time, elapsed * .001)
       gl.uniform4f(mouse, 0, 0, 0, 0)
       gl.uniform1f(resolve, entryVisualState.resolve)
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
-      tuneFramebuffer(delta, now)
+      canvas.dataset.running = 'true'
       frame = window.requestAnimationFrame(draw)
     }
 
@@ -404,7 +407,7 @@ export default function SeascapeEntryCanvas() {
       active = true
       frame = window.requestAnimationFrame(draw)
     }
-    const stop = () => { active = false; previous = null; window.cancelAnimationFrame(frame) }
+    const stop = () => { active = false; previous = null; canvas.dataset.running = 'false'; window.cancelAnimationFrame(frame) }
     const sync = () => {
       window.cancelAnimationFrame(frame)
       previous = null

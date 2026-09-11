@@ -8,6 +8,20 @@
   display: contents;
 }
 
+/* Paint containment preserves each full-page composition while limiting the
+ * invalidation caused by its animated SVGs, masks and artwork layers. */
+html:not(.portfolio-pdf-mode) .marlsa-site > section {
+  contain: paint;
+}
+.marlsa-site > [data-viewport-active="false"] *,
+.marlsa-site > [data-viewport-active="false"] *::before,
+.marlsa-site > [data-viewport-active="false"] *::after,
+.marlsa-site.is-document-hidden *,
+.marlsa-site.is-document-hidden *::before,
+.marlsa-site.is-document-hidden *::after {
+  animation-play-state: paused !important;
+}
+
 .performance-section-placeholder {
   position: relative;
   width: 100%;

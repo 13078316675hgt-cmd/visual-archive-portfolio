@@ -31,6 +31,7 @@ import { initPage02PosterMotion } from './motion/page02PosterMotion.js'
 import { initD06Page03Motion, initD07Page01Motion } from './motion/innerPagesMotion.js'
 import { initD1101HomeMotion } from './motion/d1101HomeMotion.js'
 import MarlsaArchiveHome from './components/MarlsaArchiveHome.jsx'
+import ViewportPerformance from './components/ViewportPerformance.jsx'
 import MarlsaArchiveEnding from './components/MarlsaArchiveEnding.jsx'
 import {
   AdditionalCharacterDesigns,
@@ -197,7 +198,7 @@ function usePortfolioMotion() {
     }
 
     const scheduleViewportRouteSync = () => {
-      window.cancelAnimationFrame(routeSyncFrame)
+      if (routeSyncFrame) return
       routeSyncFrame = window.requestAnimationFrame(syncViewportRouteToUrl)
     }
 
@@ -1405,14 +1406,19 @@ function WebsitePortfolioPageSequence({ className, forceContents = false }) {
     window.addEventListener('wheel', enable, { passive: true, once: true })
     window.addEventListener('touchmove', enable, { passive: true, once: true })
     window.addEventListener('keydown', enableFromKeyboard)
+    // Prepare the next screen after the GPU-heavy entry, before the first scroll.
+    window.addEventListener('portfolio:home-opening-complete', enable)
+    if (['complete', 'static'].includes(document.getElementById('title')?.dataset.d1101Opening)) enable()
     return () => {
       window.removeEventListener('wheel', enable)
       window.removeEventListener('touchmove', enable)
       window.removeEventListener('keydown', enableFromKeyboard)
+      window.removeEventListener('portfolio:home-opening-complete', enable)
     }
   }, [observerEnabled])
 
   return <main className={`marlsa-site ${className || ''}`}>
+    <ViewportPerformance />
     <MarlsaArchiveHome />
     {WEBSITE_DEFERRED_SECTIONS.map((definition) =>
       <DeferredPortfolioSection

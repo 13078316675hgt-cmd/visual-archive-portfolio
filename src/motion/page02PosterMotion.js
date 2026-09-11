@@ -23,6 +23,13 @@ export function initPage02PosterMotion(section) {
   const copy = canvas.querySelector('.kv02-poster-copy')
   const metadata = canvas.querySelectorAll('.kv02-vertical-meta, .kv02-bottom-meta, .kv02-field-meta, .kv02-registration')
   const rule = canvas.querySelector('.kv02-bottom-rule')
+  let disposed = false
+  let startFrame = 0
+  const artLayers = [main, ...masks].filter(Boolean)
+  // Decode before the first animated frame, including already downloaded images.
+  const decoded = Promise.all([...canvas.querySelectorAll('img')].map(image =>
+    image.decode?.().catch(() => {}) || Promise.resolve(),
+  ))
 
   const setFinalState = () => {
     gsap.set(main, FINAL_STATE.art)
@@ -30,6 +37,7 @@ export function initPage02PosterMotion(section) {
     gsap.set([paper, blue], { scaleX: 1 })
     gsap.set([ghost, copy, metadata], FINAL_STATE.visible)
     gsap.set(rule, { scaleX: 1 })
+    gsap.set(artLayers, { willChange: 'auto' })
     section.dataset.page02Motion = 'complete'
   }
 
@@ -38,10 +46,11 @@ export function initPage02PosterMotion(section) {
     return () => delete section.dataset.page02Motion
   }
 
-  gsap.set(main, { scale: 1.075, x: 24, y: 12, transformOrigin: '52% 46%' })
-  gsap.set(upper, { scale: 1.075, x: -18, y: -12, autoAlpha: 0.78, transformOrigin: '52% 46%' })
-  gsap.set(left, { scale: 1.075, x: -22, y: 12, autoAlpha: 0.82, transformOrigin: '52% 46%' })
-  gsap.set(right, { scale: 1.075, x: 24, y: 8, autoAlpha: 0.82, transformOrigin: '52% 46%' })
+  gsap.set(artLayers, { force3D: true, willChange: 'transform,opacity' })
+  gsap.set(main, { scale: 1.025, x: 18, y: 8, transformOrigin: '52% 46%' })
+  gsap.set(upper, { scale: 1, x: -18, y: -12, autoAlpha: 0.78 })
+  gsap.set(left, { scale: 1, x: -22, y: 12, autoAlpha: 0.82 })
+  gsap.set(right, { scale: 1, x: 24, y: 8, autoAlpha: 0.82 })
   gsap.set(paper, { scaleX: 0.7, transformOrigin: 'right center' })
   gsap.set(blue, { scaleX: 0.08, transformOrigin: 'right center' })
   gsap.set(ghost, { autoAlpha: 0, x: -36 })
@@ -70,15 +79,23 @@ export function initPage02PosterMotion(section) {
     .to(rule, { scaleX: 1, duration: 0.36 }, 1.15)
     .to(metadata, { autoAlpha: 1, y: 0, duration: 0.34, stagger: 0.035 }, 1.18)
 
-  let observer = new IntersectionObserver(([entry]) => {
+  let observer = new IntersectionObserver(async ([entry]) => {
     if (!entry?.isIntersecting) return
     observer.disconnect()
-    timeline.play(0)
+    section.dataset.page02Motion = 'waiting-images'
+    await decoded
+    if (disposed) return
+    // Give the compositor a frame to prepare the promoted image layers.
+    startFrame = requestAnimationFrame(() => {
+      startFrame = requestAnimationFrame(() => { if (!disposed) timeline.play(0) })
+    })
   }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' })
 
   observer.observe(section)
 
   return () => {
+    disposed = true
+    cancelAnimationFrame(startFrame)
     observer?.disconnect()
     observer = null
     timeline.kill()

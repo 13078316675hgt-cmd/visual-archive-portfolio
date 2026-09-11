@@ -43,7 +43,7 @@ const activateImageSources = (root) => {
 const preloadImages = async (root) => {
   const allImages = activateImageSources(root)
   const criticalImages = allImages.filter((image) => image.dataset.motionCritical === 'true')
-  const images = criticalImages.length ? criticalImages : allImages.slice(0, 1)
+  const images = root.dataset.approvedMotion === 'page03' ? allImages : criticalImages.length ? criticalImages : allImages.slice(0, 1)
   await Promise.allSettled(images.map(async (image) => {
     if (!image.complete) {
       await new Promise((resolve) => {

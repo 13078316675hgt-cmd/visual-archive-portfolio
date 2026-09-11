@@ -128,11 +128,11 @@
 .marlsa-entry-prelude-horizon > small { position: absolute; right: 0; top: 10px; color: #70849d; font: 6px/1 'Courier New', monospace; letter-spacing: .15em; }
 .marlsa-entry-splash { z-index: 3; overflow: hidden; contain: layout paint; background: radial-gradient(ellipse at 50% 115%, rgba(36,135,255,.14), rgba(40,200,255,.035) 36%, transparent 65%); }
 .marlsa-entry-splash::after { content: ''; position: absolute; inset: 0; opacity: .2; background-image: radial-gradient(circle, rgba(28,100,228,.78) 0 .55px, transparent .75px); background-size: 5px 5px; -webkit-mask-image: radial-gradient(ellipse at 50% 114%, #000 0 22%, rgba(0,0,0,.52) 43%, transparent 68%); mask-image: radial-gradient(ellipse at 50% 114%, #000 0 22%, rgba(0,0,0,.52) 43%, transparent 68%); }
-.marlsa-entry-ocean { z-index: 2; overflow: hidden; background: transparent; transform-origin: 50% 100%; }
-.marlsa-entry-ocean:not(:has(canvas[data-shader-ready='true'])) { background: linear-gradient(180deg, #99edff 0%, #226bd0 42%, #071252 100%); }
+.marlsa-entry-ocean { z-index: 2; overflow: hidden; background: linear-gradient(180deg, #99edff 0%, #226bd0 42%, #071252 100%); transform-origin: 50% 100%; }
 .marlsa-entry-ocean::after { content: ''; position: absolute; z-index: 2; inset: 0; opacity: .35; pointer-events: none; background-image: radial-gradient(circle, rgba(5,17,49,.95) 0 .72px, transparent .9px), radial-gradient(circle, rgba(0,224,255,.92) 0 .64px, transparent .84px), radial-gradient(circle, rgba(237,48,255,.74) 0 .56px, transparent .76px); background-position: 0 0, 2px 2px, 1px 3px; background-size: 4px 4px, 4px 4px, 6px 6px; mix-blend-mode: hard-light; }
 .marlsa-entry-ocean-canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
-.marlsa-entry-ocean:has(canvas[data-shader-ready='true'])::after { display: none; }
+.marlsa-entry-ocean { mask-image: linear-gradient(to bottom, transparent, #000 9%, #000); }
+.marlsa-entry-ocean::after { display: none; }
 .marlsa-entry-bridge { z-index: 5; color: #fff; opacity: 0; }
 .marlsa-entry-bridge svg { width: 100%; height: 100%; overflow: visible; fill: rgba(255,255,255,.035); stroke: rgba(213,246,255,.8); stroke-width: 1.2; }
 .marlsa-entry-bridge path { fill: none; stroke-dasharray: 5 8; }

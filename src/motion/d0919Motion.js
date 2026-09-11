@@ -9,8 +9,8 @@ const waitForImages = async (root) => {
   if (!images.length) return true
 
   const decode = Promise.all(images.map((image) => {
-    if (image.complete && image.naturalWidth > 0) return true
     if (typeof image.decode === 'function') return image.decode().then(() => true).catch(() => false)
+    if (image.complete && image.naturalWidth > 0) return true
     return new Promise((resolve) => {
       image.addEventListener('load', () => resolve(true), { once: true })
       image.addEventListener('error', () => resolve(false), { once: true })
@@ -188,9 +188,9 @@ export function initD0919Page01Motion(section) {
     opacity: 1,
     yPercent: mobile ? 1.2 : 2.2,
     scale: mobile ? 1.025 : 1.045,
-    clipPath: mobile ? 'inset(0 0 3% 0)' : 'inset(0 0 6% 0)',
     transformOrigin: '50% 58%',
-    willChange: 'transform,clip-path',
+    force3D: true,
+    willChange: 'transform',
   })
   gsap.set(copy, { opacity: 1 })
   gsap.set([brand, topnav], { opacity: 0, y: -14 })
@@ -233,7 +233,6 @@ export function initD0919Page01Motion(section) {
       .to(art, {
         yPercent: 0,
         scale: 1,
-        clipPath: 'inset(0 0 0% 0)',
         duration: mobile ? .78 : .92,
         ease: 'power3.inOut',
       }, 0)

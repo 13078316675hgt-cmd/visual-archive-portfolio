@@ -69,8 +69,8 @@ export function initD1101HomeMotion(root, { reducedMotion = false } = {}) {
       gsap.set(preludeLine, { scaleX: 0, willChange: 'transform' })
       gsap.set(preludeHorizon, { scaleX: 0, autoAlpha: 0, willChange: 'transform,opacity' })
       gsap.set(preludeMarker, { scale: .2, autoAlpha: 0, willChange: 'transform,opacity' })
-      gsap.set(splash, { autoAlpha: 1 })
-      gsap.set(ocean, { yPercent: 104, scale: 1.025, autoAlpha: 1, willChange: 'transform,opacity' })
+      gsap.set(splash, { autoAlpha: 0, yPercent: 8 })
+      gsap.set(ocean, { yPercent: 100, scale: 1, autoAlpha: 1, willChange: 'transform,opacity' })
       gsap.set(bubbles, { y: 80, scale: .25, autoAlpha: 0, willChange: 'transform,opacity' })
       gsap.set(bridge, { autoAlpha: 0, scale: 1.035, willChange: 'transform,opacity' })
       gsap.set(bridgeLines, { strokeDashoffset: 150, autoAlpha: 0 })
@@ -101,11 +101,11 @@ export function initD1101HomeMotion(root, { reducedMotion = false } = {}) {
         .to(preludeHorizon, { scaleX: 1, autoAlpha: 1, duration: .72, ease: 'power3.inOut' }, .36)
         .to(preludeMarker, { scale: 1, autoAlpha: 1, duration: .34, ease: 'back.out(1.35)' }, .6)
         // 2. The low circular field expands into the same arc used by the rising sea.
-        .to(prelude, { autoAlpha: 0, y: -8, duration: .82, ease: 'sine.inOut' }, 1.14)
+        .to(splash, { autoAlpha: 1, yPercent: 0, duration: 1.25, ease: 'sine.inOut' }, .55)
+        .to(prelude, { autoAlpha: 0, y: -8, duration: 1.05, ease: 'sine.inOut' }, 1.8)
         // 3. The real water follows the guide waves without a cut or white flash.
-        .to(ocean, { yPercent: 0, scale: 1.012, duration: 1.84, ease: 'power2.inOut' }, .98)
-        .to(splash, { autoAlpha: 0, duration: 1.02, ease: 'sine.out' }, 1.76)
-        .to(ocean, { scale: 1, duration: 2.8, ease: 'sine.out' }, 2.55)
+        .to(ocean, { yPercent: 0, duration: 2.65, ease: 'sine.inOut' }, 1.4)
+        .to(splash, { autoAlpha: 0, duration: 1.25, ease: 'sine.out' }, 2.55)
         .to(bubbles, {
           y: (index) => -window.innerHeight * (.52 + (index % 5) * .04),
           x: (index) => (index % 2 ? 16 : -12),
@@ -114,25 +114,26 @@ export function initD1101HomeMotion(root, { reducedMotion = false } = {}) {
           duration: 2.9,
           stagger: { each: .04, from: 'edges' },
           ease: 'sine.out',
-        }, 1.78)
+        }, 2.75)
         // 4. The ocean is analysed into the same continuous structure used by the homepage.
-        .to(bridge, { autoAlpha: 1, scale: 1, duration: .85, ease: 'power2.out' }, 3.48)
-        .to(bridgeLines, { strokeDashoffset: 0, autoAlpha: 1, duration: 1.3, stagger: .12, ease: 'sine.inOut' }, 3.56)
-        .to(bridgeRects, { scale: 1, autoAlpha: 1, duration: .62, stagger: .09, ease: 'back.out(1.7)' }, 3.82)
+        .to(bridge, { autoAlpha: 1, scale: 1, duration: .85, ease: 'power2.out' }, 4.2)
+        .to(bridgeLines, { strokeDashoffset: 0, autoAlpha: 1, duration: 1.3, stagger: .12, ease: 'sine.inOut' }, 4.28)
+        .to(bridgeRects, { scale: 1, autoAlpha: 1, duration: .62, stagger: .09, ease: 'power2.out' }, 4.5)
         // 5. Dry the ocean into paper and reveal the moving ribs through its curved silhouette.
         // Keep the homepage structure on its already-rendered first frame while the
         // ocean resolves. Starting its WebGL clock later prevents two fullscreen
         // render loops from fighting for the same frame during the hand-off.
-        .call(() => window.dispatchEvent(new CustomEvent('portfolio:home-reveal')), [], 5.08)
-        .set(entry, { backgroundColor: 'transparent' }, 3.7)
-        .to(blank, { autoAlpha: 0, duration: .65, ease: 'sine.inOut' }, 3.7)
-        .to(stage, { autoAlpha: 1, duration: 1.35, ease: 'sine.inOut' }, 3.7)
-        .to(entryVisualState, { resolve: 1, duration: 3.15, ease: 'sine.inOut' }, 3.65)
-        .to(reveals, { y: 0, autoAlpha: 1, duration: 1.25, stagger: .07, ease: 'power2.out' }, 5.0)
-        .to(ocean, { autoAlpha: 0, duration: 1.1, ease: 'sine.inOut' }, 5.8)
-        .to(bubbles, { autoAlpha: 0, duration: .72, stagger: .012, ease: 'sine.in' }, 4.58)
-        .to(bridge, { autoAlpha: 0, duration: .9, ease: 'sine.inOut' }, 4.45)
-        .to(entry, { autoAlpha: 0, duration: .5, ease: 'sine.out' }, 6.8)
+        .set(entry, { backgroundColor: 'transparent' }, 4.75)
+        .to(blank, { autoAlpha: 0, duration: .65, ease: 'sine.inOut' }, 4.75)
+        .to(stage, { autoAlpha: 1, duration: 1.35, ease: 'sine.inOut' }, 4.75)
+        .to(entryVisualState, { resolve: 1, duration: 2.7, ease: 'sine.inOut' }, 4.7)
+        .to(reveals, { y: 0, autoAlpha: 1, duration: 1.05, stagger: .07, ease: 'power2.out' }, 5.7)
+        .to(ocean, { autoAlpha: 0, duration: 1.1, ease: 'sine.inOut' }, 6.4)
+        .to(bubbles, { autoAlpha: 0, duration: .72, stagger: .012, ease: 'sine.inOut' }, 5.35)
+        .to(bridge, { autoAlpha: 0, duration: .9, ease: 'sine.inOut' }, 5.3)
+        .to(entry, { autoAlpha: 0, duration: .4, ease: 'sine.out' }, 7.4)
+      // Preserve the lead-in and hand-off proportions without an eight-second wait.
+      timeline.timeScale(1.6)
     }
 
     if (!location.hash || location.hash === '#title') play()

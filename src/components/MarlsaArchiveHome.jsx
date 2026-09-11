@@ -24,6 +24,7 @@ function MemoryStructure({ active }) {
     let height = 1
     let frame = 0
     let previous = null
+    let visible = false
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
     const vertices = new Float64Array(16)
     const inner = new Float64Array(16)
@@ -92,7 +93,7 @@ function MemoryStructure({ active }) {
       }
       if (canvas.dataset.ready !== 'true') canvas.dataset.ready = 'true'
     }
-    const canAnimate = () => activeRef.current && !document.hidden && !reducedMotion.matches
+    const canAnimate = () => activeRef.current && visible && !document.hidden && !reducedMotion.matches
     const tick = (now) => {
       frame = 0
       if (!canAnimate()) { previous = null; return }
@@ -118,6 +119,8 @@ function MemoryStructure({ active }) {
       draw()
     }
     const observer = new ResizeObserver(resize)
+    const visibilityObserver = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; sync() })
+    visibilityObserver.observe(canvas)
     observer.observe(canvas)
     runtimeRef.current = { sync }
     document.addEventListener('visibilitychange', sync)
@@ -127,6 +130,7 @@ function MemoryStructure({ active }) {
     return () => {
       window.cancelAnimationFrame(frame)
       observer.disconnect()
+      visibilityObserver.disconnect()
       document.removeEventListener('visibilitychange', sync)
       reducedMotion.removeEventListener('change', sync)
       if (runtimeRef.current?.sync === sync) runtimeRef.current = null
@@ -146,7 +150,6 @@ export default function MarlsaArchiveHome() {
     const start = () => setStructureActive(true)
     window.addEventListener('portfolio:home-opening-start', stop)
     window.addEventListener('portfolio:home-opening-complete', start)
-    window.addEventListener('portfolio:home-reveal', start)
     const frame = window.requestAnimationFrame(() => {
       const root = document.querySelector('#title.marlsa-archive-home')
       if (root?.dataset.d1101Opening === 'complete' || root?.dataset.d1101Opening === 'static') start()
@@ -155,7 +158,6 @@ export default function MarlsaArchiveHome() {
       window.cancelAnimationFrame(frame)
       window.removeEventListener('portfolio:home-opening-start', stop)
       window.removeEventListener('portfolio:home-opening-complete', start)
-      window.removeEventListener('portfolio:home-reveal', start)
     }
   }, [])
 
