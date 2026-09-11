@@ -8,10 +8,10 @@
   display: contents;
 }
 
-/* Paint containment preserves each full-page composition while limiting the
- * invalidation caused by its animated SVGs, masks and artwork layers. */
+/* Keep layout/style isolation without paint containment: several approved
+ * compositions intentionally let artwork extend beyond the page frame. */
 html:not(.portfolio-pdf-mode) .marlsa-site > section {
-  contain: paint;
+  contain: layout style;
 }
 .marlsa-site > [data-viewport-active="false"] *,
 .marlsa-site > [data-viewport-active="false"] *::before,
