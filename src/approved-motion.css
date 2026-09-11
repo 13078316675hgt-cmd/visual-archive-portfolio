@@ -39,6 +39,12 @@
   inset: 0;
 }
 
+.am-page03-base { z-index: 0; }
+.am-page03-registered > .am-layer,
+.am-page03-registered > .am-page03-gold { z-index: 1; }
+.am-page03-art-parent { z-index: 2; }
+.am-page03-registered > .am-page03-ui { z-index: 3; }
+
 .am-layer > img,
 .am-page03-ui > img,
 .am-page03-gold,
